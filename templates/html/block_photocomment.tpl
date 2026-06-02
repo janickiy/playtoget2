@@ -5,7 +5,7 @@
   <div class='prev'>Предыдущая</div>
   <div class='photo_big_wrap'>
     <input type='hidden' id='owner_id'/>
-    <img src='#' class='photo_wrap next'/>
+	    <img src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' class='photo_wrap next'/>
     <div class="loading-bar"><img border="0" src="./templates/images/select2-spinner.gif"></div>
     <div class="text">
       <div class="message">
@@ -43,7 +43,7 @@
 <div class='overlay' id='overlay'>
   <div class='overlay-back back_two'>Закрыть</div>
   <div class='overlay-back prev'></div>
-  <div class='photo_big_wrap' id='foto_wind'> <img src='#' class='photo_wrap next'/>
+  <div class='photo_big_wrap' id='foto_wind'> <img src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' class='photo_wrap next'/>
     <div class="loading-bar"><img border="0" src="./templates/images/select2-spinner.gif"></div>
   </div>
 </div>

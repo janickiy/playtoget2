@@ -60,7 +60,7 @@ class Photoalbum
 		return core::database()->getColumnArray($result);
 	}
 
-	static function uploadHandle($max_file_size = 102400, $upload_dir = '.', $i = 0, $photoalbum_id, $description, $user_id)  
+	static function uploadHandle($max_file_size, $upload_dir, $i, $photoalbum_id, $description, $user_id)
     {  
 		$user_id = core::database()->escape($user_id);
 		$photoalbum_id = core::database()->escape($photoalbum_id);
@@ -143,7 +143,7 @@ class Photoalbum
         return array('info' => $info, 'error' => $error);  
     }
 	
-	static function uploadHandlePup($max_file_size = 102400, $upload_dir = '.', $i = 0, $photoalbum_id, $description, $owner_id)  
+	static function uploadHandlePup($max_file_size, $upload_dir, $i, $photoalbum_id, $description, $owner_id)
     {  
 		$valid_extensions = array('jpg', 'jpeg', 'png', 'gif');  
 	   
