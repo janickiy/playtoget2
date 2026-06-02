@@ -1,10 +1,10 @@
 <?php
 
-if($_GET['id_user']){
+if($_GET['user_id']){
 
-	$id_user = core::database()->escape((int)Core_Array::getRequest('id_user'));	
+	$user_id = core::database()->escape((int)Core_Array::getRequest('user_id'));	
 
-	core::user()->setUser_id($id_user);
+	core::user()->setUser_id($user_id);
 	$profile = core::user()->getUserInfo();
 	$profile_avatar = core::documentparser()->userAvatar($profile);
 	$profile_firstname = $profile["firstname"];
@@ -16,7 +16,7 @@ if($_GET['id_user']){
 	$profile_usersetting = core::user()->getUserSetting();	
  	$last_visit = core::user()->getUserLastVisit();	
 	
-	if(!core::user()->checkUserOnline($id_user)) {
+	if(!core::user()->checkUserOnline($user_id)) {
 		$was_online = core::getLanguage('str', 'last_visit');
 		
 		$was_online = str_replace('%DATE%', core::documentparser()->mysql_russian_datetime($last_visit['last_activity']), $was_online);
@@ -25,7 +25,7 @@ if($_GET['id_user']){
 		$tpl->assign('USER_LAST_VISIT', $was_online);		
 	}		
 }
-else if($_GET['id_community']){
+else if($_GET['community_id']){
 
 	$profile_avatar = core::documentparser()->communityAvatar($community);
 	$profile_about = Sport::getSportType($community['id_sport_type']);
@@ -46,8 +46,8 @@ else{
 }
 
 if($_SESSION['user_authorization'] == "ok"){
-	if($_GET['id_user'])
-		$tpl->assign('STATUS_USER', core::user()->checkUserOnline(core::database()->escape((int)Core_Array::getRequest('id_user'))) ? 'online' : 'offline');
+	if($_GET['user_id'])
+		$tpl->assign('STATUS_USER', core::user()->checkUserOnline(core::database()->escape((int)Core_Array::getRequest('user_id'))) ? 'online' : 'offline');
 	else
 		$tpl->assign('STATUS_USER', core::user()->checkUserOnline($user['id']) ? 'online' : 'offline');
 
@@ -71,7 +71,8 @@ $tpl->assign('MENU_SHOPS', core::getLanguage('menu', 'shops'));
 $tpl->assign('MENU_FITNESS', core::getLanguage('menu', 'fitness'));
 $tpl->assign('MENU_EVENTS', core::getLanguage('menu', 'events'));
 $tpl->assign('MENU_CALENDAR', core::getLanguage('menu', 'calendar'));
-$tpl->assign('ID_USER', $_SESSION['id_user'] ? $_SESSION['id_user'] : $_COOKIE['id_user']);
+$current_user_id = !empty($user['id']) ? $user['id'] : (!empty($_SESSION['user_id']) ? $_SESSION['user_id'] : (!empty($_COOKIE['user_id']) ? $_COOKIE['user_id'] : ''));
+$tpl->assign('ID_USER', $current_user_id);
 $tpl->assign('PROFILE_FIRSTNAME', $profile_firstname);
 $tpl->assign('PROFILE_LASTNAME', $profile_lastname);
 $tpl->assign('PROFILE_SECONDNAME', $profile_secondname);
@@ -84,7 +85,7 @@ $tpl->assign('STR_ACCEPT', core::getLanguage('str', 'accept'));
 $tpl->assign('STR_SEARCHING', core::getLanguage('str', 'searching'));
 $tpl->assign('STR_USER_HAS_RESTRICTED_ACCESS_TO_THIS_SECTION', core::getLanguage('str', 'user_has_restricted_access_to_this_section'));
 
-if ($_GET['id_user']) $tpl->assign('PROFILE_USER_ID', $_GET['id_user']); 
+if ($_GET['user_id']) $tpl->assign('PROFILE_USER_ID', $_GET['user_id']); 
 
 $tpl->assign('TOP_FIRSTNAME', $user['firstname']);
 $tpl->assign('TOP_LASTNAME', $user['lastname']);
@@ -96,7 +97,7 @@ $tpl->assign('STR_YOU_HAVE_SENT_REQUEST', core::getLanguage('str', 'you_have_sen
 $tpl->assign('STR_ADD_COVER_PHOTO', core::getLanguage('str', 'add_cover_photo'));
 $tpl->assign('STR_CHANGE_COVER_PHOTO', core::getLanguage('str', 'add_cover_photo'));
 
-if($_GET['id_user'] && $user['id'] != $profile['id'] && $profile['banned'] != 1 && $profile['deleted'] != 1 && $_SESSION['user_authorization'] == "ok") {
+if($_GET['user_id'] && $user['id'] != $profile['id'] && $profile['banned'] != 1 && $profile['deleted'] != 1 && $_SESSION['user_authorization'] == "ok") {
 	$tpl->assign('SHOW_MESSAGES_LINK', 'show');		
 	$tpl->assign('BUTTON_TOP_SEND_MESSAGE', core::getLanguage('button', 'top_send_message'));		
 			
@@ -126,7 +127,7 @@ if($_GET['id_user'] && $user['id'] != $profile['id'] && $profile['banned'] != 1 
 	$tpl->assign('STR_PROFILE_TEAMS_LINKS', core::getLanguage('str', 'profile_teams_links'));	
 	$tpl->assign('TASK', $_GET['task']);
 }
-else if($_SESSION['user_authorization'] != "ok" && $_GET['id_user']){
+else if($_SESSION['user_authorization'] != "ok" && $_GET['user_id']){
 
 	if($profile_usersetting['permission_view_profile'] != 1 || $profile_usersetting['permission_view_profile'] != 2) $tpl->assign('PROFILELINKS', 'show');
 	

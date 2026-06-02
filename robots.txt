@@ -1,3 +1,1 @@
-User-agent: *
-Host: playtoget.com
-Sitemap: http://playtoget.com/sitemap.xml
+
