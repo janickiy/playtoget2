@@ -5,11 +5,11 @@
 		<div class="col-xs-12">
 			<div class="row">
 				<ul class="menu-footer">
-					<li><a href="./?task=content&id_content=1">${MENU_ABOUT_SERVICE}</a></li>
-					<li><a href="./?task=content&id_content=2">${MENU_POSSIBILITY}</a></li>
-					<li><a href="./?task=content&id_content=3">${MENU_ADVERTISING}</a></li>
-					<li><a href="./?task=content&id_content=4">${MENU_TERMS_OF_USE}</a></li>
-					<li><a href="./?task=content&id_content=5">${MENU_RULES}</a></li>
+					<li><a href="./?task=content&content_id=1">${MENU_ABOUT_SERVICE}</a></li>
+					<li><a href="./?task=content&content_id=2">${MENU_POSSIBILITY}</a></li>
+					<li><a href="./?task=content&content_id=3">${MENU_ADVERTISING}</a></li>
+					<li><a href="./?task=content&content_id=4">${MENU_TERMS_OF_USE}</a></li>
+					<li><a href="./?task=content&content_id=5">${MENU_RULES}</a></li>
 					<li><a href="./?task=feedback">${MENU_FEEDBACK}</a></li>
 				</ul>
 				<ul class="soc-menu">

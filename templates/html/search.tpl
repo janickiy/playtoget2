@@ -21,7 +21,7 @@
           <h4>${STR_USERS}</h4>
           <div id="possible-friend" class="possible-friend">
             <!-- BEGIN users_search_result_row -->
-            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&id_user=${ID}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&id_user=${ID}">
+            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&user_id=${ID}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&user_id=${ID}">
               <h5><strong>${FIRSTNAME} <br />
                 ${LASTNAME}</strong></h5>
               </a>
@@ -29,7 +29,7 @@
               <p>${CITY}</p>
               <!-- END IF -->
               <br>
-              <a href="./?task=profile&id_user=${ID_USER}&q=messages&sel=${SEL}"><b></b></a>
+              <a href="./?task=profile&user_id=${ID_USER}&q=messages&sel=${SEL}"><b></b></a>
             </div>
             <!-- END users_search_result_row -->
           </div>
@@ -40,15 +40,15 @@
           <h4>${STR_GROUPS}</h4>
           <div class="event-container">
             <!-- BEGIN group_search_result_row -->
-            <div class="event-item" id="community_${ID}"> <a href="./?task=groups&id_community=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
+            <div class="event-item" id="community_${ID}"> <a href="./?task=groups&community_id=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
               <div class="teg">
-                <p><a href="./?task=groups&id_community=${ID}">${NAME}</a></p>
+                <p><a href="./?task=groups&community_id=${ID}">${NAME}</a></p>
                 <p>${SPORT_TYPE}<br>
                   ${CITY}</p>
                 <p>${ABOUT}</p>
                 <p><i></i>${STR_MEMBER}</p>
                 <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                <a href="./?task=groups&id_community=${ID}&q=edit">${STR_EDIT}</a>
+                <a href="./?task=groups&community_id=${ID}&q=edit">${STR_EDIT}</a>
                 <!-- END IF -->
                 <div class="transparent"> </div>
               </div>
@@ -61,15 +61,15 @@
           <h4>${STR_TEAMS}</h4>
           <div class="event-container">
             <!-- BEGIN team_search_result_row -->
-            <div class="event-item" id="community_${ID}"> <a href="./?task=teams&id_community=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
+            <div class="event-item" id="community_${ID}"> <a href="./?task=teams&community_id=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
               <div class="teg">
-                <p><a href="./?task=teams&id_community=${ID}">${NAME}</a></p>
+                <p><a href="./?task=teams&community_id=${ID}">${NAME}</a></p>
                 <p>${SPORT_TYPE}<br>
                   ${CITY}</p>
                 <p>${ABOUT}</p>
                 <p><i></i>${STR_MEMBER}</p>
                 <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                <a href="./?task=teams&id_community=${ID}&q=edit">${STR_EDIT}</a>
+                <a href="./?task=teams&community_id=${ID}&q=edit">${STR_EDIT}</a>
                 <!-- END IF -->
                 <div class="transparent"> </div>
               </div>
@@ -147,9 +147,9 @@
           <h4>${STR_EVENTS}</h4>
           <div class="event-container">
           <!-- BEGIN events_search_result_row -->
-          <div class="event-item"> <a href="./?task=events&id_event=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
+          <div class="event-item"> <a href="./?task=events&event_id=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
               <div class="teg">
-                <p><a href="./?task=events&id_event=${ID}">${NAME}</a></p>
+                <p><a href="./?task=events&event_id=${ID}">${NAME}</a></p>
                 <p>
                   <!-- IF '${SPORT_TYPE}' != '' -->
                   ${SPORT_TYPE}<br>
@@ -162,7 +162,7 @@
                 <p><i></i>${PARTICIPANTS_FRIENDS}</p>
 
                 <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                <a href="./?task=events&id_event=${ID}&q=edit">${STR_EDIT}</a>
+                <a href="./?task=events&event_id=${ID}&q=edit">${STR_EDIT}</a>
                 <!-- END IF -->
                 <span>${STATUS}</span> </div>
             </div>
@@ -182,9 +182,9 @@
 		  
           <div class="event-container">
             <!-- BEGIN row_events_list -->
-            <div class="event-item"> <a href="./?task=events&id_event=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
+            <div class="event-item"> <a href="./?task=events&event_id=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
               <div class="teg">
-                <p><a href="./?task=events&id_event=${ID}">${NAME}</a></p>
+                <p><a href="./?task=events&event_id=${ID}">${NAME}</a></p>
                 <p>
                   <!-- IF '${SPORT_TYPE}' != '' -->
                   ${SPORT_TYPE}<br>
@@ -197,7 +197,7 @@
                 <p><i></i>${PARTICIPANTS_FRIENDS}</p> 
 
                 <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                <a href="./?task=events&id_event=${ID}&q=edit">${STR_EDIT}</a>
+                <a href="./?task=events&event_id=${ID}&q=edit">${STR_EDIT}</a>
                 <!-- END IF -->
                 <span>${STATUS}</span> </div>
             </div>
@@ -218,15 +218,15 @@
 		  
           <div class="event-container">
             <!-- BEGIN row_group_list -->
-            <div class="event-item" id="community_${ID}"> <a href="./?task=groups&id_community=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
+            <div class="event-item" id="community_${ID}"> <a href="./?task=groups&community_id=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
               <div class="teg">
-                <p><a href="./?task=groups&id_community=${ID}">${NAME}</a></p>
+                <p><a href="./?task=groups&community_id=${ID}">${NAME}</a></p>
                 <p>${SPORT_TYPE}<br>
                   ${CITY}</p>
                 <p>${ABOUT}</p>
                 <p><i></i>${STR_MEMBER}</p>
                 <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                <a href="./?task=groups&id_community=${ID}&q=edit">${STR_EDIT}</a>
+                <a href="./?task=groups&community_id=${ID}&q=edit">${STR_EDIT}</a>
                 <!-- END IF -->
                 <div class="transparent"> </div>
               </div>
@@ -250,15 +250,15 @@
 		  
           <div class="event-container">
             <!-- BEGIN row_team_list -->
-            <div class="event-item" id="community_${ID}"> <a href="./?task=teams&id_community=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
+            <div class="event-item" id="community_${ID}"> <a href="./?task=teams&community_id=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
               <div class="teg">
-                <p><a href="./?task=teams&id_community=${ID}">${NAME}</a></p>
+                <p><a href="./?task=teams&community_id=${ID}">${NAME}</a></p>
                 <p>${SPORT_TYPE}<br>
                   ${CITY}</p>
                 <p>${ABOUT}</p>
                 <p><i></i>${STR_MEMBER}</p>
                 <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                <a href="./?task=teams&id_community=${ID}&q=edit">${STR_EDIT}</a>
+                <a href="./?task=teams&community_id=${ID}&q=edit">${STR_EDIT}</a>
                 <!-- END IF -->
                 <div class="transparent"></div>
               </div>
@@ -378,7 +378,7 @@
           </div>
           <div id="possible-friend" class="possible-friend">
             <!-- BEGIN row_users -->
-            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&id_user=${ID}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&id_user=${ID}">
+            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&user_id=${ID}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&user_id=${ID}">
               <h5><strong>${FIRSTNAME} <br />
                 ${LASTNAME}</strong></h5>
               </a>
@@ -386,7 +386,7 @@
               <p>${CITY}</p>
               <!-- END IF -->
               <br>
-              <a href="./?task=profile&id_user=${ID_USER}&q=messages&sel=${SEL}"><b></b></a><br>
+              <a href="./?task=profile&user_id=${ID_USER}&q=messages&sel=${SEL}"><b></b></a><br>
             </div>
             <!-- END row_users -->
           </div>

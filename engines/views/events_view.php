@@ -10,7 +10,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -104,14 +104,14 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['created_at'] = date("Y-m-d H:i:s");			
 				$fields['address'] = $address; 
 			
-				$id_event = Events::addEvent($fields, $user['id']);
+				$event_id = Events::addEvent($fields, $user['id']);
 
-				if($id_event){
+				if($event_id){
 				
-					Events::addMember($id_event, $user['id'], 'user', 1);
-					Places::addGeoTarget($id_event, 'event', $id_place);
+					Events::addMember($event_id, $user['id'], 'user', 1);
+					Places::addGeoTarget($event_id, 'event', $id_place);
 				
-					header("Location: ./?task=events&id_event=" . $id_event);
+					header("Location: ./?task=events&event_id=" . $event_id);
 					exit;
 				}
 				else{
@@ -125,7 +125,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		case 'edit_event':
 
 			$name = htmlspecialchars(trim(Core_Array::getRequest('name')));		
-			$id_event = core::database()->escape(Core_Array::getRequest('id_event'));		
+			$event_id = core::database()->escape(Core_Array::getRequest('event_id'));		
 			$event_date_from = core::documentparser()->convertToDbFormat(trim(Core_Array::getRequest('event_date_from')));
 			$event_hour_from = Core_Array::getRequest('event_hour_from');
 			$event_minute_from = Core_Array::getRequest('event_minute_from');		
@@ -142,7 +142,7 @@ if($_SESSION['user_authorization'] == "ok"){
 			if(empty($event_date_from)) $error = core::getLanguage('error', 'not_all_fields_are_filled');
 			if(empty($description)) $error = core::getLanguage('error', 'not_all_fields_are_filled');
 		
-			if(empty($error) && Events::checkOwnerEvent($id_event, $user['id'], 'user')){
+			if(empty($error) && Events::checkOwnerEvent($event_id, $user['id'], 'user')){
 				$fields = array();
 				$fields['name'] = $name;			
 				$fields['date_from'] = $event_date_from . " " . $event_hour_from . ":" .$event_minute_from . ":00";
@@ -165,9 +165,9 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 				if($file_cover) $fields['cover_page'] = basename($file_cover);
 			
-				Places::addGeoTarget($id_event, 'event', $id_place);
+				Places::addGeoTarget($event_id, 'event', $id_place);
 			
-				$result = Events::editEvent($fields, $id_event, $user['id']);
+				$result = Events::editEvent($fields, $event_id, $user['id']);
 			
 				if($result){
 					header("Location: ./?task=events");
@@ -184,12 +184,12 @@ if($_SESSION['user_authorization'] == "ok"){
 		case 'create_photoalbum':
 	
 			$name = htmlspecialchars(trim(Core_Array::getRequest('name')));
-			$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));
+			$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));
 		
 			$errors = array();
 		
 			if(empty($name)) $errors[] = core::getLanguage('error', 'empty_album_name');
-			if(!empty($name) && Photoalbum::checkNameExists($name, $id_event, 'event')) $errors[] = core::getLanguage('error', 'album_name_exists');
+			if(!empty($name) && Photoalbum::checkNameExists($name, $event_id, 'event')) $errors[] = core::getLanguage('error', 'album_name_exists');
 		
 			if(count($errors) == 0){
 				$fields = array();
@@ -198,12 +198,12 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['name'] = $name;	
 				$fields['created_at'] = date("Y-m-d H:i:s");	
 				$fields['photoalbumable_type'] = 'event';
-				$fields['id_owner'] = $id_event;
+				$fields['owner_id'] = $event_id;
 			
 				$result = Photoalbum::createAlbum($fields);	
 
 				if($result)	{
-					header("Location: ./?task=events&id_event=" . $id_event . "&q=photoalbums");
+					header("Location: ./?task=events&event_id=" . $event_id . "&q=photoalbums");
 					exit;
 				}
 				else{
@@ -216,7 +216,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'edit_photoalbum':
 	
-			$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));
+			$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));
 			$name = htmlspecialchars(trim($_POST['name']));
 		
 			$errors = array();
@@ -231,7 +231,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$result = Photoalbum::editAlbum($fields, Core_Array::getRequest('id_album'));
 			
 				if($result)	{
-					header("Location: ./?task=events&id_event=" . $id_event . "&q=photoalbums");
+					header("Location: ./?task=events&event_id=" . $event_id . "&q=photoalbums");
 					exit;
 				}
 				else{
@@ -244,15 +244,15 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'remove_photoalbum':
 
-			$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));
+			$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));
 	
-			if(Events::checkOwnerEvent($id_event, $user['id'], 'user')){
+			if(Events::checkOwnerEvent($event_id, $user['id'], 'user')){
 				$result = Photoalbum::removeAlbum(Core_Array::getRequest('id_album'));
 			
 				$errors = array();	
 			
 				if($result)	{
-					header("Location: ./?task=events&id_event=" . $id_event . "&q=photoalbums");
+					header("Location: ./?task=events&event_id=" . $event_id . "&q=photoalbums");
 					exit;
 				}
 				else{
@@ -267,11 +267,11 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 			$errors = array();
 	
-			$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));
+			$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));
 			$name = htmlspecialchars(trim(Core_Array::getRequest('name')));
 
 			if(empty($name)) $errors[] = core::getLanguage('error', 'empty_album_name');
-			if(!empty($name) && Videoalbum::checkNameExists($name, $id_event, 'event')) $errors[] = core::getLanguage('error', 'album_name_exists');
+			if(!empty($name) && Videoalbum::checkNameExists($name, $event_id, 'event')) $errors[] = core::getLanguage('error', 'album_name_exists');
 	
 			if(count($errors) == 0){
 				$fields = array();
@@ -280,12 +280,12 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['name'] = $name;	
 				$fields['created_at'] = date("Y-m-d H:i:s");	
 				$fields['videoalbumable_type'] = 'event';
-				$fields['id_owner'] = $id_event;	
+				$fields['owner_id'] = $event_id;	
 		
 				$result = Videoalbum::createAlbum($fields);	
 
 				if($result)	{
-					header("Location: ./?task=events&id_event=" . $id_event . "&q=videoalbums");
+					header("Location: ./?task=events&event_id=" . $event_id . "&q=videoalbums");
 					exit;
 				}
 				else{
@@ -297,7 +297,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'edit_videoalbum':
 	
-			$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));
+			$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));
 			$name = htmlspecialchars(trim(Core_Array::getRequest('name')));
 		
 			$errors = array();
@@ -309,10 +309,10 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['name'] = $name;
 				$fields['updated_at'] = date("Y-m-d H:i:s");			
 			
-				$result = Videoalbum::editAlbum($fields, Core_Array::getRequest('id_album'), $id_event);
+				$result = Videoalbum::editAlbum($fields, Core_Array::getRequest('id_album'), $event_id);
 			
 				if($result)	{
-					header("Location: ./?task=events&id_event=" . $id_event . "&q=videoalbums");
+					header("Location: ./?task=events&event_id=" . $event_id . "&q=videoalbums");
 					exit;
 				}
 				else{
@@ -325,11 +325,11 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'remove_videoalbum':
 	
-			$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));
-			$result = Videoalbum::removeAlbum(Core_Array::getRequest('id_album'), $id_event);	
+			$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));
+			$result = Videoalbum::removeAlbum(Core_Array::getRequest('id_album'), $event_id);	
 	
 			if($result)	{
-				header("Location: ./?task=events&id_event=" . $id_event . "&q=videoalbums");
+				header("Location: ./?task=events&event_id=" . $event_id . "&q=videoalbums");
 				exit;
 			}
 			else{
@@ -342,7 +342,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			$video = htmlspecialchars(trim(Core_Array::getRequest('video')));
 			$description = htmlspecialchars(trim(Core_Array::getRequest('description')));
-			$id_event = core::database()->escape(Core_Array::getRequest('id_event'));
+			$event_id = core::database()->escape(Core_Array::getRequest('event_id'));
 			$set_video = core::documentparser()->detect_video_id($video);
 		
 			$errors[] = array();
@@ -350,17 +350,17 @@ if($_SESSION['user_authorization'] == "ok"){
 			if($set_video['video']){
 				$fields = array();
 				$fields['id'] = 0;
-				$fields['id_videoalbum'] = Core_Array::getRequest('id_videoalbum');
+				$fields['videoalbum_id'] = Core_Array::getRequest('videoalbum_id');
 				$fields['provider'] = $set_video['provider'];			
 				$fields['video'] = $set_video['video'];			
 				$fields['description'] = $description;			
-				$fields['id_owner'] = $id_event;
+				$fields['owner_id'] = $event_id;
 				$fields['created_at'] = date("Y-m-d H:i:s");
 			
 				$result = Videoalbum::addVideo($fields);
 			
 				if($result)	{
-					header("Location: ./?task=events&id_event=" . $id_event . "&q=videoalbums");
+					header("Location: ./?task=events&event_id=" . $event_id . "&q=videoalbums");
 					exit;
 				}
 				else{
@@ -373,20 +373,20 @@ if($_SESSION['user_authorization'] == "ok"){
 		break;
 	}
 
-	if($_GET['id_event']){	
+	if($_GET['event_id']){	
 
-		$tpl->assign('ID_EVENT', $_GET['id_event']);
-		$tpl->assign('ID_OWNER', $_GET['id_event']);
+		$tpl->assign('ID_EVENT', $_GET['event_id']);
+		$tpl->assign('ID_OWNER', $_GET['event_id']);
 		$tpl->assign('VIDEOALBUMABLE_TYPE', 'event');	
-		$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));		
+		$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));		
 		
-		if(Events::checkExistence($id_event) or !is_numeric($_GET['id_event'])){
+		if(Events::checkExistence($event_id) or !is_numeric($_GET['event_id'])){
 			header("HTTP/1.1 404 Not Found");
 			header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 			exit;
 		}	
 		
-		$event = Events::getEventInfo($id_event);
+		$event = Events::getEventInfo($event_id);
 	
 		$tpl->assign('STYLE', 'opacity:0');	
 		$tpl->assign('EVENT_NAME', $event['name']);		
@@ -409,32 +409,32 @@ if($_SESSION['user_authorization'] == "ok"){
 		$tpl->assign('STR_ALL_VIDEOS', core::getLanguage('str', 'all_videos'));	
 		$tpl->assign('CITY', $event['place']);
 	
-		$photoalbum_path = './?task=events&id_event=' . $id_event . '&q=photoalbums';
-		$redirect_photo_album = '/?task=events&id_event=' . $id_event . '&q=photoalbums';
-		$photoalbum_remove_path = './?task=events&id_event=' . $id_event . '&action=remove_photoalbum';
-		$photoalbum_edit_path = './?task=events&id_event=' . $id_event . '&q=edit_photoalbum';
+		$photoalbum_path = './?task=events&event_id=' . $event_id . '&q=photoalbums';
+		$redirect_photo_album = '/?task=events&event_id=' . $event_id . '&q=photoalbums';
+		$photoalbum_remove_path = './?task=events&event_id=' . $event_id . '&action=remove_photoalbum';
+		$photoalbum_edit_path = './?task=events&event_id=' . $event_id . '&q=edit_photoalbum';
 	
-		$path_video = './?task=events&id_event=' . $id_event . '&q=videoalbums';	
-		$path_remove_video = './?task=events&id_event=' . $id_event . '&q=videoalbums&action=remove_videoalbum';	
-		$path_edit_video = './?task=events&id_event=' . $id_event . '&q=edit_videoalbum';
+		$path_video = './?task=events&event_id=' . $event_id . '&q=videoalbums';	
+		$path_remove_video = './?task=events&event_id=' . $event_id . '&q=videoalbums&action=remove_videoalbum';	
+		$path_edit_video = './?task=events&event_id=' . $event_id . '&q=edit_videoalbum';
 
-		if(Events::checkEventMember($id_event, $user['id'], 'user') == 1)		
+		if(Events::checkEventMember($event_id, $user['id'], 'user') == 1)		
 			$tpl->assign('EVENT_MEMBER', 'owner');
-		else if(Events::checkEventMember($id_event, $user['id'], 'user') == 2)
+		else if(Events::checkEventMember($event_id, $user['id'], 'user') == 2)
 			$tpl->assign('EVENT_MEMBER', 'admin');
-		else if(Events::checkEventMember($id_event, $user['id'], 'user') == 3)
+		else if(Events::checkEventMember($event_id, $user['id'], 'user') == 3)
 			$tpl->assign('EVENT_MEMBER', 'member');
-		else if(Events::checkEventMember($id_event, $user['id'], 'user') == 4)
+		else if(Events::checkEventMember($event_id, $user['id'], 'user') == 4)
 			$tpl->assign('EVENT_MEMBER', 'invited');
-		else if(Events::checkEventMember($id_event, $user['id'], 'user') == 5)
+		else if(Events::checkEventMember($event_id, $user['id'], 'user') == 5)
 			$tpl->assign('EVENT_MEMBER', 'blocked');
-		else if(Events::checkEventMember($id_event, $user['id'], 'user') == '0')
+		else if(Events::checkEventMember($event_id, $user['id'], 'user') == '0')
 			$tpl->assign('EVENT_MEMBER', 'applied');
-		else if(!Events::checkEventMember($id_event, $user['id'], 'user'))
+		else if(!Events::checkEventMember($event_id, $user['id'], 'user'))
 			$tpl->assign('EVENT_MEMBER', 'none');
 		
 		if($user['id']) $tpl->assign('SHOW_COMMMENT_FORM', 'show');
-		if(Events::checkOwnerEvent($id_event, $user['id'], 'user'))  $tpl->assign('ALLOW_EDIT', 'yes');
+		if(Events::checkOwnerEvent($event_id, $user['id'], 'user'))  $tpl->assign('ALLOW_EDIT', 'yes');
 		if($event['banned'] == 1) $tpl->assign('BLOCK_PAGE', 'yes');			
 	
 		$tpl->assign('STR_EVENT_SUSPENDED', core::getLanguage('str', 'event_suspended'));	
@@ -443,7 +443,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'edit':
 		
-				if(Events::checkExistence($id_event) or !Events::checkOwnerEvent($id_event, $user['id'], 'user')){
+				if(Events::checkExistence($event_id) or !Events::checkOwnerEvent($event_id, $user['id'], 'user')){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -477,7 +477,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('EVENT_DATE_TO', $_POST['event_date_to'] ? $_POST['event_date_to'] : $out2[3] . '.' . $out2[2] . '.' . $out2[1]);
 				$tpl->assign('EVENT_HOUR_TO', $_POST['event_hour_to'] ? $_POST['event_hour_to'] : $out2[4]);
 				$tpl->assign('EVENT_MINUTE_TO', $_POST['event_minute_to'] ? $_POST['event_minute_to'] : $out2[5]);			
-				$tpl->assign('ID_PLACE', $_POST['id_place'] ? $_POST['id_place'] : Places::getTargetPlaceId($id_event, 'event'));	
+				$tpl->assign('ID_PLACE', $_POST['id_place'] ? $_POST['id_place'] : Places::getTargetPlaceId($event_id, 'event'));	
 				$tpl->assign('PLACE', $_POST['place'] ? $_POST['place'] : $event['place']);
 				$tpl->assign('SPORT_TYPE', $_POST['sport_type'] ? $_POST['sport_type'] : $event['sport_type']);			
 				$tpl->assign('BUTTON', core::getLanguage('button', 'edit'));
@@ -489,36 +489,36 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('QUERY', $_GET['q']);
 			
 				$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'members'));			
-				$tpl->assign('NUMBERMEMBER', Events::countMembers($id_event, 'user'));			
+				$tpl->assign('NUMBERMEMBER', Events::countMembers($event_id, 'user'));			
 			
-				$arr_users = Events::getEventsMemberList($id_event, 'user');
+				$arr_users = Events::getEventsMemberList($event_id, 'user');
 			
 				if($arr_users){
 					foreach($arr_users as $row){
 						$rowBlock = $tpl->fetch('row_members');	
-						core::user()->setUser_id($row['id_member']);
+						core::user()->setUser_id($row['member_id']);
 						$member = core::user()->getUserInfo();				
-						$rowBlock->assign('ID_USER', $row['id_member']);			
+						$rowBlock->assign('ID_USER', $row['member_id']);			
 						$rowBlock->assign('SEL', $user['id']);
 						$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($member));					
 						$rowBlock->assign('FIRSTNAME', $member['firstname']);					
 						$rowBlock->assign('LASTNAME', $member['lastname']);
 						$rowBlock->assign('CITY', $member['city']);	
-						$rowBlock->assign('STATUS', Events::getEventRole(Events::getMemberShipStatus($id_event,  $row['id_member'], 'user')));
-						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_member']) ? 'online' : 'offline');
+						$rowBlock->assign('STATUS', Events::getEventRole(Events::getMemberShipStatus($event_id,  $row['member_id'], 'user')));
+						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['member_id']) ? 'online' : 'offline');
 						$tpl->assign('row_members', $rowBlock);
 					}
 				}else $tpl->assign('NO_MEMBERS', core::getLanguage('str', 'empty'));
 				
-				$arr_teams = Events::getEventsMemberList($id_event, 'team');
+				$arr_teams = Events::getEventsMemberList($event_id, 'team');
 			
 				if($arr_teams){
 					$tpl->assign('STR_TEAMS', core::getLanguage('str', 'teams'));
-					$tpl->assign('NUMBERTEAMS', Events::countMembers($id_event, 'team'));	
+					$tpl->assign('NUMBERTEAMS', Events::countMembers($event_id, 'team'));	
 				
 					foreach($arr_teams as $row){
 						$rowBlock = $tpl->fetch('row_teams');	
-						$member = Communities::getCommunityInfo($row['id_member']);
+						$member = Communities::getCommunityInfo($row['member_id']);
 						$rowBlock->assign('ID', $member['id']);		
 						$rowBlock->assign('NAME', $member['name']);		
 						$rowBlock->assign('ABOUT', $member['about']);					
@@ -539,15 +539,15 @@ if($_SESSION['user_authorization'] == "ok"){
 					}
 				}else $tpl->assign('NO_TEAMS', core::getLanguage('str', 'empty'));
 			
-				$arr_groups = Events::getEventsMemberList($id_event, 'group');
+				$arr_groups = Events::getEventsMemberList($event_id, 'group');
 			
 				if($arr_groups){
 					$tpl->assign('STR_GROUPS', core::getLanguage('str', 'groups'));
-					$tpl->assign('NUMBERGROUPS', Events::countMembers($id_event, 'group'));
+					$tpl->assign('NUMBERGROUPS', Events::countMembers($event_id, 'group'));
 				
 					foreach($arr_groups as $row){
 						$rowBlock = $tpl->fetch('row_groups');	
-						$member = Communities::getCommunityInfo($row['id_member']);
+						$member = Communities::getCommunityInfo($row['member_id']);
 						$rowBlock->assign('ID', $member['id']);		
 						$rowBlock->assign('NAME', $member['name']);		
 						$rowBlock->assign('ABOUT', $member['about']);					
@@ -603,7 +603,7 @@ if($_SESSION['user_authorization'] == "ok"){
 							$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], $info['photoalbumable_type']));	
 							$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], $info['photoalbumable_type']));
 							$rowBlock->assign('DESCRIPTION', $row['description']);
-							if($row['id_owner'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
+							if($row['owner_id'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
 							$tpl->assign('row_photos_list', $rowBlock);	
 						}
 					}			
@@ -613,7 +613,7 @@ if($_SESSION['user_authorization'] == "ok"){
 			
 					$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'photoalbums'));
 		
-					if(Events::checkOwnerEvent($id_event, $user['id'], 'user')){ 
+					if(Events::checkOwnerEvent($event_id, $user['id'], 'user')){ 
 						$tpl->assign('SHOW_ADD_PHOTOS_MENU', 'show');
 					}
 				
@@ -625,11 +625,11 @@ if($_SESSION['user_authorization'] == "ok"){
 					$tpl->assign('STR_MY_ALBUMS', core::getLanguage('str', 'photoalbums'));	
 					$tpl->assign('STR_MY_PHOTOS', core::getLanguage('title', 'photoalbums'));
 					$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos('event'));		
-					$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($id_event, 'event'));		
-					$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($id_event, 'event'));	
+					$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($event_id, 'event'));		
+					$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($event_id, 'event'));	
 					$tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));
 					
-					$arr_albums = Photoalbum::getAlbumList($id_event, 'event');
+					$arr_albums = Photoalbum::getAlbumList($event_id, 'event');
 		
 					if($arr_albums){
 						foreach($arr_albums as $row){
@@ -645,7 +645,7 @@ if($_SESSION['user_authorization'] == "ok"){
 							$rowBlock->assign('PHOTOALBUM_REMOVE_PATH', $photoalbum_remove_path);				
 							$rowBlock->assign('PHOTOALBUM_EDIT_PATH', $photoalbum_edit_path);				
 				
-							if($id_user == $row['id_owner'] || Events::checkOwnerEvent($id_event, $user['id'], 'user')) $rowBlock->assign('SHOW_EDIT_LINKS', 'show');
+							if($user_id == $row['owner_id'] || Events::checkOwnerEvent($event_id, $user['id'], 'user')) $rowBlock->assign('SHOW_EDIT_LINKS', 'show');
 					
 							$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));					
 							$rowBlock->assign('STR_REMOVE', core::getLanguage('str', 'remove'));					
@@ -659,17 +659,17 @@ if($_SESSION['user_authorization'] == "ok"){
 						}
 					}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 	
-					$arr_photos = Photoalbum::getPhotosList($id_event, 'event', 6, 0);
+					$arr_photos = Photoalbum::getPhotosList($event_id, 'event', 6, 0);
 		
 					if($arr_photos){
 						foreach($arr_photos as $row){
 							$rowBlock = $tpl->fetch('row_my_photos_list');
 							$rowBlock->assign('ID', $row['id']);
-							$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+							$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 							$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'event'));				
 							$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'event'));
 							
-							if($row['id_owner'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
+							if($row['owner_id'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
 							
 							$rowBlock->assign('DESCRIPTION', $row['description']);
 							$tpl->assign('row_my_photos_list', $rowBlock);
@@ -702,18 +702,18 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('ACTION', $_SERVER['REQUEST_URI']);			
 				$tpl->assign('REDIRECT_PHOTO_ALBUM', $redirect_photo_album);
 
-				if(Photoalbum::getNumberAlbums($id_event, 'event') == 0){
+				if(Photoalbum::getNumberAlbums($event_id, 'event') == 0){
 					$fields = array();
 					$fields['id'] = 0;
 					$fields['name'] = core::getLanguage('str', 'album');
 					$fields['created_at'] = date("Y-m-d H:i:s");
 					$fields['photoalbumable_type'] = 'event';
-					$fields['id_owner'] = $id_event;		
+					$fields['owner_id'] = $event_id;		
 			
 					Photoalbum::createAlbum($fields);	
 				}			
 			
-				$arr = Photoalbum::getAlbumsOptionList($id_event, 'event');
+				$arr = Photoalbum::getAlbumsOptionList($event_id, 'event');
 			
 				if(is_array($arr)){			
 				
@@ -757,7 +757,7 @@ if($_SESSION['user_authorization'] == "ok"){
 						exit;
 					}
 		
-				$album = Videoalbum::getAlbumInfo($id_album, $id_event);
+				$album = Videoalbum::getAlbumInfo($id_album, $event_id);
 				$tpl->assign('TITLE_PAGE', $album['name']);		
 				$tpl->assign('STR_EDIT', core::getLanguage('str', 'edit'));
 				$tpl->assign('STR_REMOVE', core::getLanguage('str', 'remove'));
@@ -782,7 +782,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				
 				$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'videoalbums'));
 			
-				if(Events::checkOwnerEvent($id_event, $user['id'], 'user')) $tpl->assign('SHOW_ADD_VIDEO_MENU', 'show');	
+				if(Events::checkOwnerEvent($event_id, $user['id'], 'user')) $tpl->assign('SHOW_ADD_VIDEO_MENU', 'show');	
 		
 				$tpl->assign('PATH_VIDEO', $path_video);
 				$tpl->assign('PATH_REMOVE_VIDEO', $path_remove_video);		
@@ -792,12 +792,12 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('STR_MY_ALBUMS', core::getLanguage('str', 'albums'));
 				$tpl->assign('STR_POPULAR_VIDEOS',  core::getLanguage('str', 'popular_videos'));
 				$tpl->assign('STR_MY_VIDEOS', core::getLanguage('str', 'videos'));		
-				$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($id_event, 'event'));
+				$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($event_id, 'event'));
 				$tpl->assign('NUMBER_POPULAR_VIDEOS', Videoalbum::getNumberPopVideos('event'));		
-				$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($id_event, 'event'));			
+				$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($event_id, 'event'));			
 				$tpl->assign('NO_POP_VIDEOS', core::getLanguage('str', 'empty'));					
 		
-				$arr_albums = Videoalbum::getAlbumList($id_event, 'event');
+				$arr_albums = Videoalbum::getAlbumList($event_id, 'event');
 		
 				if($arr_albums){
 					foreach($arr_albums as $row){
@@ -818,17 +818,17 @@ if($_SESSION['user_authorization'] == "ok"){
 					}
 				}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 		
-				$arr_my_videos = Videoalbum::getVideosList($id_event, 'event', 6, 0);
+				$arr_my_videos = Videoalbum::getVideosList($event_id, 'event', 6, 0);
 		
 				if($arr_my_videos){
 					foreach($arr_my_videos as $row){
 						$rowBlock = $tpl->fetch('row_my_videos_list');					
 						$rowBlock->assign('ID', $row['id']);
-						$rowBlock->assign('ID_VIDEO', $row['id_video']);					
+						$rowBlock->assign('ID_VIDEO', $row['video_id']);					
 						$rowBlock->assign('DESCRIPTION', $arow['description']);
 						$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));
 						$rowBlock->assign('VIDEO', core::documentparser()->getVideoPlayer($row['provider'], $row['video']));					
-						$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id_video']));						
+						$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['video_id']));						
 						$tpl->assign('row_my_videos_list', $rowBlock);
 					}	
 				}	
@@ -847,18 +847,18 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('ERROR_ALERT', $error_msg);
 			}	
 	
-			if(Videoalbum::NumberAlbums($id_event, 'event') == 0){
+			if(Videoalbum::NumberAlbums($event_id, 'event') == 0){
 				$fields = array();
 				$fields['id'] = 0;		
 				$fields['name'] = core::getLanguage('str', 'videoalbum');		
 				$fields['created_at'] = date("Y-m-d H:i:s");
 				$fields['videoalbumable_type'] = 'event';		
-				$fields['id_owner'] = $id_event;	
+				$fields['owner_id'] = $event_id;	
 		
 				Videoalbum::createAlbum($fields);		
 			}		
 
-			foreach(Videoalbum::getVideoAlbumOption($id_event, 'event') as $row){
+			foreach(Videoalbum::getVideoAlbumOption($event_id, 'event') as $row){
 				$rowBlock = $tpl->fetch('row_option_videoalbum');
 				$rowBlock->assign('ID', $row['id']);
 				$rowBlock->assign('NAME', $row['name']);				
@@ -868,7 +868,7 @@ if($_SESSION['user_authorization'] == "ok"){
 			$tpl->assign('ACTION', $_SERVER['REQUEST_URI']);	
 			$tpl->assign('STR_DESCRIPTION', core::getLanguage('str', 'description'));		
 			$tpl->assign('STR_ALBUM', core::getLanguage('str', 'album'));	
-			$tpl->assign('OPTION_ID', $_POST['id_videoalbum']);	
+			$tpl->assign('OPTION_ID', $_POST['videoalbum_id']);	
 			$tpl->assign('VIDEO', $_POST['video']);	
 			$tpl->assign('DESCRIPTION', $_POST['description']);
 			$tpl->assign('BUTTON_ADD', core::getLanguage('button', 'add'));	
@@ -907,14 +907,14 @@ if($_SESSION['user_authorization'] == "ok"){
 			$tpl->assign('STR_WHATS_INTERESTING', core::getLanguage('str', 'whats_interesting'));
 			$tpl->assign('STR_REPLY', core::getLanguage('str', 'reply'));
 
-			if(Events::checkOwnerEvent($id_event, $user['id'], 'user')) $tpl->assign('ADMIN', 'yes');			
+			if(Events::checkOwnerEvent($event_id, $user['id'], 'user')) $tpl->assign('ADMIN', 'yes');			
 		
-			$arr = Comments::treeComments(0, Comments::getCommentList($id_event, 'event', 10, 0));
+			$arr = Comments::treeComments(0, Comments::getCommentList($event_id, 'event', 10, 0));
 
 			foreach($arr as $row){
 				$rowBlock = $tpl->fetch('row_comments');	
 
-				if (Events::checkOwnerEvent($id_event, $row['id_user'], 'user')){
+				if (Events::checkOwnerEvent($event_id, $row['user_id'], 'user')){
 					$avatar = core::documentparser()->eventAvatar($event['cover_page']);
 					$name = $event['name'];	
 					$rowBlock->assign('NAME', $name);
@@ -924,39 +924,39 @@ if($_SESSION['user_authorization'] == "ok"){
 				}
 					
 				$rowBlock->assign('ID', $row['id_comment']);
-				$rowBlock->assign('ID_PARENT', $row['id_parent']);	
-				$rowBlock->assign('ID_USER', $row['id_user']);			
+				$rowBlock->assign('ID_PARENT', $row['parent_id']);	
+				$rowBlock->assign('ID_USER', $row['user_id']);			
 				$rowBlock->assign('ID_USER_SESSION', $user['id']);
-				$rowBlock->assign('ID_CONTENT', $row['id_content']);		
+				$rowBlock->assign('ID_CONTENT', $row['content_id']);		
 				$rowBlock->assign('AVATAR', $avatar);
 				$rowBlock->assign('FIRSTNAME', $row['firstname']);		
 				$rowBlock->assign('LASTNAME', $row['lastname']);		
 				$rowBlock->assign('CREATED', $row['created']);
-				$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline');				
+				$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline');				
 				$rowBlock->assign('CONTENT', core::documentparser()->link_replace($row['content']));
 				$rowBlock->assign('NUMBERTELL', Comments::getNumberTell($row['id_comment'], 'comment'));
 				$rowBlock->assign('NUMBERLIKED', Comments::getNumberLiked($row['id_comment'], 'comment'));
 				
-				if($user['id'] == $row['id_user'])
+				if($user['id'] == $row['user_id'])
 					$rowBlock->assign('BUTTON_SHARE', 'hide');
 				else
 					$rowBlock->assign('BUTTON_SHARE', 'show');					
 				
-				if($row['id_parent'] == 0){
+				if($row['parent_id'] == 0){
 					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
 						$rowAttach = $rowBlock->fetch('row_attach');
-						$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 						$rowAttach->assign('SMALL_PHOTO', PATH_COMMENT_ATTACHMENTS . $photo['small_photo']);
-						$rowAttach->assign('ID_PHOTO', $photo['id_photo']);
+						$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
 						$rowBlock->assign('row_attach', $rowAttach);
 					}
 				}
 				else{
 					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
 						$rowAttach = $rowBlock->fetch('row_reply_attach');
-						$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 						$rowAttach->assign('SMALL_PHOTO', PATH_COMMENT_ATTACHMENTS . $photo['small_photo']);
-						$rowAttach->assign('ID_PHOTO', $photo['id_photo']);
+						$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
 						$rowBlock->assign('row_reply_attach', $rowAttach);
 					}
 				}	
@@ -1043,7 +1043,7 @@ if($_SESSION['user_authorization'] == "ok"){
 					else if(Events::getEventStatus($row['id']) == 'end')	
 						$rowBlock->assign('STATUS', core::getLanguage('str', 'event_completed'));
 
-					if(Events::checkOwnerEvent($row['id_event'], $user['id'], 'user')) $rowBlock->assign('ALLOW_EDIT', 'yes');
+					if(Events::checkOwnerEvent($row['event_id'], $user['id'], 'user')) $rowBlock->assign('ALLOW_EDIT', 'yes');
 				
 					$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));
 				
@@ -1060,14 +1060,14 @@ if($_SESSION['user_authorization'] == "ok"){
 			if($arr_my_events){
 				foreach($arr_my_events as $row){
 					$rowBlock = $tpl->fetch('my_event_row');
-					$rowBlock->assign('ID', $row['id_event']);	
+					$rowBlock->assign('ID', $row['event_id']);	
 					$rowBlock->assign('NAME', $row['name']);
 					$rowBlock->assign('AVATAR', core::documentparser()->eventAvatar($row['cover_page']));		
 					$rowBlock->assign('SPORT_TYPE', $row['sport_type']);
 					$rowBlock->assign('CITY', $row['place']);
-					$rowBlock->assign('ROLE', Events::getEventRole(Events::getMemberShipStatus($row['id_event'], $user['id'], 'user')));
+					$rowBlock->assign('ROLE', Events::getEventRole(Events::getMemberShipStatus($row['event_id'], $user['id'], 'user')));
 					$rowBlock->assign('DESCRIPTION', $row['description']);
-					$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['id_event'], 'user'), core::getLanguage('str', 'participants_friends')));
+					$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['event_id'], 'user'), core::getLanguage('str', 'participants_friends')));
 					$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));				
 			
 					$date_interval_event_beginning = str_replace('%DATE_FROM%', core::documentparser()->mysql_russian_datetime($row['date_from']), core::getLanguage('str', 'date_interval_event_beginning'));
@@ -1081,12 +1081,12 @@ if($_SESSION['user_authorization'] == "ok"){
 						$rowBlock->assign('DATE_INTERVAL_EVENT_END', $date_interval_event_end);
 					}
 				
-					if(Events::getEventStatus($row['id_event']) == 'continues') 
+					if(Events::getEventStatus($row['event_id']) == 'continues') 
 						$rowBlock->assign('STATUS', core::getLanguage('str', 'event_continues'));
-					else if(Events::getEventStatus($row['id_event']) == 'end')	
+					else if(Events::getEventStatus($row['event_id']) == 'end')	
 						$rowBlock->assign('STATUS', core::getLanguage('str', 'event_completed'));				
 			
-					if(Events::checkOwnerEvent($row['id_event'], $user['id'], 'user'))  $rowBlock->assign('ALLOW_EDIT', 'yes');
+					if(Events::checkOwnerEvent($row['event_id'], $user['id'], 'user'))  $rowBlock->assign('ALLOW_EDIT', 'yes');
 			
 					$tpl->assign('my_event_row', $rowBlock);
 				}	
@@ -1100,13 +1100,13 @@ if($_SESSION['user_authorization'] == "ok"){
 			if($arr_invited_me_events){
 				foreach($arr_invited_me_events as $row){
 					$rowBlock = $tpl->fetch('invited_me_events_row');
-					$rowBlock->assign('ID', $row['id_event']);	
+					$rowBlock->assign('ID', $row['event_id']);	
 					$rowBlock->assign('NAME', $row['name']);
 					$rowBlock->assign('AVATAR', core::documentparser()->eventAvatar($row['cover_page']));		
 					$rowBlock->assign('SPORT_TYPE', $row['sport_type']);
 					$rowBlock->assign('CITY', $row['place']);
 					$rowBlock->assign('DESCRIPTION', $row['description']);
-					$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['id_event'], 'user'), core::getLanguage('str', 'participants_friends')));
+					$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['event_id'], 'user'), core::getLanguage('str', 'participants_friends')));
 			
 					$date_interval_event_beginning = str_replace('%DATE_FROM%', core::documentparser()->mysql_russian_datetime($row['date_from']), core::getLanguage('str', 'date_interval_event_beginning'));
 					$date_interval_event_beginning = str_replace('%TIME_FROM%', $row['time_from'], $date_interval_event_beginning);
@@ -1142,7 +1142,7 @@ else{
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 	
-	if(empty($_GET['id_event'])){
+	if(empty($_GET['event_id'])){
 		header("Location: http://" . $_SERVER['SERVER_NAME']);
 		exit;
 	}
@@ -1175,11 +1175,11 @@ else{
 	include_once "left_block.inc";
 	include_once "right_block.inc";
 	
-	$tpl->assign('ID_EVENT', $_GET['id_event']);
-	$tpl->assign('ID_OWNER', $_GET['id_event']);
+	$tpl->assign('ID_EVENT', $_GET['event_id']);
+	$tpl->assign('ID_OWNER', $_GET['event_id']);
 	$tpl->assign('VIDEOALBUMABLE_TYPE', 'event');	
-	$id_event = core::database()->escape((int)Core_Array::getRequest('id_event'));
-	$event = Events::getEventInfo($id_event);
+	$event_id = core::database()->escape((int)Core_Array::getRequest('event_id'));
+	$event = Events::getEventInfo($event_id);
 	
 	$tpl->assign('STYLE', 'opacity:0');	
 	$tpl->assign('EVENT_NAME', $event['name']);		
@@ -1213,35 +1213,35 @@ else{
 		
 			$tpl->assign('QUERY', $_GET['q']);			
 			$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'members'));			
-			$tpl->assign('NUMBERMEMBER', Events::countMembers($id_event, 'user'));			
+			$tpl->assign('NUMBERMEMBER', Events::countMembers($event_id, 'user'));			
 			
-			$arr_users = Events::getEventsMemberList($id_event, 'user');
+			$arr_users = Events::getEventsMemberList($event_id, 'user');
 			
 			if($arr_users){
 				foreach($arr_users as $row){
 					$rowBlock = $tpl->fetch('row_members');	
-					core::user()->setUser_id($row['id_member']);
+					core::user()->setUser_id($row['member_id']);
 					$member = core::user()->getUserInfo();				
-					$rowBlock->assign('ID_USER', $row['id_member']);			
+					$rowBlock->assign('ID_USER', $row['member_id']);			
 					$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($member));					
 					$rowBlock->assign('FIRSTNAME', $member['firstname']);					
 					$rowBlock->assign('LASTNAME', $member['lastname']);
 					$rowBlock->assign('CITY', $member['city']);	
-					$rowBlock->assign('STATUS', Events::getEventRole(Events::getMemberShipStatus($id_event,  $row['id_member'], 'user')));
-					$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_member']) ? 'online' : 'offline');
+					$rowBlock->assign('STATUS', Events::getEventRole(Events::getMemberShipStatus($event_id,  $row['member_id'], 'user')));
+					$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['member_id']) ? 'online' : 'offline');
 					$tpl->assign('row_members', $rowBlock);
 				}
 			}else $tpl->assign('NO_MEMBERS', core::getLanguage('str', 'empty'));
 				
-			$arr_teams = Events::getEventsMemberList($id_event, 'team');
+			$arr_teams = Events::getEventsMemberList($event_id, 'team');
 			
 			if($arr_teams){
 				$tpl->assign('STR_TEAMS', core::getLanguage('str', 'teams'));
-				$tpl->assign('NUMBERTEAMS', Events::countMembers($id_event, 'team'));	
+				$tpl->assign('NUMBERTEAMS', Events::countMembers($event_id, 'team'));	
 				
 				foreach($arr_teams as $row){
 					$rowBlock = $tpl->fetch('row_teams');	
-					$member = Communities::getCommunityInfo($row['id_member']);
+					$member = Communities::getCommunityInfo($row['member_id']);
 					$rowBlock->assign('ID', $member['id']);		
 					$rowBlock->assign('NAME', $member['name']);		
 					$rowBlock->assign('ABOUT', $member['about']);					
@@ -1261,15 +1261,15 @@ else{
 				}
 			}else $tpl->assign('NO_TEAMS', core::getLanguage('str', 'empty'));
 			
-			$arr_groups = Events::getEventsMemberList($id_event, 'group');
+			$arr_groups = Events::getEventsMemberList($event_id, 'group');
 			
 			if($arr_groups){
 				$tpl->assign('STR_GROUPS', core::getLanguage('str', 'groups'));
-				$tpl->assign('NUMBERGROUPS', Events::countMembers($id_event, 'group'));
+				$tpl->assign('NUMBERGROUPS', Events::countMembers($event_id, 'group'));
 				
 				foreach($arr_groups as $row){
 					$rowBlock = $tpl->fetch('row_groups');	
-					$member = Communities::getCommunityInfo($row['id_member']);
+					$member = Communities::getCommunityInfo($row['member_id']);
 					$rowBlock->assign('ID', $member['id']);		
 					$rowBlock->assign('NAME', $member['name']);		
 					$rowBlock->assign('ABOUT', $member['about']);					
@@ -1340,11 +1340,11 @@ else{
 				$tpl->assign('STR_MY_ALBUMS', core::getLanguage('str', 'photoalbums'));	
 				$tpl->assign('STR_MY_PHOTOS', core::getLanguage('title', 'photoalbums'));
 				$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos('event'));		
-				$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($id_event, 'event'));		
-				$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($id_event, 'event'));	
+				$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($event_id, 'event'));		
+				$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($event_id, 'event'));	
 				$tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));
 					
-				$arr_albums = Photoalbum::getAlbumList($id_event, 'event');
+				$arr_albums = Photoalbum::getAlbumList($event_id, 'event');
 		
 				if($arr_albums){
 					foreach($arr_albums as $row){
@@ -1369,13 +1369,13 @@ else{
 					}
 				}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 	
-				$arr_photos = Photoalbum::getPhotosList($id_event, 'event', 6, 0);
+				$arr_photos = Photoalbum::getPhotosList($event_id, 'event', 6, 0);
 		
 				if($arr_photos){
 					foreach($arr_photos as $row){
 						$rowBlock = $tpl->fetch('row_my_photos_list');
 						$rowBlock->assign('ID', $row['id']);
-						$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+						$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 						$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'event'));				
 						$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'event'));							
 						$rowBlock->assign('DESCRIPTION', $row['description']);
@@ -1403,7 +1403,7 @@ else{
 					exit;
 				}
 		
-				$album = Videoalbum::getAlbumInfo($id_album, $id_event);
+				$album = Videoalbum::getAlbumInfo($id_album, $event_id);
 				$tpl->assign('TITLE_PAGE', $album['name']);		
 				$tpl->assign('STR_EDIT', core::getLanguage('str', 'edit'));
 				$tpl->assign('STR_REMOVE', core::getLanguage('str', 'remove'));
@@ -1436,12 +1436,12 @@ else{
 				$tpl->assign('STR_MY_ALBUMS', core::getLanguage('str', 'albums'));
 				$tpl->assign('STR_POPULAR_VIDEOS',  core::getLanguage('str', 'popular_videos'));
 				$tpl->assign('STR_MY_VIDEOS', core::getLanguage('str', 'videos'));		
-				$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($id_event, 'event'));
+				$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($event_id, 'event'));
 				$tpl->assign('NUMBER_POPULAR_VIDEOS', Videoalbum::getNumberPopVideos('event'));		
-				$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($id_event, 'event'));				
+				$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($event_id, 'event'));				
 				$tpl->assign('NO_POP_VIDEOS', core::getLanguage('str', 'empty'));					
 		
-				$arr_albums = Videoalbum::getAlbumList($id_event, 'event');
+				$arr_albums = Videoalbum::getAlbumList($event_id, 'event');
 		
 				if($arr_albums){
 					foreach($arr_albums as $row){
@@ -1462,17 +1462,17 @@ else{
 					}
 				}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 		
-				$arr_my_videos = Videoalbum::getVideosList($id_event, 'event', 6, 0);
+				$arr_my_videos = Videoalbum::getVideosList($event_id, 'event', 6, 0);
 		
 				if($arr_my_videos){
 					foreach($arr_my_videos as $row){
 						$rowBlock = $tpl->fetch('row_my_videos_list');					
 						$rowBlock->assign('ID', $row['id']);
-						$rowBlock->assign('ID_VIDEO', $row['id_video']);					
+						$rowBlock->assign('ID_VIDEO', $row['video_id']);					
 						$rowBlock->assign('DESCRIPTION', $arow['description']);
 						$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));
 						$rowBlock->assign('VIDEO', core::documentparser()->getVideoPlayer($row['provider'], $row['video']));					
-						$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id_video']));						
+						$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['video_id']));						
 						$tpl->assign('row_my_videos_list', $rowBlock);
 					}	
 				}	

@@ -21,7 +21,7 @@
           </div>
           <div id="possible-friend" class="possible-friend">
             <!-- BEGIN row_possible_friends -->
-            <div class="col-xs-6 possible-friend-cart" data-num='${ID_FRIEND}'> <a class="possible-avatar" href="./?task=profile&id_user=${ID_FRIEND}" > <img src="${AVATAR}" alt="" > </a> <a href="./?task=profile&id_user=${ID_FRIEND}">
+            <div class="col-xs-6 possible-friend-cart" data-num='${ID_FRIEND}'> <a class="possible-avatar" href="./?task=profile&user_id=${ID_FRIEND}" > <img src="${AVATAR}" alt="" > </a> <a href="./?task=profile&user_id=${ID_FRIEND}">
               <h5><strong>${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_FRIEND}'></span> <br />
                 ${LASTNAME}</strong></h5>
               </a>
@@ -46,13 +46,13 @@
           <div id='friends' class="possible-friend my-friend">
             <!-- BEGIN row_my_friends -->
             <div class="col-xs-6 possible-friend-cart"> 
-              <a class="possible-avatar" href="./?task=profile&id_user=${ID_FRIEND}"> 
-                <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&id_user=${ID_FRIEND}">
+              <a class="possible-avatar" href="./?task=profile&user_id=${ID_FRIEND}"> 
+                <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&user_id=${ID_FRIEND}">
               <h5><strong>${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_FRIEND}'></span><br />
                 ${LASTNAME}</strong></h5>
               </a>
               <p>${CITY}</p>
-              <a href="./?task=profile&id_user=${SEL}&q=messages&sel=${ID_FRIEND}" data-tooltip='Написать сообщение'><b></b></a>
+              <a href="./?task=profile&user_id=${SEL}&q=messages&sel=${ID_FRIEND}" data-tooltip='Написать сообщение'><b></b></a>
 			 <!-- IF '${REMOVE_FRIEND}' == 'show' --><div class='control'> <span> </span> <span> <a onclick='remove_friend(${ID_FRIEND});' data-tooltip="Удалить из друзей"><img src='./templates/images/icon-krest.png' alt=""/></a> </span> </div> <!-- END IF -->
                 </div>
             <!-- END row_my_friends -->
@@ -77,12 +77,12 @@
           </div>
           <div class="possible-friend my-friend">
             <!-- BEGIN row_request_friends -->
-            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&id_user=${ID_FRIEND}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&id_user=${ID_FRIEND}">
+            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&user_id=${ID_FRIEND}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&user_id=${ID_FRIEND}">
               <h5><strong>${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_FRIEND}'></span><br />
                 ${LASTNAME}</strong></h5>
               </a>
               <p>${CITY}</p>
-			  <a href="./?task=profile&id_user=${SEL}&q=messages&sel=${ID_FRIEND}" data-tooltip='Написать сообщение'><b></b></a>
+			  <a href="./?task=profile&user_id=${SEL}&q=messages&sel=${ID_FRIEND}" data-tooltip='Написать сообщение'><b></b></a>
               <div class='control'> <span> <a onclick='accept_friendship(${ID_FRIEND});' data-tooltip="Принять заявку"><img src='./templates/images/icon-ok.png' alt=""/></a> </span> <span> </span> </div>
             </div>
             <!-- END row_request_friends -->
@@ -98,12 +98,12 @@
           </div>
           <div class="possible-friend my-friend">
             <!-- BEGIN row_outgoing_request -->
-            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&id_user=${ID_FRIEND}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&id_user=${ID_FRIEND}">
+            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&user_id=${ID_FRIEND}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&user_id=${ID_FRIEND}">
               <h5><strong>${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_FRIEND}'></span><br />
                 ${LASTNAME}</strong></h5>
               </a>
               <p>${CITY}</p>
-			  <!-- IF '${SEL}' != '' --><a href="./?task=profile&id_user=${SEL}&q=messages&sel=${ID_FRIEND}" data-tooltip='Написать сообщение'><b></b></a><!-- END IF -->
+			  <!-- IF '${SEL}' != '' --><a href="./?task=profile&user_id=${SEL}&q=messages&sel=${ID_FRIEND}" data-tooltip='Написать сообщение'><b></b></a><!-- END IF -->
             </div>
             <!-- END row_outgoing_request -->
           </div>

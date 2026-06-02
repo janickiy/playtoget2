@@ -37,7 +37,7 @@
 
 <div class="my-albums">
   <!-- BEGIN row_my_videoalbum_list -->
-  <div class="album"> <a href="${PATH_VIDEO}&id_album=${ID}<!-- IF '${PROFILE_USER_ID}' != '' -->&id_user=${PROFILE_USER_ID}<!-- END IF -->">
+  <div class="album"> <a href="${PATH_VIDEO}&id_album=${ID}<!-- IF '${PROFILE_USER_ID}' != '' -->&user_id=${PROFILE_USER_ID}<!-- END IF -->">
     <div class="img-container"><img src="${THUMB}" alt=""></div>
     </a>
     <p>${NAME}</p>

@@ -4,7 +4,7 @@ defined('PLAYTOGET') || exit('Playtoget: access denied!');
 
 class Model_settings extends Model
 {
-	public function changeUserSettings($fields, $id_user)
+	public function changeUserSettings($fields, $user_id)
 	{
 		$arr_user = array();
 		$arr_user['contact_email'] = $fields['contact_email'];		
@@ -20,24 +20,24 @@ class Model_settings extends Model
 		$cover_page = !empty($fields['cover_page']) ? basename($fields['cover_page']) : '';
 		$avatar_tmp = $avatar ? $tmp_dir . $avatar : '';
 		$cover_page_tmp = $cover_page ? $tmp_dir . $cover_page : '';
-		if($avatar && file_exists($avatar_tmp)) $arr_user['avatar'] = $id_user . '_' . $avatar;
-		if($cover_page && file_exists($cover_page_tmp)) $arr_user['cover_page'] = $id_user . '_' . $cover_page;
+		if($avatar && file_exists($avatar_tmp)) $arr_user['avatar'] = $user_id . '_' . $avatar;
+		if($cover_page && file_exists($cover_page_tmp)) $arr_user['cover_page'] = $user_id . '_' . $cover_page;
 		
 		$result = TRUE;
 		
 		core::database()->querySQL('SET AUTOCOMMIT=0');
 		core::database()->querySQL('START TRANSACTION');
 		
-		$query = "SELECT avatar, cover_page FROM " . core::database()->getTableName('users') . " WHERE id=" . $id_user;
+		$query = "SELECT avatar, cover_page FROM " . core::database()->getTableName('users') . " WHERE id=" . $user_id;
 		$current_user_result = core::database()->querySQL($query);
 		$current_user = core::database()->getRow($current_user_result);
 		
-		if(!core::database()->update($arr_user, core::database()->getTableName('users'), "id=" . $id_user)) {
+		if(!core::database()->update($arr_user, core::database()->getTableName('users'), "id=" . $user_id)) {
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}		
 		
-		$query = "SELECT * FROM " . core::database()->getTableName('usersettings') . " WHERE id_user=" . $id_user;
+		$query = "SELECT * FROM " . core::database()->getTableName('usersettings') . " WHERE user_id=" . $user_id;
 		$settings_result = core::database()->querySQL($query);		
 		
 		if(core::database()->getRecordCount($settings_result) == 0){
@@ -60,7 +60,7 @@ class Model_settings extends Model
 			$arr_usersettings['notification_events'] = $fields['notification_events'];
 			$arr_usersettings['notification_birthdays'] = $fields['notification_birthdays'];
 			$arr_usersettings['notification_answers_in_comments'] = $fields['notification_answers_in_comments'];			
-			$arr_usersettings['id_user'] = $id_user;
+			$arr_usersettings['user_id'] = $user_id;
 			
 			if(!core::database()->insert($arr_usersettings, core::database()->getTableName('usersettings'))) {
 				$result = FALSE;
@@ -87,7 +87,7 @@ class Model_settings extends Model
 			$arr_usersettings['notification_birthdays'] = $fields['notification_birthdays'];
 			$arr_usersettings['notification_answers_in_comments'] = $fields['notification_answers_in_comments'];
 
-			if(!core::database()->update($arr_usersettings, core::database()->getTableName('usersettings'), "id_user=" . $id_user)) {
+			if(!core::database()->update($arr_usersettings, core::database()->getTableName('usersettings'), "user_id=" . $user_id)) {
 				$result = FALSE;
 				
 			

@@ -18,7 +18,7 @@ class Photoalbum
 	static function removeAlbum($id_album)
 	{
 		$query = "SELECT * FROM " . core::database()->getTableName('photos') . " p
-					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON p.id_photoalbum=a.id
+					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON p.photoalbum_id=a.id
 					WHERE a.id=" . $id_album;
 		
 		$result = core::database()->querySQL($query);
@@ -30,28 +30,28 @@ class Photoalbum
 			if(file_exists($path . $row['photo'])) unlink($path . $row['photo']);
 		}
 		
-		if(core::database()->delete(core::database()->getTableName('photos'), "id_photoalbum=" . $id_album,'') && core::database()->delete(core::database()->getTableName('photoalbums'), "id=" . $id_album,'')){
+		if(core::database()->delete(core::database()->getTableName('photos'), "photoalbum_id=" . $id_album,'') && core::database()->delete(core::database()->getTableName('photoalbums'), "id=" . $id_album,'')){
 			return TRUE;
 		}
 		else
 			return FALSE;		
 	}
 
-	static function getAlbumList($id_owner, $photoalbumable_type)
+	static function getAlbumList($owner_id, $photoalbumable_type)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE id_owner=" . $id_owner . " AND photoalbumable_type='" . $photoalbumable_type . "'";
+		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE owner_id=" . $owner_id . " AND photoalbumable_type='" . $photoalbumable_type . "'";
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getColumnArray($result);
 	}
 
-	static function getPhotosList($id_owner, $photoalbumable_type, $limit, $offset=0)
+	static function getPhotosList($owner_id, $photoalbumable_type, $limit, $offset=0)
 	{
-		$id_owner = core::database()->escape($id_owner);
+		$owner_id = core::database()->escape($owner_id);
 		
-		$query = "SELECT *, a.id AS id_photo FROM " . core::database()->getTableName('photos') . " a 
-					LEFT JOIN " . core::database()->getTableName('photoalbums') . " b ON a.id_photoalbum=b.id 
-					WHERE (a.banned!=1) AND (b.photoalbumable_type='" . $photoalbumable_type . "') AND (b.id_owner=" . $id_owner . ")
+		$query = "SELECT *, a.id AS photo_id FROM " . core::database()->getTableName('photos') . " a 
+					LEFT JOIN " . core::database()->getTableName('photoalbums') . " b ON a.photoalbum_id=b.id 
+					WHERE (a.banned!=1) AND (b.photoalbumable_type='" . $photoalbumable_type . "') AND (b.owner_id=" . $owner_id . ")
 					ORDER BY a.id DESC					
 					LIMIT " . $limit ." OFFSET " . $offset . "";
 					
@@ -60,10 +60,10 @@ class Photoalbum
 		return core::database()->getColumnArray($result);
 	}
 
-	static function uploadHandle($max_file_size = 102400, $upload_dir = '.', $i = 0, $id_photoalbum, $description, $id_user)  
+	static function uploadHandle($max_file_size = 102400, $upload_dir = '.', $i = 0, $photoalbum_id, $description, $user_id)  
     {  
-		$id_user = core::database()->escape($id_user);
-		$id_photoalbum = core::database()->escape($id_photoalbum);
+		$user_id = core::database()->escape($user_id);
+		$photoalbum_id = core::database()->escape($photoalbum_id);
 	
 		$valid_extensions = array('jpg', 'jpeg', 'png', 'gif');  
 	   
@@ -101,11 +101,11 @@ class Photoalbum
                     if (move_uploaded_file($_FILES['photo']['tmp_name'][$i], $destination)){
 						$fields = array();
 						$fields['id'] = 0;						
-						$fields['id_photoalbum'] = $id_photoalbum;						 	
+						$fields['photoalbum_id'] = $photoalbum_id;						 	
 						$fields['small_photo'] = $small_photo;
 						$fields['photo'] = $photo;
 						$fields['description'] = $description;
-						$fields['id_owner'] = $id_user;
+						$fields['owner_id'] = $user_id;
 						$fields['created_at'] = date("Y-m-d H:i:s");
 						$fields['moderate'] = 0;						
 						
@@ -143,7 +143,7 @@ class Photoalbum
         return array('info' => $info, 'error' => $error);  
     }
 	
-	static function uploadHandlePup($max_file_size = 102400, $upload_dir = '.', $i = 0, $id_photoalbum, $description, $id_owner)  
+	static function uploadHandlePup($max_file_size = 102400, $upload_dir = '.', $i = 0, $photoalbum_id, $description, $owner_id)  
     {  
 		$valid_extensions = array('jpg', 'jpeg', 'png', 'gif');  
 	   
@@ -183,11 +183,11 @@ class Photoalbum
                     if (file_exists($destination)){
 						$fields = array();
 						$fields['id'] = 0;						
-						$fields['id_photoalbum'] = $id_photoalbum;						 	
+						$fields['photoalbum_id'] = $photoalbum_id;						 	
 						$fields['small_photo'] = $small_photo;
 						$fields['photo'] = $photo;
 						$fields['description'] = $description;
-						$fields['id_owner'] = $id_owner;
+						$fields['owner_id'] = $owner_id;
 						$fields['created_at'] = date("Y-m-d H:i:s");
 						$fields['moderate'] = 0;						
 						
@@ -225,31 +225,31 @@ class Photoalbum
         return array('info' => $info,'id' => $insert_id, 'error' => $error);  
     }
 	
-	static function getAlbumsOptionList($id_owner, $photoalbumable_type)
+	static function getAlbumsOptionList($owner_id, $photoalbumable_type)
 	{
-		if(is_numeric($id_owner) && $photoalbumable_type){
-			$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE photoalbumable_type='" . $photoalbumable_type . "' AND id_owner=" . $id_owner . " ORDER by name";
+		if(is_numeric($owner_id) && $photoalbumable_type){
+			$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE photoalbumable_type='" . $photoalbumable_type . "' AND owner_id=" . $owner_id . " ORDER by name";
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getColumnArray($result);
 		}
 	}
 
-	static function getPhotoAlbumInfo($id_photoalbum)
+	static function getPhotoAlbumInfo($photoalbum_id)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE id=" . $id_photoalbum;
+		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE id=" . $photoalbum_id;
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getRow($result);	
 	}
 	
-	static function getPhotoInfo($id_photo)
+	static function getPhotoInfo($photo_id)
 	{
-		if(is_numeric($id_photo)){
-			$query = "SELECT *, DATE_FORMAT(a.created_at,'%Y-%m-%d') AS created, a.id AS id_photo, a.id_owner AS id_owner, b.id_owner AS photoalbum_owner FROM " . core::database()->getTableName('photos') . " a
-						LEFT JOIN " . core::database()->getTableName('photoalbums') . " b ON a.id_photoalbum=b.id
-						LEFT JOIN " . core::database()->getTableName('users') . " c ON a.id_owner=c.id
-						WHERE a.id=" . $id_photo;
+		if(is_numeric($photo_id)){
+			$query = "SELECT *, DATE_FORMAT(a.created_at,'%Y-%m-%d') AS created, a.id AS photo_id, a.owner_id AS owner_id, b.owner_id AS photoalbum_owner FROM " . core::database()->getTableName('photos') . " a
+						LEFT JOIN " . core::database()->getTableName('photoalbums') . " b ON a.photoalbum_id=b.id
+						LEFT JOIN " . core::database()->getTableName('users') . " c ON a.owner_id=c.id
+						WHERE a.id=" . $photo_id;
 			
 			$result = core::database()->querySQL($query);
 		
@@ -257,19 +257,19 @@ class Photoalbum
 		}		
 	}
 	
-	static function getPicList($id_photoalbum, $limit = 5, $offset = 0)
+	static function getPicList($photoalbum_id, $limit = 5, $offset = 0)
 	{
-		if(is_numeric($id_photoalbum)){
-			$query = "SELECT * FROM " . core::database()->getTableName('photos') . " WHERE banned!=1 AND id_photoalbum=" . $id_photoalbum . " ORDER BY id DESC LIMIT " . $limit . " OFFSET " . $offset . "";
+		if(is_numeric($photoalbum_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('photos') . " WHERE banned!=1 AND photoalbum_id=" . $photoalbum_id . " ORDER BY id DESC LIMIT " . $limit . " OFFSET " . $offset . "";
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getColumnArray($result);
 		}		
 	}	
 	
-	static function checkNameExists($name, $id_owner, $photoalbumable_type)
+	static function checkNameExists($name, $owner_id, $photoalbumable_type)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE (id_owner='" . $id_owner . "') AND (photoalbumable_type='" . $photoalbumable_type . "') AND (name LIKE '".$name."')";	
+		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE (owner_id='" . $owner_id . "') AND (photoalbumable_type='" . $photoalbumable_type . "') AND (name LIKE '".$name."')";	
 		$result = core::database()->querySQL($query);
 				
 		if(core::database()->getRecordCount($result) == 0)
@@ -278,51 +278,51 @@ class Photoalbum
 			return TRUE;
 	}
 	
-	static function getMainImage($id_photoalbum)
+	static function getMainImage($photoalbum_id)
 	{
 		$query = "SELECT * FROM " . core::database()->getTableName('photos') . " p 
-					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON p.id_photoalbum=a.id
-					WHERE p.banned!=1 AND p.id_photoalbum=" . $id_photoalbum . " ORDER by p.id DESC LIMIT 1";
+					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON p.photoalbum_id=a.id
+					WHERE p.banned!=1 AND p.photoalbum_id=" . $photoalbum_id . " ORDER by p.id DESC LIMIT 1";
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getRow($result);		
 	}
 	
-	static function getNumberAlbums($id_owner, $photoalbumable_type)
+	static function getNumberAlbums($owner_id, $photoalbumable_type)
 	{
-		if(is_numeric($id_owner) && $photoalbumable_type){
-			$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') ." WHERE photoalbumable_type='" . $photoalbumable_type . "' AND id_owner=" . $id_owner;
+		if(is_numeric($owner_id) && $photoalbumable_type){
+			$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') ." WHERE photoalbumable_type='" . $photoalbumable_type . "' AND owner_id=" . $owner_id;
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getRecordCount($result);
 		}
 	}
 	
-	static function NumberPhotos($id_owner, $photoalbumable_type)
+	static function NumberPhotos($owner_id, $photoalbumable_type)
 	{
 		$query = "SELECT * FROM " . core::database()->getTableName('photos') . " a 
-					LEFT JOIN  " . core::database()->getTableName('photoalbums') . " b ON b.id=a.id_photoalbum 
-					WHERE (a.banned!=1) AND (b.photoalbumable_type='" . $photoalbumable_type . "') AND (b.id_owner=" . $id_owner . ")";
+					LEFT JOIN  " . core::database()->getTableName('photoalbums') . " b ON b.id=a.photoalbum_id 
+					WHERE (a.banned!=1) AND (b.photoalbumable_type='" . $photoalbumable_type . "') AND (b.owner_id=" . $owner_id . ")";
 					
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getRecordCount($result);
 	}
 	
-	static function getNumberLiked($id_photo)
+	static function getNumberLiked($photo_id)
 	{
-		if(is_numeric($id_photo)){
-			$query = "SELECT * FROM " . core::database()->getTableName('likes') . " WHERE id_content=" . $id_photo  . " AND likeable_type='photo' GROUP by id_user";
+		if(is_numeric($photo_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('likes') . " WHERE content_id=" . $photo_id  . " AND likeable_type='photo' GROUP by user_id";
 			$result = core::database()->querySQL($query);
 				
 			return core::database()->getRecordCount($result);
 		}
 	}
 	
-	static function getNumberTell($id_photo)
+	static function getNumberTell($photo_id)
 	{
-		if(is_numeric($id_photo)){
-			$query = "SELECT * FROM " . core::database()->getTableName('share') . " WHERE id_content=" . $id_photo  . " AND shareable_type='photo' GROUP by id_user";
+		if(is_numeric($photo_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('share') . " WHERE content_id=" . $photo_id  . " AND shareable_type='photo' GROUP by user_id";
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getRecordCount($result);
@@ -331,9 +331,9 @@ class Photoalbum
 	
 	static function getPopularPhotos($photoalbumable_type, $limit = 5, $offset=0)
 	{
-		$query = "SELECT *, sum(l.id_user) pop, p.id AS id_photo FROM " . core::database()->getTableName('photos') . " p 
-					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON a.id=p.id_photoalbum
-					INNER JOIN  " . core::database()->getTableName('likes') . " l ON l.id_content=p.id
+		$query = "SELECT *, sum(l.user_id) pop, p.id AS photo_id FROM " . core::database()->getTableName('photos') . " p 
+					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON a.id=p.photoalbum_id
+					INNER JOIN  " . core::database()->getTableName('likes') . " l ON l.content_id=p.id
 					WHERE (p.banned!=1) AND (a.photoalbumable_type='" . $photoalbumable_type . "') AND (l.likeable_type='photo')
 					GROUP by p.id
 					ORDER by pop DESC
@@ -346,9 +346,9 @@ class Photoalbum
 	
 	static function NumberTotalPopPhotos($photoalbumable_type)
 	{
-		$query = "SELECT *, sum(l.id_user) pop FROM " . core::database()->getTableName('photos') . " p 
-					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON a.id=p.id_photoalbum
-					INNER JOIN  " . core::database()->getTableName('likes') . " l ON l.id_content=p.id
+		$query = "SELECT *, sum(l.user_id) pop FROM " . core::database()->getTableName('photos') . " p 
+					LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON a.id=p.photoalbum_id
+					INNER JOIN  " . core::database()->getTableName('likes') . " l ON l.content_id=p.id
 					WHERE (p.banned!=1) AND (a.photoalbumable_type='" . $photoalbumable_type . "') AND (l.likeable_type='photo')
 					GROUP by p.id";
 					
@@ -368,22 +368,22 @@ class Photoalbum
 		
 		$result = TRUE;
 		
-		if(!core::database()->delete(core::database()->getTableName('photos'), "id=" . $row['id_photo'], '')){
+		if(!core::database()->delete(core::database()->getTableName('photos'), "id=" . $row['photo_id'], '')){
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
 		
-		if(!core::database()->delete(core::database()->getTableName('comments'), "commentable_type='photo' AND id_content=" . $row['id_photo'], '')){
+		if(!core::database()->delete(core::database()->getTableName('comments'), "commentable_type='photo' AND content_id=" . $row['photo_id'], '')){
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
 		
-		if(!core::database()->delete(core::database()->getTableName('likes'), "likeable_type='photo' AND id_content=" . $row['id_photo'], '')){
+		if(!core::database()->delete(core::database()->getTableName('likes'), "likeable_type='photo' AND content_id=" . $row['photo_id'], '')){
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
 
-		if(!core::database()->delete(core::database()->getTableName('share'), "shareable_type='photo' AND id_content=" . $row['id_photo'], '')){
+		if(!core::database()->delete(core::database()->getTableName('share'), "shareable_type='photo' AND content_id=" . $row['photo_id'], '')){
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
@@ -412,9 +412,9 @@ class Photoalbum
 		}		
 	}
 	
-	static function checkOwner($id_album, $id_owner)
+	static function checkOwner($id_album, $owner_id)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE id=" . $id_album . " AND id_owner=" . $id_owner;
+		$query = "SELECT * FROM " . core::database()->getTableName('photoalbums') . " WHERE id=" . $id_album . " AND owner_id=" . $owner_id;
 		$result = core::database()->querySQL($query);
 		
 		if(core::database()->getRecordCount($result) == 0) 
@@ -423,21 +423,21 @@ class Photoalbum
 			return TRUE;
 	}
 	
-	static function getUserPublishPhoto($id_user, $limit = 5, $offset = 0)
+	static function getUserPublishPhoto($user_id, $limit = 5, $offset = 0)
 	{
-		if(is_numeric($id_user)){
-			$query = "SELECT *,u.id as id_user, f.id_friend AS id_friend, DATE_FORMAT(p.created_at, '%Y-%m-%d') AS added, DATE_FORMAT(p.created_at, '%Y%m%d%H%i%s') AS timeorder, p.id AS id_photo FROM " . core::database()->getTableName('photos') . " p,
+		if(is_numeric($user_id)){
+			$query = "SELECT *,u.id as user_id, f.friend_id AS friend_id, DATE_FORMAT(p.created_at, '%Y-%m-%d') AS added, DATE_FORMAT(p.created_at, '%Y%m%d%H%i%s') AS timeorder, p.id AS photo_id FROM " . core::database()->getTableName('photos') . " p,
 					" . core::database()->getTableName('photoalbums') . " a,
 					" . core::database()->getTableName('users') . " u, 
 					" . core::database()->getTableName('friends') . " f
 					WHERE
 					CASE
-						WHEN f.id_user='" . $id_user . "'
-						THEN f.id_friend=u.id
-						WHEN f.id_friend='" . $id_user . "'
-						THEN f.id_user=u.id
+						WHEN f.user_id='" . $user_id . "'
+						THEN f.friend_id=u.id
+						WHEN f.friend_id='" . $user_id . "'
+						THEN f.user_id=u.id
 					END					
-					AND	((f.status='1') AND (p.id_owner!=" . $id_user . ") AND (a.photoalbumable_type='user') AND (a.id=p.id_photoalbum) AND (p.id_owner=u.id))
+					AND	((f.status='1') AND (p.owner_id!=" . $user_id . ") AND (a.photoalbumable_type='user') AND (a.id=p.photoalbum_id) AND (p.owner_id=u.id))
 					ORDER BY p.created_at DESC
 					LIMIT " . $limit . " OFFSET " . $offset . "
 					";					
@@ -448,12 +448,12 @@ class Photoalbum
 		}
 	}
 	
-	static function getAllPicList($id_photoalbum)
+	static function getAllPicList($photoalbum_id)
 	{
-		if(is_numeric($id_photoalbum)){
-			$query = "SELECT *, p.id AS id_photo FROM " . core::database()->getTableName('photos') . " p 
-						LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON p.id_photoalbum=a.id
-						WHERE p.banned!=1 AND p.id_photoalbum=" . $id_photoalbum . " ORDER BY p.id DESC";
+		if(is_numeric($photoalbum_id)){
+			$query = "SELECT *, p.id AS photo_id FROM " . core::database()->getTableName('photos') . " p 
+						LEFT JOIN " . core::database()->getTableName('photoalbums') . " a ON p.photoalbum_id=a.id
+						WHERE p.banned!=1 AND p.photoalbum_id=" . $photoalbum_id . " ORDER BY p.id DESC";
 					
 			$result = core::database()->querySQL($query);
 		

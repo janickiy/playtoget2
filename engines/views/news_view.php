@@ -11,7 +11,7 @@ session_start();
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -52,168 +52,168 @@ session_start();
 	$arrs = array();
 
 	foreach(Comments::getCommentEvent($user['id'], 5, 0) as $row){
-		$id_event = $row['id_event'];
+		$event_id = $row['event_id'];
 		$id_author = $row['id_author'];
 		
-		if (Events::checkOwnerEvent($id_event, $id_author, 'user'))	{
+		if (Events::checkOwnerEvent($event_id, $id_author, 'user'))	{
 
 			$publication_name = $row['name'];
 			$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 			$publication_msg .= '<ul class="attach_image">';
 			
 			foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 			}
 			
 			$publication_msg .= '</ul>'	;
-			$arrs[] = array('name' => $publication_name,'type' => 'event','id_author' => $id_event, 'msg' => $publication_msg, 'avatar' => core::documentparser()->eventAvatar($row['cover_page']), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name,'type' => 'event','id_author' => $event_id, 'msg' => $publication_msg, 'avatar' => core::documentparser()->eventAvatar($row['cover_page']), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 
 		}
 	}
 
 	foreach(Comments::getCommentCommunity($user['id'], 5, 0) as $row){
-		$id_community = $row['id_community'];
+		$community_id = $row['community_id'];
 		$id_author = $row['id_author'];
 		
-		if(Communities::checkOwnerCommunity($id_community, $id_author) or Communities::checkAdminCommunity($id_community, $id_author)){
+		if(Communities::checkOwnerCommunity($community_id, $id_author) or Communities::checkAdminCommunity($community_id, $id_author)){
 			$publication_name = $row['name'];
 			$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 			$publication_msg .= '<ul class="attach_image">';
 			
 			foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 			}	
 			
 			$publication_msg .= '</ul>'	;
-			$arrs[] = array('name' => $publication_name,'type' => $row['commentable_type'],'id_author' => $id_community, 'msg' => $publication_msg, 'avatar' => core::documentparser()->communityAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name,'type' => $row['commentable_type'],'id_author' => $community_id, 'msg' => $publication_msg, 'avatar' => core::documentparser()->communityAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		}
 	}
 
 	foreach(Comments::getUserComment($user['id'], 5, 0) as $row){
 		$publication_name = $row['firstname'] . " " . $row['lastname'];
-		$publication_id_author = $row['id_user'];
+		$publication_id_author = $row['user_id'];
 		$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 		$publication_msg .= '<ul class="attach_image">';
 		
 		foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-			$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-			$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+			$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+			$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 		}	
 		
 		$publication_msg .= '</ul>'	;
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 	}
 
 	foreach(Videoalbum::getUserPublishVideo($user['id'], 5, 0) as $row){
 		$publication_name = $row['firstname'] . " " . $row['lastname'];
-		$publication_id_author = $row['id_user'];
+		$publication_id_author = $row['user_id'];
 		$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($row['provider'], $row['video']), core::getLanguage('str', 'useraction_published_video')); 
-		$publication_msg = str_replace('%ID%', $row['id_video'], $publication_msg); 	
+		$publication_msg = str_replace('%ID%', $row['video_id'], $publication_msg); 	
 	
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_video'], 'likeable_type' => 'video', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['video_id'], 'likeable_type' => 'video', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 	}
 
 	foreach(Photoalbum::getUserPublishPhoto($user['id'], 5, 0) as $row){
 		$publication_name = $row['firstname'] . " " . $row['lastname'];
-		$publication_id_author = $row['id_user'];
+		$publication_id_author = $row['user_id'];
 		$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($row['small_photo'], $row['photoalbumable_type']), core::getLanguage('str', 'useraction_added_photo')); 
-		$publication_msg = str_replace('%ID%', $row['id_photo'], $publication_msg); 
+		$publication_msg = str_replace('%ID%', $row['photo_id'], $publication_msg); 
 	
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_photo'], 'likeable_type' => 'photo', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['photo_id'], 'likeable_type' => 'photo', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 	}
 
 	foreach(core::user()->getMyFriendsLastFriend(5, 0) as $row){
 		$publication_name = $row['lastname'] . " " . $row['firstname'];
-		$publication_id_author = $row['id_user'];
+		$publication_id_author = $row['user_id'];
 	
 		$userfriend = $row['friend_lastname'] . " " . $row['friend_firstname'];
 	
 		$publication_msg = str_replace('%USERFRIEND%', $userfriend, core::getLanguage('str', 'useraction_make_friends')); 
-		$publication_msg = str_replace('%ID_FRIEND%', $row['id_friend'], $publication_msg); 
+		$publication_msg = str_replace('%ID_FRIEND%', $row['friend_id'], $publication_msg); 
 	
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => '', 'likeable_type' => '', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => '', 'likeable_type' => '', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 	}
 
 	foreach(Comments::getUserGetVideoComment($user['id'], 5, 0) as $row){
 		$publication_name = $row['firstname'] . " " . $row['lastname'];	
-		$publication_id_author = $row['id_user'];
+		$publication_id_author = $row['user_id'];
 		$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_commented_video'));  
 	
-		$video = Videoalbum::getVideoInfo($row['id_content']);
+		$video = Videoalbum::getVideoInfo($row['content_id']);
 		
-		if($video['id_owner']){
+		if($video['owner_id']){
 			$avatar = core::documentparser()->userAvatar($video);
 			$date = core::documentparser()->mysql_russian_date($row['added']);
 			$author_name = $video['lastname'] . " " . $video['firstname'];	
 			$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($video['provider'], $video['video']), $publication_msg);
 			$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);
-			$publication_msg = str_replace('%ID_AUTHOR%', $video['id_owner'], $publication_msg);
-			$publication_msg = str_replace('%ID%', $video['id_video'], $publication_msg); 
+			$publication_msg = str_replace('%ID_AUTHOR%', $video['owner_id'], $publication_msg);
+			$publication_msg = str_replace('%ID%', $video['video_id'], $publication_msg); 
 			$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 			$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 		}
 
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'video', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'video', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 	} 
 
 	foreach(Comments::getUserGetPhotoComment($user['id'], 5, 0) as $row){
 		$publication_name = $row['firstname'] . " " . $row['lastname'];
-		$publication_id_author = $row['id_user'];
+		$publication_id_author = $row['user_id'];
 		$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_commented_photo'));
 	
-		$photo = Photoalbum::getPhotoInfo($row['id_content']);
+		$photo = Photoalbum::getPhotoInfo($row['content_id']);
 		
-		if($photo['id_owner']){
+		if($photo['owner_id']){
 			$avatar = core::documentparser()->userAvatar($photo);
 			$date = core::documentparser()->mysql_russian_date($row['added']);	
 			$author_name = $photo['firstname'] . " " . $photo['lastname'];	
 			
 			$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($photo['small_photo'], $photo['photoalbumable_type']), $publication_msg);
-			$publication_msg = str_replace('%ID_AUTHOR%',$photo['id_owner'], $publication_msg); 
+			$publication_msg = str_replace('%ID_AUTHOR%',$photo['owner_id'], $publication_msg); 
 			$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);	
-			$publication_msg = str_replace('%ID%', $row['id_photo'], $publication_msg);  
+			$publication_msg = str_replace('%ID%', $row['photo_id'], $publication_msg);  
 			$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 			$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 		}
 	
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'photo', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);	
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'photo', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);	
 	}
 
 	foreach(core::user()->getUserFriendsLiked(5, 0) as $row){
 		$publication_name = $row['firstname'] . " " . $row['lastname'];
-		$publication_id_author = $row['id_user'];	
-		$id_content = $row['id_content'];
+		$publication_id_author = $row['user_id'];	
+		$content_id = $row['content_id'];
 		$pubmsg['publication_date'][] = core::documentparser()->mysql_russian_date($row['added']);
 		$pubmsg['timeorder'][] = $row['timeorder'];
 	
 		if($row['likeable_type'] == 'comment'){
-			$comment = Comments::getCommentInfo($row['id_content']);
+			$comment = Comments::getCommentInfo($row['content_id']);
 
-			if($comment['id_user']){
+			if($comment['user_id']){
 				$author_name = $comment['firstname'] . " " . $comment['lastname'];	
 				$avatar = core::documentparser()->userAvatar($comment);
-				$link = './?task=profile&id_user='.$comment['id_user'];
+				$link = './?task=profile&user_id='.$comment['user_id'];
 				
 				if ($comment['commentable_type']=='group' || $comment['commentable_type']=='team'){
 
-					$community = Communities::getCommunityInfo($comment['id_content']);
+					$community = Communities::getCommunityInfo($comment['content_id']);
 					
-					if(Communities::checkOwnerCommunity($comment['id_content'], $comment['id_user']) or Communities::checkAdminCommunity($comment['id_content'], $comment['id_user'])){
+					if(Communities::checkOwnerCommunity($comment['content_id'], $comment['user_id']) or Communities::checkAdminCommunity($comment['content_id'], $comment['user_id'])){
 						$author_name = $community['name'];	
 						$avatar = core::documentparser()->communityAvatar($community);
-						$link = './?task='.$community['type'].'s&id_community='.$comment['id_content'];
+						$link = './?task='.$community['type'].'s&community_id='.$comment['content_id'];
 					}
 				}
 				
 				if ($comment['commentable_type']=='event'){
-					$event = Events::getEventInfo($comment['id_content']);
+					$event = Events::getEventInfo($comment['content_id']);
 					
-					if (Events::checkOwnerEvent($comment['id_content'], $comment['id_user'], 'user')){
+					if (Events::checkOwnerEvent($comment['content_id'], $comment['user_id'], 'user')){
 						$author_name = $event['name'];	
 						$avatar = core::documentparser()->eventAvatar($event['cover_page']);
-						$link = './?task=events&id_event='.$comment['id_content'];
+						$link = './?task=events&event_id='.$comment['content_id'];
 					}
 				}
 			
@@ -226,9 +226,9 @@ session_start();
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 				$publication_msg .= '<ul class="attach_image">';
 				
-				foreach(Attach::getAttachList($row['id_content'], 'comment') as $row2){
-					$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+				foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 				}	
 				
 				$publication_msg .= '</ul>'	;
@@ -236,73 +236,73 @@ session_start();
 			}	
 		}	
 		else if($row['likeable_type'] == 'video'){
-			$video = Videoalbum::getVideoInfo($row['id_content']);
+			$video = Videoalbum::getVideoInfo($row['content_id']);
 			$avatar = core::documentparser()->userAvatar($video);
 			$date = core::documentparser()->mysql_russian_date($row['added']);
 		
-			if($video['id_owner']){
+			if($video['owner_id']){
 				$author_name = $video['firstname'] . " " . $video['lastname'];	
 				$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($video['provider'], $video['video']), core::getLanguage('str', 'useraction_liked_video'));
 				$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);
-				$publication_msg = str_replace('%ID_AUTHOR%', $video['id_owner'], $publication_msg);
-				$publication_msg = str_replace('%ID%', $video['id_video'], $publication_msg); 
+				$publication_msg = str_replace('%ID_AUTHOR%', $video['owner_id'], $publication_msg);
+				$publication_msg = str_replace('%ID%', $video['video_id'], $publication_msg); 
 				$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg); 
 			}	
 		}	
 		else if($row['likeable_type'] == 'photo'){	
-			$photo = Photoalbum::getPhotoInfo($row['id_content']);
+			$photo = Photoalbum::getPhotoInfo($row['content_id']);
 			$avatar = core::documentparser()->userAvatar($photo);
 			$date = core::documentparser()->mysql_russian_date($row['added']);
 		
-			if($photo['id_owner']){
+			if($photo['owner_id']){
 				$author_name = $photo['firstname'] . " " . $photo['lastname'];	
 			
 				$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($photo['small_photo'], $photo['photoalbumable_type']), core::getLanguage('str', 'useraction_liked_photo'));
-				$publication_msg = str_replace('%ID_AUTHOR%',$photo['id_owner'], $publication_msg); 
+				$publication_msg = str_replace('%ID_AUTHOR%',$photo['owner_id'], $publication_msg); 
 				$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);	
-				$publication_msg = str_replace('%ID%', $id_content, $publication_msg);  
+				$publication_msg = str_replace('%ID%', $content_id, $publication_msg);  
 				$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 			}		
 		}	
 	
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $id_content, 'likeable_type' => $row['likeable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $content_id, 'likeable_type' => $row['likeable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 	}
 
 	foreach(core::user()->getUserShare(5, 0) as $row){
 		$publication_name = $row['firstname'] . " " . $row['lastname'];
-		$publication_id_author = $row['id_user'];	
-		$id_content = $row['id_content'];
+		$publication_id_author = $row['user_id'];	
+		$content_id = $row['content_id'];
 		$pubmsg['publication_date'][] = core::documentparser()->mysql_russian_date($row['added']);
 		$pubmsg['timeorder'][] = $row['timeorder'];	
 	
 		if($row['shareable_type'] == 'comment'){
-			$comment = Comments::getCommentInfo($row['id_content']);
+			$comment = Comments::getCommentInfo($row['content_id']);
 		
-			if($comment['id_user']){
+			if($comment['user_id']){
 				$author_name = $comment['firstname'] . " " . $comment['lastname'];
 				$avatar = core::documentparser()->userAvatar($comment);
-				$link = './?task=profile&id_user='.$comment['id_user'];
+				$link = './?task=profile&user_id='.$comment['user_id'];
 				
 				if ($comment['commentable_type']=='group'||$comment['commentable_type']=='team'){
 
-					$community = Communities::getCommunityInfo($comment['id_content']);
+					$community = Communities::getCommunityInfo($comment['content_id']);
 					
-					if(Communities::checkOwnerCommunity($comment['id_content'], $comment['id_user']) or Communities::checkAdminCommunity($comment['id_content'], $comment['id_user'])){
+					if(Communities::checkOwnerCommunity($comment['content_id'], $comment['user_id']) or Communities::checkAdminCommunity($comment['content_id'], $comment['user_id'])){
 						$author_name = $community['name'];	
 						$avatar = core::documentparser()->communityAvatar($community);
-						$link = './?task='.$community['type'].'s&id_community='.$comment['id_content'];
+						$link = './?task='.$community['type'].'s&community_id='.$comment['content_id'];
 					}
 				}
 				
 				if ($comment['commentable_type']=='event'){
-					$event = Events::getEventInfo($comment['id_content']);
+					$event = Events::getEventInfo($comment['content_id']);
 					
-					if (Events::checkOwnerEvent($comment['id_content'], $comment['id_user'], 'user')){
+					if (Events::checkOwnerEvent($comment['content_id'], $comment['user_id'], 'user')){
 						$author_name = $event['name'];	
 						$avatar = core::documentparser()->eventAvatar($event['cover_page']);
-						$link = './?task=events&id_event='.$comment['id_content'];
+						$link = './?task=events&event_id='.$comment['content_id'];
 					}
 				}
 				
@@ -315,9 +315,9 @@ session_start();
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg);			
 				$publication_msg .= '<ul class="attach_image">';
 				
-				foreach(Attach::getAttachList($row['id_content'], 'comment') as $row2){
-					$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+				foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 				}
 				
 				$publication_msg .= '</ul>'	;
@@ -325,38 +325,38 @@ session_start();
 			}	
 		}	
 		else if($row['shareable_type'] == 'video'){
-			$video = Videoalbum::getVideoInfo($row['id_content']);
+			$video = Videoalbum::getVideoInfo($row['content_id']);
 			$avatar = core::documentparser()->userAvatar($video);
 			$date = core::documentparser()->mysql_russian_date($row['added']);	
 		
-			if($video['id_owner']){
+			if($video['owner_id']){
 				$author_name = $video['firstname'] . " " . $video['lastname'];	
 				$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($video['provider'], $video['video']), core::getLanguage('str', 'useraction_shared_video'));
 				$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);
-				$publication_msg = str_replace('%ID_AUTHOR%', $video['id_owner'], $publication_msg);
-				$publication_msg = str_replace('%ID%', $video['id_video'], $publication_msg); 	 
+				$publication_msg = str_replace('%ID_AUTHOR%', $video['owner_id'], $publication_msg);
+				$publication_msg = str_replace('%ID%', $video['video_id'], $publication_msg); 	 
 				$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg);		
 			}	
 		}	
 		else if($row['shareable_type'] == 'photo'){	
-			$photo = Photoalbum::getPhotoInfo($row['id_content']);
+			$photo = Photoalbum::getPhotoInfo($row['content_id']);
 			$avatar = core::documentparser()->userAvatar($photo);
 			$date = core::documentparser()->mysql_russian_date($row['added']);	
 		
-			if($photo['id_owner']){
+			if($photo['owner_id']){
 				$author_name = $photo['firstname'] . " " . $photo['lastname'];	
 			
 				$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($photo['small_photo'], $photo['photoalbumable_type']), core::getLanguage('str', 'useraction_shared_photo'));
-				$publication_msg = str_replace('%ID_AUTHOR%',$photo['id_owner'], $publication_msg); 
+				$publication_msg = str_replace('%ID_AUTHOR%',$photo['owner_id'], $publication_msg); 
 				$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);	
-				$publication_msg = str_replace('%ID%', $id_content, $publication_msg);  	 
+				$publication_msg = str_replace('%ID%', $content_id, $publication_msg);  	 
 				$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 			}		
 		}	
 	
-		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $id_content, 'likeable_type' => $row['shareable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $content_id, 'likeable_type' => $row['shareable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 	}
 
 	foreach(core::documentparser()->customMultiSort($arrs, 'timeorder') as $row){
@@ -366,13 +366,13 @@ session_start();
 		$rowBlock->assign('PUBLICATION_NAME', $row['name']);	
 		$rowBlock->assign('PUBLICATION_MSG', $row['msg']);
 		$rowBlock->assign('PUBLICATION_TYPE', $row['type']);
-		$rowBlock->assign('ID', $row['id_content']);	
+		$rowBlock->assign('ID', $row['content_id']);	
 		$rowBlock->assign('PUBLICATION_DATE', $row['publication_date']);
 		$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_author']) ? 'online' : 'offline');
 	
 		if($row['likeable_type']){
-			$rowBlock->assign('NUMBERLIKED', Comments::getNumberLiked($row['id_content'], $row['likeable_type']));
-			$rowBlock->assign('NUMBERTELL', Comments::getNumberTell($row['id_content'], $row['likeable_type']));	
+			$rowBlock->assign('NUMBERLIKED', Comments::getNumberLiked($row['content_id'], $row['likeable_type']));
+			$rowBlock->assign('NUMBERTELL', Comments::getNumberTell($row['content_id'], $row['likeable_type']));	
 			$rowBlock->assign('LIKEABLE_TYPE', $row['likeable_type']);
 		}
 	

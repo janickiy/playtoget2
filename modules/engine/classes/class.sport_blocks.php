@@ -68,9 +68,9 @@ class SportBlocks
 		}		
 	}
 	
-	static function checkOwner($id_sport_block, $id_owner)
+	static function checkOwner($id_sport_block, $owner_id)
 	{		
-		$query = "SELECT * FROM " . core::database()->getTableName('sport_blocks') . " WHERE id=" . $id_sport_block . " AND id_owner=" . $id_owner;
+		$query = "SELECT * FROM " . core::database()->getTableName('sport_blocks') . " WHERE id=" . $id_sport_block . " AND owner_id=" . $owner_id;
 		$result =  core::database()->querySQL($query);
 				
 		if(core::database()->getRecordCount($result) == 0)
@@ -79,10 +79,10 @@ class SportBlocks
 			return TRUE;
 	}
 	
-	static function getMySportBlocks($type, $id_owner, $limit = 5, $offset = 0)
+	static function getMySportBlocks($type, $owner_id, $limit = 5, $offset = 0)
 	{
-		if(is_numeric($id_owner) && $type){
-			$query = "SELECT * FROM " . core::database()->getTableName('sport_blocks') . " WHERE (banned!=1) AND (type='" . $type . "') AND (id_owner=" . $id_owner . ")";
+		if(is_numeric($owner_id) && $type){
+			$query = "SELECT * FROM " . core::database()->getTableName('sport_blocks') . " WHERE (banned!=1) AND (type='" . $type . "') AND (owner_id=" . $owner_id . ")";
 			$result =  core::database()->querySQL($query);
 		
 			return core::database()->getColumnArray($result);
@@ -131,7 +131,7 @@ class SportBlocks
 	static function getSportBlockIdPhotoAlbum($id_sport_block, $photoalbumable_type)
 	{
 		if(is_numeric($id_sport_block) && $photoalbumable_type){
-			$query = "SELECT id FROM " . core::database()->getTableName('photoalbums') . " WHERE photoalbumable_type='" . $photoalbumable_type . "' AND id_owner=" . $id_sport_block;
+			$query = "SELECT id FROM " . core::database()->getTableName('photoalbums') . " WHERE photoalbumable_type='" . $photoalbumable_type . "' AND owner_id=" . $id_sport_block;
 			$result =  core::database()->querySQL($query);
 			$row = core::database()->getRow($result);
 		

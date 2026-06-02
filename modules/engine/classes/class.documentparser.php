@@ -1120,25 +1120,25 @@ class DocumentParser {
 				
 				case user:
 				
-					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $id;
+					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $id;
 					
 				break;
 				
 				case group:
 				
-					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $id;
+					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $id;
 				
 				break;
 				
 				case team:
 				
-					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&id_community=' . $id;				
+					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $id;				
 				
 				break;
 				
 				case event:
 				
-					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&id_event=' . $id;	
+					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $id;	
 				
 				break;
 				

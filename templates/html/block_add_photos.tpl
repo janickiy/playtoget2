@@ -8,11 +8,11 @@
 <div class='job_form'>
 <form class="form-horizontal" id="photo-upload-form">
     <div class="form-group">
-    	<label class="col-lg-3 control-label" for="id_photoalbum">Выберите альбом:</label>
+    	<label class="col-lg-3 control-label" for="photoalbum_id">Выберите альбом:</label>
             <div class="col-lg-7">
                 <div class="styled-select styled-select-4">
 				<!-- IF '${SHOW_CATEGORY_LIST}' == 'show' -->
-				<select name="id_photoalbum">
+				<select name="photoalbum_id">
 				  <!-- BEGIN row_option_album -->
 				  <option value="${ID}">${NAME}</option>
 				  <!-- END row_option_album -->
@@ -169,7 +169,7 @@
 			let xhr = new XMLHttpRequest();
 
 			formData.append('file', item.file);
-			formData.append('categorie', $('select[name=id_photoalbum]').val());
+			formData.append('categorie', $('select[name=photoalbum_id]').val());
 			formData.append('photoalbumable_type', '${PHOTOALBUMABLE_TYPE}');
 			formData.append('description', $item.find('textarea').val());
 
@@ -211,7 +211,7 @@
 	}
 
 	function uploadQueue() {
-		let albumId = $('select[name=id_photoalbum]').val();
+		let albumId = $('select[name=photoalbum_id]').val();
 		let current = 0;
 		let failed = 0;
 

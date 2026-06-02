@@ -3,8 +3,8 @@
 <!--START CONTENT-->
 <script>
 window.avatar = '${TOP_AVATAR}';
-window.id_user = '${ID_USER}';
-window.id_content = '${ID_CONTENT}';
+window.user_id = '${ID_USER}';
+window.content_id = '${ID_CONTENT}';
 window.id_profile = <!-- IF '${PROFILE_ID_USER}'!='' --> '${PROFILE_ID_USER}' <!-- ELSE --> '${ID_USER}' <!-- END IF -->;
 window.placeholder = '${STR_YOUR_COMMENT}';
 window.error = '${STR_THERE_ARE_NO_MORE_ENTRIES}';
@@ -41,15 +41,15 @@ window.init = '${STR_CLICK}';
     <div class="content padding_none" id="content">
       <!-- IF '${QUERY}' == 'messages' -->
 	  <!-- INCLUDE block_photowindow.tpl -->      
-      <a href="./?task=profile&id_user=${SEL}">${RECEIVER_FIRSNAME} ${RECEIVER_LASTNAME}</a>
-      <a href="./?task=profile&id_user=${ID_SENDER}&q=dialogues " class='float_right'>${TO_DIALOGUES_LIST}</a>
+      <a href="./?task=profile&user_id=${SEL}">${RECEIVER_FIRSNAME} ${RECEIVER_LASTNAME}</a>
+      <a href="./?task=profile&user_id=${ID_SENDER}&q=dialogues " class='float_right'>${TO_DIALOGUES_LIST}</a>
       <div class='mess_list'>
       <!-- IF '${NO_MESSAGES}'=='' -->
         <!-- BEGIN row_messages -->
         <!-- IF '${ID_USER}' == '${ID_SENDER}' -->
         <div id="message-${ID}" class="message" >
           <div class="message-account"> <img src="${AVATAR}" alt="" class="img-account">
-            <h5 class="name"><a href="./?task=profile&id_user=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a></h5>
+            <h5 class="name"><a href="./?task=profile&user_id=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a></h5>
             <p class="data">${CREATED}</p>
           </div>
           <p class="message-text">
@@ -69,7 +69,7 @@ window.init = '${STR_CLICK}';
         <div class="message-reply" id="message-${ID}">
           <div class="message">
             <div class="message-account"> <img src="${AVATAR}" alt="" class="img-account">
-              <h5 class="name"><a href="./?task=profile&id_user=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a></h5>
+              <h5 class="name"><a href="./?task=profile&user_id=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a></h5>
               <p class="data">${CREATED}</p>
             </div>
             <p class="message-reply-text"> 
@@ -105,12 +105,12 @@ window.init = '${STR_CLICK}';
 	  <!-- IF '${PERMISSION_MESSAGE}' == 'yes' -->
 	  <div class='wrap_text_dialog'>
       <div class='ava_dialog'>
-        <a href="./?task=profile&id_user=${ID_USER}"><img src='${MY_AVATAR}'/></a>
+        <a href="./?task=profile&user_id=${ID_USER}"><img src='${MY_AVATAR}'/></a>
       </div>
       <div class='text_form'>
       <form id="addMessageForm" class="form-horizontal" method="POST" action="">
-        <input type="hidden" name="id_sender" value="${ID_USER}">
-        <input type="hidden" name="id_receiver" value="${SEL}">
+        <input type="hidden" name="sender_id" value="${ID_USER}">
+        <input type="hidden" name="receiver_id" value="${SEL}">
         <div class="form-group">
           <div class="col-lg-7 message_textarea">
             <input type="file" class="file_name" name="file_name[]" data-num="0" multiple/>
@@ -130,7 +130,7 @@ window.init = '${STR_CLICK}';
       </form>
       </div>
       <div class='ava_dialog'>
-        <a href="./?task=profile&id_user=${SEL}"><img src='${RECEIVER_AVATAR}'/></a>
+        <a href="./?task=profile&user_id=${SEL}"><img src='${RECEIVER_AVATAR}'/></a>
       </div>
     </div>
     <!-- ELSE -->
@@ -150,9 +150,9 @@ window.init = '${STR_CLICK}';
       <div class='container_dialog hide' id='new_dialogue'> 
       <!-- IF '${NO_FRIENDS}' == '' -->
         <!-- BEGIN row_my_friends -->
-            <div class="row dialogues " data-num='${ID_FRIEND}' onclick='window.location.href = "./?task=profile&id_user=${ID_USER}&q=messages&sel=${ID_FRIEND}"'>
+            <div class="row dialogues " data-num='${ID_FRIEND}' onclick='window.location.href = "./?task=profile&user_id=${ID_USER}&q=messages&sel=${ID_FRIEND}"'>
           <div class="col-md-12"> 
-            <a href="./?task=profile&id_user=${ID_FRIEND}"> <img src="${AVATAR}" width="50" alt="" class="img-account float_left">
+            <a href="./?task=profile&user_id=${ID_FRIEND}"> <img src="${AVATAR}" width="50" alt="" class="img-account float_left">
               <div class="fromwho"> ${FIRSTNAME} ${LASTNAME}
               </div>
             </a> 
@@ -168,9 +168,9 @@ window.init = '${STR_CLICK}';
       <!-- IF '${NO_DIALOGUES}' == '' -->
         <!-- BEGIN row_dialogues -->
          
-        <div class="row dialogues " data-num='${ID_RECEIVER}' onclick='window.location.href = "./?task=profile&id_user=${ID_USER}&q=messages&sel=${ID_RECEIVER}"'>
+        <div class="row dialogues " data-num='${ID_RECEIVER}' onclick='window.location.href = "./?task=profile&user_id=${ID_USER}&q=messages&sel=${ID_RECEIVER}"'>
           <div class="col-md-4"> 
-            <a href="./?task=profile&id_user=${ID_RECEIVER}"> <img src="${AVATAR}" width="50" alt="" class="img-account float_left">
+            <a href="./?task=profile&user_id=${ID_RECEIVER}"> <img src="${AVATAR}" width="50" alt="" class="img-account float_left">
               <div class="fromwho name_dialog"> ${FIRSTNAME}<br>
                 ${LASTNAME}<br>
                 <span>${CREATED_AT}</span> 
@@ -234,9 +234,9 @@ window.init = '${STR_CLICK}';
       <div class="message-content">
         <form autocomplete="off" id="addCommentForm" method="POST" action="" enctype="multipart/form-data">
           <input type="hidden" name="commentable_type" value="user">
-          <input type="hidden" name="id_content" value="${ID_CONTENT}">
-          <input type="hidden" name="id_user" value="${ID_USER}">
-          <input type="hidden" name="id_parent" value="0">
+          <input type="hidden" name="content_id" value="${ID_CONTENT}">
+          <input type="hidden" name="user_id" value="${ID_USER}">
+          <input type="hidden" name="parent_id" value="0">
           <input type="file"  class="file_name" name="file_name[]" data-num="${ID_CONTENT}" multiple/>
           <textarea id="comment" name="comment" data-num="${ID_CONTENT}" class='ahref_input' placeholder="${STR_WHATS_INTERESTING}"></textarea>
           <div class="smile-files"> 
@@ -266,7 +266,7 @@ window.init = '${STR_CLICK}';
           <div class="del_mess" data-item='${ID}'></div>
           <!-- END IF -->
           <!-- END IF -->
-          <h5 class="name"><a href="./?task=profile&id_user=${ID_USER}">${FIRSTNAME} ${LASTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_USER}'></span></a></h5>
+          <h5 class="name"><a href="./?task=profile&user_id=${ID_USER}">${FIRSTNAME} ${LASTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_USER}'></span></a></h5>
           <p class="data">${CREATED}</p>
         </div>
         <!-- IF '${CONTENT}'!='' -->
@@ -301,7 +301,7 @@ window.init = '${STR_CLICK}';
         <!-- END IF -->
         <div class="message">
           <div class="message-account"> <img src="${AVATAR}" alt="" class="img-account">
-            <h5 class="name"><a href="./?task=profile&id_user=${ID_USER}">${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_USER}'></span><br>${LASTNAME}</a></h5>
+            <h5 class="name"><a href="./?task=profile&user_id=${ID_USER}">${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${ID_USER}'></span><br>${LASTNAME}</a></h5>
             <p class="data">${CREATED}</p>
           </div>
           <!-- IF '${CONTENT}'!='' -->

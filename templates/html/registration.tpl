@@ -50,7 +50,7 @@
 								<input type="password" name="password" placeholder="${STR_PASSWORD}*" id="input-password" request>
 								<input type="password" name="confirm_password" placeholder="${STR_CONFIRM_PASSWORD}*" id="input-s-password" request>
 								<input type="checkbox" name="use_terms" <!-- IF '${USE_TERMS}' != '' -->checked="checked"<!-- END IF --> id="input-checkbox" hidden>
-								<label for="input-checkbox"><div class="confirm-block"><a href="./?task=content&id_content=5" class="form-enter-link_pass">${STR_USE_TERMS}</a> ${STR_ACCEPT_AGREEMENT_FORM} *</div></label>
+								<label for="input-checkbox"><div class="confirm-block"><a href="./?task=content&content_id=5" class="form-enter-link_pass">${STR_USE_TERMS}</a> ${STR_ACCEPT_AGREEMENT_FORM} *</div></label>
 								<input type="submit" value="${BUTTON_SIGN_UP}" name="action" id="input-submit">
 							</form>
 							<div class="social">

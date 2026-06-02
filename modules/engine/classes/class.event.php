@@ -6,7 +6,7 @@ class Events
 {
 	static function getEventsList($limit = 5, $offset = 0)
 	{
-		$from = "" . core::database()->getTableName('events') . " e LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.id_event=e.id";
+		$from = "" . core::database()->getTableName('events') . " e LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.event_id=e.id";
 
 		$place = core::database()->escape(Core_Array::getRequest('place'));
 		$sport = core::database()->escape(Core_Array::getRequest('sport'));
@@ -31,14 +31,14 @@ class Events
 			if(!empty($place)) $additional_pars .= " AND (place LIKE '" . $place . "')";
 			if(!empty($sport)) $additional_pars .= " AND (sport_type LIKE '" . $sport . "')";
 			
-			$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS id_event";
+			$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS event_id";
 			$where = "WHERE e.banned!=1 " . ((!empty($tmp)) ? 'AND' : '') . " " . $tmp . "" . $additional_pars . "";
 			$group = "GROUP BY e.id";
 			$order = "ORDER BY e.name";
 			$limit = "LIMIT " . $limit . " OFFSET " . $offset . "";
          
         } else {
-			$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS id_event";
+			$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS event_id";
 			$where = "WHERE e.banned!=1";
 			$group = "GROUP BY e.id";
 			$order = "ORDER BY e.name";
@@ -50,10 +50,10 @@ class Events
         return core::database()->getColumnArray($result);
 	}		
 	
-	static function getSearchEventsList($id_member, $eventable_type, $limit = 5, $offset = 0)
+	static function getSearchEventsList($member_id, $eventable_type, $limit = 5, $offset = 0)
 	{
-		if(is_numeric($id_member)){
-			$from = "" . core::database()->getTableName('events') . " e LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.id_event=e.id";
+		if(is_numeric($member_id)){
+			$from = "" . core::database()->getTableName('events') . " e LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.event_id=e.id";
 
 			$place = core::database()->escape(Core_Array::getRequest('place'));
 			$sport = core::database()->escape(Core_Array::getRequest('sport'));
@@ -78,14 +78,14 @@ class Events
 				if(!empty($place)) $additional_pars .= " AND (place LIKE '" . $place . "')";
 				if(!empty($sport)) $additional_pars .= " AND (sport LIKE '" . $sport . "')";
 			
-				$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS id_event";
+				$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS event_id";
 				$where = "WHERE (e.banned!=1) AND " . ((!empty($tmp)) ? 'AND' : '') . " " . $tmp . "" . $additional_pars . "";
 				$group = "GROUP BY e.id";
 				$order = "ORDER BY e.name";
 				$limit = "LIMIT " . $limit . " OFFSET " . $offset . "";
          
 			} else {
-				$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS id_event";
+				$parameters = "*,DATE_FORMAT(e.created_at,'%d.%m.%y') AS putdate_created, e.id AS event_id";
 				$where = "WHERE e.banned!=1";
 				$group = "GROUP BY e.id";
 				$order = "ORDER BY e.name";
@@ -100,8 +100,8 @@ class Events
 	
 	static function getPopularEventList($limit = 5, $offset = 0)
 	{
-		$query = "SELECT *, sum(a.id_member) pop, e.id AS id, a.id AS id_member, DATE_FORMAT(e.date_from,'%d.%m.%y %H:%i') AS date_beginning, DATE_FORMAT(e.date_from,'%H:%i') AS time_from, DATE_FORMAT(e.date_to,'%d.%m.%y %H:%i') AS date_end, DATE_FORMAT(e.date_to,'%H:%i') AS time_to FROM " . core::database()->getTableName('events') . " e
-					INNER JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.id_event=e.id					
+		$query = "SELECT *, sum(a.member_id) pop, e.id AS id, a.id AS member_id, DATE_FORMAT(e.date_from,'%d.%m.%y %H:%i') AS date_beginning, DATE_FORMAT(e.date_from,'%H:%i') AS time_from, DATE_FORMAT(e.date_to,'%d.%m.%y %H:%i') AS date_end, DATE_FORMAT(e.date_to,'%H:%i') AS time_to FROM " . core::database()->getTableName('events') . " e
+					INNER JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.event_id=e.id					
 					WHERE (e.banned!=1) AND ((e.date_to IS NULL AND e.date_from > NOW()) OR e.date_to > NOW())				
 					GROUP by e.id
 					ORDER by pop DESC
@@ -114,8 +114,8 @@ class Events
 
  	static function getNumberPopularEvents()
 	{
-		$query = "SELECT *, sum(a.id_member) pop FROM " . core::database()->getTableName('events') . " e
-					INNER JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.id_event=e.id					
+		$query = "SELECT *, sum(a.member_id) pop FROM " . core::database()->getTableName('events') . " e
+					INNER JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.event_id=e.id					
 					WHERE (e.banned!=1) AND ((e.date_to IS NULL AND e.date_from > NOW()) OR e.date_to > NOW())	
 					GROUP by e.id";
 					
@@ -124,20 +124,20 @@ class Events
 		return core::database()->getRecordCount($result);
 	}
 	
-	static function changememberstatus($id_event, $id_member, $eventable_type, $status)
+	static function changememberstatus($event_id, $member_id, $eventable_type, $status)
 	{
-		if(is_numeric($id_event) && is_numeric($id_member) && $eventable_type && Events::checkBlocked($id_event)){
+		if(is_numeric($event_id) && is_numeric($member_id) && $eventable_type && Events::checkBlocked($event_id)){
 			if($status == 1){
-				$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (id_event=" . $id_event . ") AND (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member . ")";
+				$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (event_id=" . $event_id . ") AND (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id . ")";
 				$result = core::database()->querySQL($query);
 			
 				if(core::database()->getRecordCount($result) == 0){
 					$fields = array();
 					$fields['id'] = 0;				
 					$fields['eventable_type'] = $eventable_type;				
-					$fields['id_member'] = $id_member;				
+					$fields['member_id'] = $member_id;				
 					$fields['role'] = 3;				
-					$fields['id_event'] = $id_event;				
+					$fields['event_id'] = $event_id;				
 				
 					$result = core::database()->insert($fields, core::database()->getTableName('accepted_event_members'));
 				
@@ -147,7 +147,7 @@ class Events
 						return FALSE;
 				}
 				else{
-					$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (id_event=" . $id_event . ") AND (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member . ")";
+					$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (event_id=" . $event_id . ") AND (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id . ")";
 					$result = core::database()->querySQL($query);
 					$row = core::database()->getRow($result);
 				
@@ -155,7 +155,7 @@ class Events
 						$fields = array();
 						$fields['role'] = 3;
 			
-						$update = core::database()->update($fields, core::database()->getTableName('accepted_event_members'), "(id_event=" . $id_event . ") AND (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member . ")"); 
+						$update = core::database()->update($fields, core::database()->getTableName('accepted_event_members'), "(event_id=" . $event_id . ") AND (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id . ")"); 
 			
 						if($update) 
 							return TRUE;
@@ -168,7 +168,7 @@ class Events
 				}
 			}
 			else if($status == 0){
-				if(core::database()->delete(core::database()->getTableName('accepted_event_members'), "(id_event=" . $id_event . ") AND (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member . ")", '')){
+				if(core::database()->delete(core::database()->getTableName('accepted_event_members'), "(event_id=" . $event_id . ") AND (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id . ")", '')){
 					return TRUE;
 				}
 				else{
@@ -178,18 +178,18 @@ class Events
 		}
 	}
 
-	static function change_member_role($id_event, $id_member, $eventable_type, $role)
+	static function change_member_role($event_id, $member_id, $eventable_type, $role)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (id_event=" . $id_event . ") AND (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member . ")";
+		$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (event_id=" . $event_id . ") AND (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id . ")";
 		$result = core::database()->querySQL($query);
 		
 		if(core::database()->getRecordCount($result) == 0){
 			$fields = array();
 			$fields['id'] = 0;				
 			$fields['eventable_type'] = $eventable_type;				
-			$fields['id_member'] = $id_member;				
+			$fields['member_id'] = $member_id;				
 			$fields['role'] = $role;				
-			$fields['id_event'] = $id_event;
+			$fields['event_id'] = $event_id;
 			
 			$insert = core::database()->insert($fields, core::database()->getTableName('accepted_event_members'));
 				
@@ -202,7 +202,7 @@ class Events
 			$fields = array();
 			$fields['role'] = $role;
 			
-			$update = core::database()->update($fields, core::database()->getTableName('accepted_event_members'), "id=" . $id_event); 
+			$update = core::database()->update($fields, core::database()->getTableName('accepted_event_members'), "id=" . $event_id); 
 			
 			if($update) 
 				return TRUE;
@@ -211,12 +211,12 @@ class Events
 		}	
 	}	
 	
-	static function getMyEvents($id_member, $eventable_type, $limit = 5, $offset = 0)
+	static function getMyEvents($member_id, $eventable_type, $limit = 5, $offset = 0)
 	{
-		if(is_numeric($id_member) && $eventable_type){
-			$query = "SELECT *, DATE_FORMAT(date_from,'%d.%m.%y %H:%i') AS date_beginning, DATE_FORMAT(date_from,'%H:%i') AS time_from, DATE_FORMAT(date_to,'%d.%m.%y %H:%i') AS date_end, DATE_FORMAT(date_to,'%H:%i') AS time_to, e.id AS id_event FROM " . core::database()->getTableName('events') . " e 
-						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.id_event=e.id
-						WHERE (e.banned!=1) AND (a.role IN (1,2,3)) AND (a.eventable_type='" . $eventable_type . "') AND (a.id_member=" . $id_member . ")
+		if(is_numeric($member_id) && $eventable_type){
+			$query = "SELECT *, DATE_FORMAT(date_from,'%d.%m.%y %H:%i') AS date_beginning, DATE_FORMAT(date_from,'%H:%i') AS time_from, DATE_FORMAT(date_to,'%d.%m.%y %H:%i') AS date_end, DATE_FORMAT(date_to,'%H:%i') AS time_to, e.id AS event_id FROM " . core::database()->getTableName('events') . " e 
+						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.event_id=e.id
+						WHERE (e.banned!=1) AND (a.role IN (1,2,3)) AND (a.eventable_type='" . $eventable_type . "') AND (a.member_id=" . $member_id . ")
 						GROUP BY e.id
 						ORDER by a.role 					
 						LIMIT " . $limit . " OFFSET " . $offset ."";			
@@ -227,10 +227,10 @@ class Events
 		}
 	}
 	
-	static function countMembers($id_event, $eventable_type)
+	static function countMembers($event_id, $eventable_type)
 	{
-		if(is_numeric($id_event) && $eventable_type){
-			$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (role IN (1,2,3)) AND (eventable_type='" . $eventable_type . "') AND (id_event=" . $id_event . ")";
+		if(is_numeric($event_id) && $eventable_type){
+			$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (role IN (1,2,3)) AND (eventable_type='" . $eventable_type . "') AND (event_id=" . $event_id . ")";
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getRecordCount($result);
@@ -257,10 +257,10 @@ class Events
 		}
 	}
 	
-	static function checkOwnerEvent($id, $id_member, $eventable_type)
+	static function checkOwnerEvent($id, $member_id, $eventable_type)
 	{
-		if(is_numeric($id) && is_numeric($id_member)){
-			$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (role=1) AND (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member . ") AND (id_event=" . $id . ")";
+		if(is_numeric($id) && is_numeric($member_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (role=1) AND (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id . ") AND (event_id=" . $id . ")";
 			$result = core::database()->querySQL($query);
 		
 			if(core::database()->getRecordCount($result) == 0)
@@ -270,10 +270,10 @@ class Events
 		}		
 	}
 	
-	static function checkEventMember($id, $id_member, $eventable_type)
+	static function checkEventMember($id, $member_id, $eventable_type)
 	{
-		if(is_numeric($id) && is_numeric($id_member)){
-			$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member . ") AND (id_event=" . $id . ")";
+		if(is_numeric($id) && is_numeric($member_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id . ") AND (event_id=" . $id . ")";
 			$result = core::database()->querySQL($query);
 			$row = core::database()->getRow($result);
 		
@@ -281,22 +281,22 @@ class Events
 		}		
 	}
 
-	static function getEventInfo($id_event)
+	static function getEventInfo($event_id)
 	{
-		if(is_numeric($id_event)){
-			$query = "SELECT * FROM " . core::database()->getTableName('events') . " WHERE id=" . $id_event;
+		if(is_numeric($event_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('events') . " WHERE id=" . $event_id;
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getRow($result);
 		}
 	}	
 
-	static function getNumberMyEvents($id_member, $eventable_type)
+	static function getNumberMyEvents($member_id, $eventable_type)
 	{
-		if(is_numeric($id_member) && $eventable_type){
+		if(is_numeric($member_id) && $eventable_type){
 			$query = "SELECT * FROM " . core::database()->getTableName('events') . " e
-						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " m ON m.id_event=e.id
-						WHERE (e.banned!=1) AND (m.role IN (1,2,3)) AND (m.eventable_type='" . $eventable_type . "') AND (m.id_member=" . $id_member . ")";
+						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " m ON m.event_id=e.id
+						WHERE (e.banned!=1) AND (m.role IN (1,2,3)) AND (m.eventable_type='" . $eventable_type . "') AND (m.member_id=" . $member_id . ")";
 					
 			$result = core::database()->querySQL($query);
 		
@@ -313,22 +313,22 @@ class Events
 		return core::database()->insert($fields, core::database()->getTableName('events'));
 	}
 	
-	static function addMember($id_event, $id_member, $eventable_type, $status)
+	static function addMember($event_id, $member_id, $eventable_type, $status)
 	{
 		$fields = array();
 		$fields['id'] = 0;
 		$fields['eventable_type'] = $eventable_type;
-		$fields['id_member'] = $id_member;
+		$fields['member_id'] = $member_id;
 		$fields['role'] = $status;
-		$fields['id_event'] = $id_event;
+		$fields['event_id'] = $event_id;
 		
 		return core::database()->insert($fields, core::database()->getTableName('accepted_event_members'));		
 	}
 	
-	static function editEvent($fields, $id_event)
+	static function editEvent($fields, $event_id)
 	{
 		if($fields['cover_page'] && file_exists('tmp/' . $fields['cover_page'])){
-			$query = "SELECT cover_page FROM " . core::database()->getTableName('events') . " WHERE id=" . $id_event;
+			$query = "SELECT cover_page FROM " . core::database()->getTableName('events') . " WHERE id=" . $event_id;
 			$result = core::database()->querySQL($query);		
 			$row = core::database()->getRow($result);
 			
@@ -337,28 +337,28 @@ class Events
 			rename('tmp/' . $fields['cover_page'], PATH_EVENTS_COVER_PAGE_IMAGES . $fields['cover_page']);
 		}
 		
-		$result = core::database()->update($fields, core::database()->getTableName('events'), "id=" . $id_event); 
+		$result = core::database()->update($fields, core::database()->getTableName('events'), "id=" . $event_id); 
 		
 		return $result;
 	}
 	
-	static function getEventsMemberList($id_event, $eventable_type)
+	static function getEventsMemberList($event_id, $eventable_type)
 	{
 		$query = "SELECT * FROM " . core::database()->getTableName('events') . " e
-					LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON e.id=a.id_event
-					WHERE (a.eventable_type='" . $eventable_type . "') AND (a.role IN(1,2,3)) AND (a.id_event=" . $id_event . ")";
+					LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON e.id=a.event_id
+					WHERE (a.eventable_type='" . $eventable_type . "') AND (a.role IN(1,2,3)) AND (a.event_id=" . $event_id . ")";
 					
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getColumnArray($result);
 	}
 	
-	static function getEventsOfMember($id_member, $eventable_type)
+	static function getEventsOfMember($member_id, $eventable_type)
 	{
-		if(is_numeric($id_member) && $eventable_type){
+		if(is_numeric($member_id) && $eventable_type){
 			$query = "SELECT * FROM " . core::database()->getTableName('events') . " e
-						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON e.id=a.id_event
-						WHERE a.eventable_type='" . $eventable_type . "' AND a.id_member=" . $id_member;
+						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON e.id=a.event_id
+						WHERE a.eventable_type='" . $eventable_type . "' AND a.member_id=" . $member_id;
 					
 			$result = core::database()->querySQL($query);
 		
@@ -376,10 +376,10 @@ class Events
 			return core::getLanguage('str', 'member');
 	}
 	
-	static function getMemberShipStatus($id_event, $id_member, $eventable_type)
+	static function getMemberShipStatus($event_id, $member_id, $eventable_type)
 	{
-		if(is_numeric($id_event) && is_numeric($id_member) && $eventable_type){
-			$query = "SELECT role FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (id_event=" . $id_event . ") AND (eventable_type='" . $eventable_type . "') AND (id_member=" . $id_member .")";
+		if(is_numeric($event_id) && is_numeric($member_id) && $eventable_type){
+			$query = "SELECT role FROM " . core::database()->getTableName('accepted_event_members') . " WHERE (event_id=" . $event_id . ") AND (eventable_type='" . $eventable_type . "') AND (member_id=" . $member_id .")";
 			$result = core::database()->querySQL($query);
 		
 			$row = core::database()->getRow($result);
@@ -401,12 +401,12 @@ class Events
 		}		
 	}
 	
-	static function getNumberInvitedMeEvents($id_member, $eventable_type)
+	static function getNumberInvitedMeEvents($member_id, $eventable_type)
 	{
-		if(is_numeric($id_member) && $eventable_type){
+		if(is_numeric($member_id) && $eventable_type){
 			$query = "SELECT * FROM " . core::database()->getTableName('events') . " e
-						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " m ON m.id_event=e.id
-						WHERE (e.banned!=1) AND (m.role=4) AND (m.eventable_type='" . $eventable_type . "') AND (m.id_member=" . $id_member . ")";
+						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " m ON m.event_id=e.id
+						WHERE (e.banned!=1) AND (m.role=4) AND (m.eventable_type='" . $eventable_type . "') AND (m.member_id=" . $member_id . ")";
 					
 			$result = core::database()->querySQL($query);
 		
@@ -414,12 +414,12 @@ class Events
 		}
 	}
 	
-	static function getInvitedMeEvents($id_member, $eventable_type, $limit = 5, $offset = 0)
+	static function getInvitedMeEvents($member_id, $eventable_type, $limit = 5, $offset = 0)
 	{
-		if(is_numeric($id_member) && $eventable_type){
-			$query = "SELECT *, DATE_FORMAT(date_from,'%d.%m.%y %H:%i') AS date_beginning, DATE_FORMAT(date_from,'%H:%i') AS time_from, DATE_FORMAT(date_to,'%d.%m.%y %H:%i') AS date_end, DATE_FORMAT(date_to,'%H:%i') AS time_to, e.id AS id_event FROM " . core::database()->getTableName('events') . " e 
-						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.id_event=e.id
-						WHERE (e.banned!=1) AND (a.role=4) AND (a.eventable_type='" . $eventable_type . "') AND (a.id_member=" . $id_member . ")
+		if(is_numeric($member_id) && $eventable_type){
+			$query = "SELECT *, DATE_FORMAT(date_from,'%d.%m.%y %H:%i') AS date_beginning, DATE_FORMAT(date_from,'%H:%i') AS time_from, DATE_FORMAT(date_to,'%d.%m.%y %H:%i') AS date_end, DATE_FORMAT(date_to,'%H:%i') AS time_to, e.id AS event_id FROM " . core::database()->getTableName('events') . " e 
+						LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON a.event_id=e.id
+						WHERE (e.banned!=1) AND (a.role=4) AND (a.eventable_type='" . $eventable_type . "') AND (a.member_id=" . $member_id . ")
 						GROUP BY e.id
 						ORDER by a.role 					
 						LIMIT " . $limit . " OFFSET " . $offset ."";			

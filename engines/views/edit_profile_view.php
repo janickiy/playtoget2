@@ -9,11 +9,11 @@ Auth::authorization();
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 
 	$tpl->assign('NUMBERMESSAGE', core::user()->MessageNotification());
@@ -270,7 +270,7 @@ Auth::authorization();
 			$rowBlock = $rowAchivmentsBlock->fetch('ACHIVMENTS_OPTION_SPORT_LEVEL');	
 			$rowBlock->assign('ID_LEVEL', $row2['id']);	
 			$rowBlock->assign('LEVEL_NAME', $row2['name']);
-			$rowBlock->assign('ACHIVMENTS_ID_LEVEL', $row['id_sport_level']);
+			$rowBlock->assign('ACHIVMENTS_ID_LEVEL', $row['sport_level_id']);
 			$rowAchivmentsBlock->assign('ACHIVMENTS_OPTION_SPORT_LEVEL', $rowBlock);		
 		}			
 		

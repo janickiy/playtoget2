@@ -10,7 +10,7 @@ Auth::authorization();
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
 	if($_POST['action']){
-		core::user()->setUser_id($_SESSION['id_user']);
+		core::user()->setUser_id($_SESSION['user_id']);
 		$user = core::user()->getUserInfo();
 		core::user()->setUserActivity();
 	
@@ -50,7 +50,7 @@ Auth::authorization();
 		}
 	}
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -155,7 +155,7 @@ Auth::authorization();
 
 	foreach(core::user()->getBlockUsersList() as $row){
 		$rowBlock = $tpl->fetch('row_block_users');
-		$rowBlock->assign('ID_USER', $row['id_friend']);	
+		$rowBlock->assign('ID_USER', $row['friend_id']);	
 		$rowBlock->assign('FIRSTNAME', $row['firstname']);
 		$rowBlock->assign('LASTNAME', $row['lastname']);	
 		$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($row));	

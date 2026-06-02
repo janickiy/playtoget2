@@ -11,7 +11,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -57,7 +57,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['avatar'] = basename($file_ava);
 				$fields['website'] = $website;
 				$fields['type'] = 'playground';			 
-				$fields['id_owner'] = $user['id'];			
+				$fields['owner_id'] = $user['id'];			
 				$fields['created_at'] = date("Y-m-d H:i:s");
 			
 				$id_sport_block = SportBlocks::createSportBlock($fields);
@@ -70,7 +70,7 @@ if($_SESSION['user_authorization'] == "ok"){
 						$fields['name'] = $name;
 						$fields['created_at'] = date("Y-m-d H:i:s");
 						$fields['photoalbumable_type'] = 'playground';
-						$fields['id_owner'] = $id_sport_block;		
+						$fields['owner_id'] = $id_sport_block;		
 			
 						Photoalbum::createAlbum($fields);	
 					}				
@@ -199,7 +199,7 @@ if($_SESSION['user_authorization'] == "ok"){
 			$fields['name'] = $sport_block['name'];
 			$fields['created_at'] = date("Y-m-d H:i:s");
 			$fields['photoalbumable_type'] = 'playground';
-			$fields['id_owner'] = $id_sport_block;		
+			$fields['owner_id'] = $id_sport_block;		
 			
 			Photoalbum::createAlbum($fields);	
 		}
@@ -213,7 +213,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		$tpl->assign('INFO_SPORT_BLOCK_WEBSITE', $sport_block['website']);
 		$tpl->assign('SPORT_BLOCK_AVATAR', core::documentparser()->sportblockAvatar($sport_block['avatar']));
 		$tpl->assign('SPORT_BLOCK_TYPE', 'playgrounds');
-		$tpl->assign('ID_OWNER', $sport_block['id_owner']);
+		$tpl->assign('ID_OWNER', $sport_block['owner_id']);
 		$tpl->assign('ID_SPORT_BLOCK_PHOTO_ALBUM', SportBlocks::getSportBlockIdPhotoAlbum($id_sport_block, 'playground'));
 	
 		if(Photoalbum::getNumberAlbums($id_sport_block, 'playground') > 0){
@@ -223,21 +223,21 @@ if($_SESSION['user_authorization'] == "ok"){
 			if($arr_photos){
 				foreach($arr_photos as $row){
 					$rowBlock = $tpl->fetch('row_small_images_list');
-					$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+					$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 					$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], $row['photoalbumable_type']));	
 					$tpl->assign('row_small_images_list', $rowBlock);	
 				}
 			
 				foreach($arr_photos as $row){
 					$rowBlock = $tpl->fetch('row_big_images_list');
-					$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+					$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 					$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], $row['photoalbumable_type']));
 					$tpl->assign('row_big_images_list', $rowBlock);	
 				}			
 			
 				foreach($arr_photos as $row){
 					$rowBlock = $tpl->fetch('row_photos_list');
-					$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+					$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 					$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], $row['photoalbumable_type']));	
 					$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], $row['photoalbumable_type']));
 					$rowBlock->assign('DESCRIPTION', $row['description']);
@@ -334,7 +334,7 @@ if($_SESSION['user_authorization'] == "ok"){
 					$rowBlock->assign('ABOUT', $row['about']);				
 					$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));
 				
-					if($row['id_owner'] == $user['id']) $rowBlock->assign('SHOW_EDTI_LINK', 'show');
+					if($row['owner_id'] == $user['id']) $rowBlock->assign('SHOW_EDTI_LINK', 'show');
 				
 					$rowBlock->assign('AVATAR', core::documentparser()->sportblockAvatar($row['avatar']));				
 					$tpl->assign('row_my_id_sport_block', $rowBlock);
@@ -413,7 +413,7 @@ else {
 		$fields['name'] = $sport_block['name'];
 		$fields['created_at'] = date("Y-m-d H:i:s");
 		$fields['photoalbumable_type'] = 'playground';
-		$fields['id_owner'] = $id_sport_block;		
+		$fields['owner_id'] = $id_sport_block;		
 			
 		Photoalbum::createAlbum($fields);	
 	}
@@ -428,7 +428,7 @@ else {
 	$tpl->assign('INFO_SPORT_BLOCK_WEBSITE', $sport_block['website']);
 	$tpl->assign('SPORT_BLOCK_AVATAR', core::documentparser()->sportblockAvatar($sport_block['avatar']));
 	$tpl->assign('SPORT_BLOCK_TYPE', 'playgrounds');
-	$tpl->assign('ID_OWNER', $sport_block['id_owner']);
+	$tpl->assign('ID_OWNER', $sport_block['owner_id']);
 	$tpl->assign('ID_SPORT_BLOCK_PHOTO_ALBUM', SportBlocks::getSportBlockIdPhotoAlbum($id_sport_block, 'playground'));
 	
 	if(Photoalbum::getNumberAlbums($id_sport_block, 'playground') > 0){
@@ -437,21 +437,21 @@ else {
 		if($arr_photos){
 			foreach($arr_photos as $row){
 				$rowBlock = $tpl->fetch('row_small_images_list');
-				$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+				$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 				$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], $row['photoalbumable_type']));	
 				$tpl->assign('row_small_images_list', $rowBlock);	
 			}
 			
 			foreach($arr_photos as $row){
 				$rowBlock = $tpl->fetch('row_big_images_list');
-				$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+				$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 				$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], $row['photoalbumable_type']));
 				$tpl->assign('row_big_images_list', $rowBlock);	
 			}			
 			
 			foreach($arr_photos as $row){
 				$rowBlock = $tpl->fetch('row_photos_list');
-				$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+				$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 				$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], $row['photoalbumable_type']));	
 				$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], $row['photoalbumable_type']));
 				$rowBlock->assign('DESCRIPTION', $row['description']);

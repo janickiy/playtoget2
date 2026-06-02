@@ -20,7 +20,7 @@ $(document).ready(function () {
 
                 let Message = '<div id="message-' + data.id + '" class="message">';
                 Message += '<img src="' + data.avatar + '" alt="" class="img-account">';
-                Message += '<h5 class="name"><a href="./?task=profile&id_user=' + data.id_sender + '">' + data.firstname + ' ' + data.lastname + '</a></h5>';
+                Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.sender_id + '">' + data.firstname + ' ' + data.lastname + '</a></h5>';
                 Message += '<p class="data">' + data.created + '</p>';
                 Message += '<p class="message-text">' + data.content + '</p>';
                 Message += '</div>';
@@ -59,8 +59,8 @@ $(document).ready(function () {
             const $settings = settings;
             let offset = $settings.offset;
             let busy = false;
-            const idSender = $('[name=id_sender]').val();
-            const idReceiver = $('[name=id_receiver]').val() || $this.attr('data-num');
+            const idSender = $('[name=sender_id]').val();
+            const idReceiver = $('[name=receiver_id]').val() || $this.attr('data-num');
             const initMessage = $settings.scroll ? '' : '${STR_CLICK}';
 
             $this.append('<div class="commnet-list"></div><div class="loading-bar">' + initMessage + '</div>');
@@ -70,8 +70,8 @@ $(document).ready(function () {
                 $.post('./?task=ajax_action&action=getmessages', {
                     number: $settings.nop,
                     offset: offset,
-                    id_sender: idSender,
-                    id_receiver: idReceiver,
+                    sender_id: idSender,
+                    receiver_id: idReceiver,
 
                 }, function (data) {
 
@@ -87,10 +87,10 @@ $(document).ready(function () {
 
                             for (let i = 0; i < data.item.length; i++) {
                                 let Message;
-                                if (String(data.item[i].id_sender) === String(idSender)) {
+                                if (String(data.item[i].sender_id) === String(idSender)) {
                                     Message = '<div id="message-' + data.item[i].id + '" class="message">';
                                     Message += '<img src="' + data.item[i].avatar + '" alt="" class="img-account">';
-                                    Message += '<h5 class="name"><a href="./?task=profile&id_user=' + data.item[i].id_sender + '">' + data.item[i].firstname + ' ' + data.item[i].lastname + '</a></h5>';
+                                    Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.item[i].sender_id + '">' + data.item[i].firstname + ' ' + data.item[i].lastname + '</a></h5>';
                                     Message += '<p class="data">' + data.item[i].created + '</p>';
                                     Message += '<p class="message-text">' + data.item[i].content + '</p>';
                                     Message += '</div>';
@@ -99,7 +99,7 @@ $(document).ready(function () {
                                     Message += '<div class="message ">';
                                     Message += '<div class="message-account">';
                                     Message += '<img src="' + data.item[i].avatar + '" alt="" class="img-account">';
-                                    Message += '<h5 class="name"><a href="./?task=profile&id_user=' + data.item[i].id_sender + '">' + data.item[i].firstname + ' ' + data.item[i].lastname + '</a></h5>';
+                                    Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.item[i].sender_id + '">' + data.item[i].firstname + ' ' + data.item[i].lastname + '</a></h5>';
                                     Message += '<p class="data">' + data.item[i].created + '</p>';
                                     Message += '</div>';
                                     Message += '<p class="message-reply-text">' + data.item[i].content + '</p>';

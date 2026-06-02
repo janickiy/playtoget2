@@ -31,12 +31,12 @@ class Sport
 		return core::database()->getColumnArray($result);
 	}
 
-	static function getUserSportTypeList($id_user)
+	static function getUserSportTypeList($user_id)
 	{
-		if(is_numeric($id_user)){
+		if(is_numeric($user_id)){
 			$query = "SELECT *, l.name AS sport_level FROM " . core::database()->getTableName('users_sport_types') . " u
-						LEFT JOIN " . core::database()->getTableName('sport_level') . " l ON u.id_sport_level=l.id
-						WHERE u.id_user=" . $id_user;
+						LEFT JOIN " . core::database()->getTableName('sport_level') . " l ON u.sport_level_id=l.id
+						WHERE u.user_id=" . $user_id;
 			
 			$result = core::database()->querySQL($query);
 		

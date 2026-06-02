@@ -1,7 +1,7 @@
 
 
 <h2>${PHOTOALBUM_NAME}  ${WERR2}</h2>
-<p><a href="${PHOTOALBUM_PATH}<!-- IF '${PROFILE_USER_ID}' != '' -->&id_user=${PROFILE_USER_ID}<!-- END IF -->">${STR_ALL_PHOTOS}</a></p>
+<p><a href="${PHOTOALBUM_PATH}<!-- IF '${PROFILE_USER_ID}' != '' -->&user_id=${PROFILE_USER_ID}<!-- END IF -->">${STR_ALL_PHOTOS}</a></p>
 <!-- IF '${NO_IMAGES}' == '' -->
 <div  class="photo-container pop-photos">
   <!-- BEGIN row_photos_list -->

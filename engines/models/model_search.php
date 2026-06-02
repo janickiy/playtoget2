@@ -6,7 +6,7 @@ class Model_search extends Model
 {
 	public function getUsersList($limit, $offset = 0)
 	{
-		$from = "" . core::database()->getTableName('users') . " u LEFT JOIN " . core::database()->getTableName('users_sport_types') . " t ON u.id=id_user";
+		$from = "" . core::database()->getTableName('users') . " u LEFT JOIN " . core::database()->getTableName('users_sport_types') . " t ON u.id=user_id";
 		$parameters = "*, u.id AS id";
 		
 		$place = core::database()->escape(Core_Array::getRequest('place'));

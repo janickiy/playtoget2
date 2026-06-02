@@ -3,7 +3,7 @@
 <!--START CONTENT-->
 <script>
 window.avatar = '${TOP_AVATAR}';
-window.id_user = '${ID_USER}';
+window.user_id = '${ID_USER}';
 window.placeholder = '${STR_YOUR_COMMENT}';
 window.error = '${STR_THERE_ARE_NO_MORE_ENTRIES}';
 window.init = '${STR_CLICK}';

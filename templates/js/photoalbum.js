@@ -53,13 +53,13 @@ $(document).ready(function () {
         $.ajax({
             type: 'POST',
             url: './?task=ajax_action&action=getphotoinfo',
-            data: 'id_photo=' + id,
+            data: 'photo_id=' + id,
             success: function (data) {
                 //console.log(data);
                 if (data.status === 1) {
                     //console.log(data);
-                    $('#id_owner').val(data.id_owner);
-                    $('#name_foto').html('<a href="./?task=profile&id_user=' + data.id_owner + '">' + data.firstname + ' ' + data.lastname + '</a>');
+                    $('#owner_id').val(data.owner_id);
+                    $('#name_foto').html('<a href="./?task=profile&user_id=' + data.owner_id + '">' + data.firstname + ' ' + data.lastname + '</a>');
                     $('#date_foto .data').html(data.created);
                     $('.info_photo').html(data.description);
                     $('#photo_big').find('.tell').html(data.tell).attr('data-item', id).attr('id', 'tell-photo-' + id).attr('data-type', 'photo');
@@ -97,7 +97,7 @@ $(document).ready(function () {
         $('.loading-bar').show();
         $('.photo_big_wrap').find('.photo_wrap').hide();
         const id = $(this).attr('data-num');
-        $('.photo_big_wrap').find('#id_content').val(id);
+        $('.photo_big_wrap').find('#content_id').val(id);
         $('body,html').css('overflow', 'hidden');
         $('#photo_big').show();
         $('#photo_big').animate({scrollTop: 0}, 0);
@@ -110,7 +110,7 @@ $(document).ready(function () {
     $(document).on('click', '.next', function () {
         $('.loading-bar').show();
         $('.photo_big_wrap').find('.photo_wrap').hide();
-        const id = $('#id_content').val();
+        const id = $('#content_id').val();
         let index_new = 0;
         const index = parseInt($.inArray(id, mass_photo));
         //console.log(id+'-'+index);
@@ -120,7 +120,7 @@ $(document).ready(function () {
             index_new = index + 1;
         }
 
-        $('#id_content').val(mass_photo[index_new]);
+        $('#content_id').val(mass_photo[index_new]);
         getPhotoInfo(mass_photo[index_new]);
     })
 
@@ -128,7 +128,7 @@ $(document).ready(function () {
     $(document).on('click', '.prev', function () {
         $('.loading-bar').show();
         $('.photo_big_wrap').find('.photo_wrap').hide();
-        const id = $('#id_content').val();
+        const id = $('#content_id').val();
         let index_new = 0;
         const index = parseInt($.inArray(id, mass_photo));
 
@@ -138,7 +138,7 @@ $(document).ready(function () {
             index_new = index - 1;
         }
 
-        $('#id_content').val(mass_photo[index_new]);
+        $('#content_id').val(mass_photo[index_new]);
         getPhotoInfo(mass_photo[index_new]);
     })
 
@@ -163,7 +163,7 @@ $(document).on("click", ".show-pop-photo-block", function () {
 
 $(document).on("click", ".photo_big_wrap .reply", function () {
     const IdComment = $(this).attr('data-item');
-    const IdParent = $('#id_content').val();
+    const IdParent = $('#content_id').val();
     $('.reply').show();
     $(this).hide();
     $('.my-comment').remove();
@@ -174,9 +174,9 @@ $(document).on("click", ".photo_big_wrap .reply", function () {
     ReplyForm += '</div>';
     ReplyForm += '<form autocomplete="off" id="reply-form-' + IdComment + '" data-num = ' + IdComment + ' action="">';
     ReplyForm += '<input type="hidden" name="commentable_type" value="photo">';
-    ReplyForm += '<input type="hidden" name="id_content" value="' + IdParent + '">';
-    ReplyForm += '<input type="hidden" name="id_user" value="' + id_user + '">';
-    ReplyForm += '<input type="hidden" name="id_parent" value="' + IdComment + '">';
+    ReplyForm += '<input type="hidden" name="content_id" value="' + IdParent + '">';
+    ReplyForm += '<input type="hidden" name="user_id" value="' + user_id + '">';
+    ReplyForm += '<input type="hidden" name="parent_id" value="' + IdComment + '">';
     ReplyForm += '<input type="file" class="file_name" name="file_name[]" data-num="' + IdComment + '" multiple/>';
     ReplyForm += '<input id="comment" name="comment" type="text" data-num="' + IdComment + '" placeholder="' + placeholder + '">';
     ReplyForm += '<div class="smile-files">';

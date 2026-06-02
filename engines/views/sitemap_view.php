@@ -25,7 +25,7 @@ if($_GET['q'] == 'xml'){
 	
 		Auth::authorization();		
 
-		core::user()->setUser_id($_SESSION['id_user']);
+		core::user()->setUser_id($_SESSION['user_id']);
 		$user = core::user()->getUserInfo();
 		core::user()->setUserActivity();
 

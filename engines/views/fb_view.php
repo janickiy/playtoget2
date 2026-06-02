@@ -40,9 +40,9 @@ if (isset($_GET['code'])) {
 			$email = $userInfo['id'] . '@facebook.com';			
 		 
 			if($data->checkExistUser($email)){
-				$id_user = $data->getUserId($email);
+				$user_id = $data->getUserId($email);
 				
-				Auth::Login($id_user, 1);
+				Auth::Login($user_id, 1);
 				
 				header("Location: http://playtoget.com");
 				exit;	

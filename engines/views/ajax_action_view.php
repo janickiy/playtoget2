@@ -5,7 +5,7 @@ defined('PLAYTOGET') || exit('Playtoget: access denied!');
 session_start();
 
 if($_SESSION['user_authorization'] == "ok"){
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	
 	core::user()->setUserActivity();	
@@ -19,20 +19,20 @@ switch ($_GET['action'])
 	
 		if($_REQUEST['id']){
 			
-			$id_photo = core::database()->escape((int)Core_Array::getRequest('id'));	
+			$photo_id = core::database()->escape((int)Core_Array::getRequest('id'));	
 
-			$row = Photoalbum::getPhotoInfo($id_photo);
+			$row = Photoalbum::getPhotoInfo($photo_id);
 			
 			$allow = FALSE;
 			
 			switch($row['photoalbumable_type']) {
 		
 				case user:
-					if($row['id_owner'] == $user['id']) $allow = TRUE;
+					if($row['owner_id'] == $user['id']) $allow = TRUE;
 				break;
 
 				case user_attach:
-					if($row['id_owner'] == $user['id']) $allow = TRUE;
+					if($row['owner_id'] == $user['id']) $allow = TRUE;
 				break;
 
 				case team: 		
@@ -44,24 +44,24 @@ switch ($_GET['action'])
 				break;		
 		
 				case event: 		
-					if($row['id_owner'] == $user['id'] or Events::checkOwnerEvent($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or Events::checkOwnerEvent($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 		
 				case playground:		
-					if($row['id_owner'] == $user['id'] or Playgrounds::checkOwnerPlayground($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or Playgrounds::checkOwnerPlayground($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 		
 				case fitness:		
-					if($row['id_owner'] == $user['id'] or SportBlocks::checkOwner($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 		
 				case shop: 		
-					if($row['id_owner'] == $user['id'] or SportBlocks::checkOwner($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 			}			
 			
 			if($allow){
-				if(Photoalbum::removePhoto($id_photo))
+				if(Photoalbum::removePhoto($photo_id))
 					$content = array("result" => 'success');
 				else
 					$content = array("result" => 'error');
@@ -87,7 +87,7 @@ switch ($_GET['action'])
 			switch($row['videoalbumable_type']) {
 		
 				case user:
-					if($row['id_owner'] == $user['id']) $allow = TRUE;
+					if($row['owner_id'] == $user['id']) $allow = TRUE;
 				break;			
 		
 				case team: 		
@@ -100,19 +100,19 @@ switch ($_GET['action'])
 				break;		
 		
 				case event: 		
-					if($row['id_owner'] == $user['id'] or Events::checkOwnerEvent($row['id_albumowner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or Events::checkOwnerEvent($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 		
 				case playground:		
-					if($row['id_owner'] == $user['id'] or Playgrounds::checkOwnerPlayground($row['id_albumowner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or Playgrounds::checkOwnerPlayground($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 		
 				case fitness:		
-					if($row['id_owner'] == $user['id'] or SportBlocks::checkOwner($row['id_albumowner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 		
 				case shop: 		
-					if($row['id_owner'] == $user['id'] or SportBlocks::checkOwner($row['id_albumowner'], $user['id'])) $allow = TRUE;
+					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 			}
 			
@@ -136,9 +136,9 @@ switch ($_GET['action'])
 	
 		$errors = array();
 
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();		
-		$id_content = is_numeric($_REQUEST['id_content']) ? $_REQUEST['id_content'] : exit();		
-		$id_parent = is_numeric($_REQUEST['id_parent']) ? $_REQUEST['id_parent'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();		
+		$content_id = is_numeric($_REQUEST['content_id']) ? $_REQUEST['content_id'] : exit();		
+		$parent_id = is_numeric($_REQUEST['parent_id']) ? $_REQUEST['parent_id'] : exit();
 		$attach = $_REQUEST['attach'] ? explode(",", $_REQUEST['attach']) : '';
 		
 		$author_community = $_REQUEST['author_community'] ? $_REQUEST['author_community'] : ''; 
@@ -147,37 +147,37 @@ switch ($_GET['action'])
 		$comment = htmlspecialchars(trim(Core_Array::getRequest('comment')));
 		
 		if($commentable_type == 'user'){
-			core::user()->setUser_id($id_content);
+			core::user()->setUser_id($content_id);
 			$owner = core::user()->getUserInfo();
 			$owner_settings = core::user()->getUserSetting();
 			
-			if(core::user()->permissionUser($user['id'], $owner_settings['permission_view_wall']) && $data->checkBlock($user['id'], $id_content))
+			if(core::user()->permissionUser($user['id'], $owner_settings['permission_view_wall']) && $data->checkBlock($user['id'], $content_id))
 				$permit = 'yes';
 			else
 				$permit = 'no';
 		}		
 		
-		if(empty($errors) && $permit != 'no' && Comments::checkBanReceiver($commentable_type, $id_content)){
+		if(empty($errors) && $permit != 'no' && Comments::checkBanReceiver($commentable_type, $content_id)){
 			$fields = array();
 			$fields['id'] = 0;
 			$fields['commentable_type'] = $commentable_type;
-			$fields['id_content'] = $id_content;
-			$fields['id_user'] = $user['id'];
+			$fields['content_id'] = $content_id;
+			$fields['user_id'] = $user['id'];
 			$fields['content'] = $comment;
 			$fields['created_at'] = date("Y-m-d H:i:s");
-			$fields['id_parent'] = $id_parent;			
+			$fields['parent_id'] = $parent_id;			
 			
 			if($commentable_type == 'group' or $commentable_type == 'team'){
-				if($author_community == 1 && Communities::checkOwnerCommunity($id_content, $user['id']) or Communities::checkAdminCommunity($id_content, $user['id'])) {
+				if($author_community == 1 && Communities::checkOwnerCommunity($content_id, $user['id']) or Communities::checkAdminCommunity($content_id, $user['id'])) {
 					$fields['behalfable_type'] = $commentable_type;
-					$fields['id_behalf'] = $fields['id_content'];
+					$fields['behalf_id'] = $fields['content_id'];
 					$head = TRUE;
 				}
 			}
 			else if($commentable_type == 'event'){
-				if($author_community == 1 && Events::checkOwnerEvent($id_content, $user['id'], 'user')) {
+				if($author_community == 1 && Events::checkOwnerEvent($content_id, $user['id'], 'user')) {
 					$fields['behalfable_type'] = $commentable_type;
-					$fields['id_behalf'] = $fields['id_content'];
+					$fields['behalf_id'] = $fields['content_id'];
 					$head = TRUE;
 				}
 			}
@@ -196,29 +196,29 @@ switch ($_GET['action'])
 						
 						case team:
 						
-							$page_link = './?task=teams&id_user=' . $id_content;
+							$page_link = './?task=teams&user_id=' . $content_id;
 						
 						break;
 						
 						case group:
 						
-							$page_link = './?task=groups&id_user=' . $id_content;
+							$page_link = './?task=groups&user_id=' . $content_id;
 							
 						break;
 						
 						case event:
 						
-							$page_link = './?task=events&id_user=' . $id_content;
+							$page_link = './?task=events&user_id=' . $content_id;
 							
 						break;
 					}
 				}else{
 					$avatar = core::documentparser()->userAvatar($row);
-					$name = $row['firstname'] . ' '  . $row['lastname'].'<span class="status_user' . (core::user()->checkUserOnline($row['id_user']) ? ' online' : '') . '" data-num="' . $row['id_user'] . '"></span>';
-					$page_link = './?task=profile&id_user=' . $row['id_user'];
+					$name = $row['firstname'] . ' '  . $row['lastname'].'<span class="status_user' . (core::user()->checkUserOnline($row['user_id']) ? ' online' : '') . '" data-num="' . $row['user_id'] . '"></span>';
+					$page_link = './?task=profile&user_id=' . $row['user_id'];
 				}	
 
-				if($id_parent == 0){
+				if($parent_id == 0){
 					$html = '<div id="message-' . $insert_id . '" class="message">';
 					$html .= '<div class="del_mess" data-item="' . $insert_id . '"></div>';
 					
@@ -241,7 +241,7 @@ switch ($_GET['action'])
 							$html .= '<li>';
 							$message = Attach::uploadAttach($attach[$i], $insert_id,'comment');
 							
-							if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $html .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big"  data-num='.$message['id_photo'].'>';
+							if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $html .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big"  data-num='.$message['photo_id'].'>';
 						
 							$html .= '</li>';
 						}
@@ -280,7 +280,7 @@ switch ($_GET['action'])
 							$html .= '<li>';
 							$message = Attach::uploadAttach($attach[$i], $insert_id, 'comment');
 							
-							if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $html .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big" data-num='.$message['id_photo'].'>';
+							if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $html .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big" data-num='.$message['photo_id'].'>';
 						
 							$html .= '</li>';
 						}
@@ -307,10 +307,10 @@ switch ($_GET['action'])
 			
 				$settings = core::user()->getUserSetting();			
 			
-				if($id_parent == 0){			
+				if($parent_id == 0){			
 					if($commentable_type == 'user')	{
-						if($settings['notification_wall_comments'] != 'no' && $user['id'] != $id_content){						
-							core::user()->setUser_id($id_content);
+						if($settings['notification_wall_comments'] != 'no' && $user['id'] != $content_id){						
+							core::user()->setUser_id($content_id);
 							$receiver = core::user()->getUserInfo();
 						
 							$mail = $data->getMailNotification(3);	
@@ -329,7 +329,7 @@ switch ($_GET['action'])
 							$published = str_replace('%DATE%', date("Y-m-d"), $published); 
 							$published = str_replace('%TIME%', date("H:i"), $published);						
 							$message['date'] = $published;						
-							$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'];
+							$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'];
 
 							$msg = $mail['content_ru'];
 							
@@ -343,7 +343,7 @@ switch ($_GET['action'])
 							$msg = substr($msg, 0, 800 + $pos) . $srttmpend; 								
 							
 							$msg = str_replace('%COMMENT%', htmlspecialchars(trim(Core_Array::getRequest('comment'))), $msg);
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'], $msg);
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'], $msg);
 							$message['msg'] = $msg;
 							
 							$restrict_or_cancel_notification = core::getLanguage('str', 'restrict_or_cancel_notification');
@@ -354,13 +354,13 @@ switch ($_GET['action'])
 						}
 					}
 					else if($commentable_type == 'photo'){						
-						if($settings['notification_picture_comments'] != 'no' && $user['id'] != $id_content){
+						if($settings['notification_picture_comments'] != 'no' && $user['id'] != $content_id){
 							$mail = $data->getMailNotification(4);	
-							$photo = Photoalbum::getPhotoInfo($id_content);
+							$photo = Photoalbum::getPhotoInfo($content_id);
 
 							$small_photo = core::documentparser()->photogalleryPic($photo['small_photo']);
 						
-							core::user()->setUser_id($photo['id_owner']);
+							core::user()->setUser_id($photo['owner_id']);
 							$receiver = core::user()->getUserInfo();	
 			
 							$subject = $mail['subject_ru'];
@@ -381,19 +381,19 @@ switch ($_GET['action'])
 							$msg = str_replace('%PHOTO%', 'cid:photo', $msg);							
 							$msg = str_replace('%COMMENT%', htmlspecialchars(trim(Core_Array::getRequest('comment'))), $msg);
 							if($photo['photoalbumable_type'] == 'user') 
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=photoalbums&id_album=' . $photo['id_photoalbum'] . '&id_user=' . $photo['id_owner'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=photoalbums&id_album=' . $photo['photoalbum_id'] . '&user_id=' . $photo['owner_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'team')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&id_community=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'group')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'event')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&id_event=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'playground')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'fitness')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'shop')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 				
 							$message = array();
 							
@@ -407,7 +407,7 @@ switch ($_GET['action'])
 							$published = str_replace('%DATE%', date("Y-m-d"), $published); 
 							$published = str_replace('%TIME%', date("H:i"), $published);						
 							$message['date'] = $published;						
-							$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'];
+							$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'];
 							$message['msg'] = $msg;								
 							$restrict_or_cancel_notification = core::getLanguage('str', 'restrict_or_cancel_notification');
 							$restrict_or_cancel_notification = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=settings', $restrict_or_cancel_notification);
@@ -417,12 +417,12 @@ switch ($_GET['action'])
 						}					
 					}
 					else if($commentable_type == 'video'){
-						if($settings['notification_video_comments'] != 'no' && $user['id'] != $id_content){
+						if($settings['notification_video_comments'] != 'no' && $user['id'] != $content_id){
 							$mail = $data->getMailNotification(5);	
 			
-							$video = Videoalbum::getVideoInfo($id_content);
+							$video = Videoalbum::getVideoInfo($content_id);
 						
-							core::user()->setUser_id($video['id_owner']);
+							core::user()->setUser_id($video['owner_id']);
 							$receiver = core::user()->getUserInfo();	
 			
 							$subject = $mail['subject_ru'];
@@ -446,19 +446,19 @@ switch ($_GET['action'])
 							$msg = str_replace('%COMMENT%', htmlspecialchars(trim(Core_Array::getRequest('comment'))), $msg);							
 							
 							if($video['videoalbumable_type'] == 'user')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=videoalbums&id_album=' . $video['videoalbum'] . '&id_user=' . $video['id_owner'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=videoalbums&id_album=' . $video['videoalbum'] . '&user_id=' . $video['owner_id'], $msg);
 							else if($video['videoalbumable_type'] == 'team')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&id_community=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'group')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'event')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&id_event=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);				
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);				
 							else if($video['videoalbumable_type'] == 'playground')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'fitness')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $video['id_owner'] . '&q=photoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $video['owner_id'] . '&q=photoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'shop')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $video['id_owner'] . '&q=photoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $video['owner_id'] . '&q=photoalbums&id_album=' . $video['videoalbum_id'], $msg);
 					
 							$message = array();
 							$message['subject'] = $subject;
@@ -471,7 +471,7 @@ switch ($_GET['action'])
 							$published = str_replace('%DATE%', date("Y-m-d"), $published); 
 							$published = str_replace('%TIME%', date("H:i"), $published);						
 							$message['date'] = $published;						
-							$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'];
+							$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'];
 							$restrict_or_cancel_notification = core::getLanguage('str', 'restrict_or_cancel_notification');
 							$restrict_or_cancel_notification = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=settings', $restrict_or_cancel_notification);
 							$message['restrict_or_cancel_notification'] = $restrict_or_cancel_notification;	
@@ -482,10 +482,10 @@ switch ($_GET['action'])
 					}	
 				}
 				else{
-					if($settings['notification_answers_in_comments'] != 'no' && $user['id'] != $id_content){
+					if($settings['notification_answers_in_comments'] != 'no' && $user['id'] != $content_id){
 						$mail = $data->getMailNotification(7);
 						
-						core::user()->setUser_id($id_content);
+						core::user()->setUser_id($content_id);
 						$receiver = core::user()->getUserInfo();
 	
 						$subject = $mail['subject_ru'];
@@ -502,7 +502,7 @@ switch ($_GET['action'])
 						$published = str_replace('%DATE%', date("Y-m-d"), $published); 
 						$published = str_replace('%TIME%', date("H:i"), $published);						
 						$message['date'] = $published;						
-						$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'];
+						$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'];
 						
 						$msg = $mail['content_ru'];
 						
@@ -517,55 +517,55 @@ switch ($_GET['action'])
 						$msg = str_replace('%COMMENT%', htmlspecialchars(trim(Core_Array::getRequest('comment'))), $msg);
 						
 						if($row['commentable_type'] == 'user')
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $row['id_content'], $msg);
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $row['content_id'], $msg);
 						else if($row['commentable_type'] == 'team')
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&id_community=' . $row['id_content'], $msg);
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $row['content_id'], $msg);
 						else if($row['commentable_type'] == 'group')
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $row['id_content'], $msg);
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $row['content_id'], $msg);
 						else if($row['commentable_type'] == 'event')
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&id_event=' . $row['id_content'], $msg);
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $row['content_id'], $msg);
 						else if($row['commentable_type'] == 'playground')
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $row['id_content'], $msg);						
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $row['content_id'], $msg);						
 						else if($row['commentable_type'] == 'fitness')
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $row['id_content'], $msg);
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $row['content_id'], $msg);
 						else if($row['commentable_type'] == 'shop')
-							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $row['id_content'], $msg);
+							$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $row['content_id'], $msg);
 						else if($row['commentable_type'] == 'photo'){
-							$photo = Photoalbum::getPhotoInfo($row['id_content']);
+							$photo = Photoalbum::getPhotoInfo($row['content_id']);
 							
 							if($photo['photoalbumable_type'] == 'user') 
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=photoalbums&id_album=' . $photo['id_photoalbum'] . '&id_user=' . $photo['id_owner'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=photoalbums&id_album=' . $photo['photoalbum_id'] . '&user_id=' . $photo['owner_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'team')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&id_community=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'group')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'event')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&id_event=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'playground')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'fitness')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);
 							else if($photo['photoalbumable_type'] == 'shop')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $photo['id_owner'] . '&q=photoalbums&id_album=' . $photo['id_photoalbum'], $msg);							
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $photo['owner_id'] . '&q=photoalbums&id_album=' . $photo['photoalbum_id'], $msg);							
 						}
 						else if($row['commentable_type'] == 'video'){
 							
-							$video = Videoalbum::getVideoInfo($row['id_content']);
+							$video = Videoalbum::getVideoInfo($row['content_id']);
 							
 							if($video['videoalbumable_type'] == 'user')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=videoalbums&id_album=' . $video['videoalbum'] . '&id_user=' . $video['id_owner'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=videoalbums&id_album=' . $video['videoalbum'] . '&user_id=' . $video['owner_id'], $msg);
 							else if($video['videoalbumable_type'] == 'team')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&id_community=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'group')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'event')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&id_event=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);				
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);				
 							else if($video['videoalbumable_type'] == 'playground')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $video['id_owner'] . '&q=videoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_playground=' . $video['owner_id'] . '&q=videoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'fitness')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $video['id_owner'] . '&q=photoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $video['owner_id'] . '&q=photoalbums&id_album=' . $video['videoalbum_id'], $msg);
 							else if($video['videoalbumable_type'] == 'shop')
-								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $video['id_owner'] . '&q=photoalbums&id_album=' . $video['id_videoalbum'], $msg);
+								$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $video['owner_id'] . '&q=photoalbums&id_album=' . $video['videoalbum_id'], $msg);
 						}						
 						
 						$restrict_or_cancel_notification = core::getLanguage('str', 'restrict_or_cancel_notification');
@@ -640,12 +640,12 @@ switch ($_GET['action'])
 			
 			$photoinfo = Photoalbum::getPhotoInfo($id);			
 			
-			core::user()->setUser_id($photoinfo['id_owner']);
+			core::user()->setUser_id($photoinfo['owner_id']);
 			$owner = core::user()->getUserInfo();
 			$owner_settings = core::user()->getUserSetting();
 			
-			if($photoinfo['id_owner'] != $user['id']){
-				if(core::user()->permissionUser($user['id'], $owner_settings['permission_view_photo']) && $data->checkBlock($user['id'], $photoinfo['id_owner'])) $permit = 'yes';
+			if($photoinfo['owner_id'] != $user['id']){
+				if(core::user()->permissionUser($user['id'], $owner_settings['permission_view_photo']) && $data->checkBlock($user['id'], $photoinfo['owner_id'])) $permit = 'yes';
 			}
 			else{
 				if($settings['permission_view_photo'] != 2) $permit = 'yes';
@@ -654,12 +654,12 @@ switch ($_GET['action'])
 		else if($commentable_type == 'video'){
 			$videoinfo = Videoalbum::getVideoInfo($id);
 			
-			core::user()->setUser_id($videoinfo['id_owner']);
+			core::user()->setUser_id($videoinfo['owner_id']);
 			$owner = core::user()->getUserInfo();
 			$owner_settings = core::user()->getUserSetting();
 			
-			if($videoinfo['id_owner'] != $user['id']){
-				if(core::user()->permissionUser($user['id'], $owner_settings['permission_view_video']) && $data->checkBlock($user['id'], $videoinfo['id_owner'])) $permit = 'yes';
+			if($videoinfo['owner_id'] != $user['id']){
+				if(core::user()->permissionUser($user['id'], $owner_settings['permission_view_video']) && $data->checkBlock($user['id'], $videoinfo['owner_id'])) $permit = 'yes';
 			}
 			else{
 				if($settings['permission_view_photo'] != 2) $permit = 'yes';
@@ -684,12 +684,12 @@ switch ($_GET['action'])
 	
 			foreach($arr_comments as $row){	
 				if($commentable_type == 'group' or $commentable_type == 'team'){
-					if($author_community == 1 && Communities::checkOwnerCommunity($id_content, $user['id']) or Communities::checkAdminCommunity($id_content, $user['id'])) {
+					if($author_community == 1 && Communities::checkOwnerCommunity($content_id, $user['id']) or Communities::checkAdminCommunity($content_id, $user['id'])) {
 						$head = TRUE;
 					}
 				}
 				else if($commentable_type == 'event'){
-					if($author_community == 1 && Events::checkOwnerEvent($id_content, $user['id'], 'user')) {
+					if($author_community == 1 && Events::checkOwnerEvent($content_id, $user['id'], 'user')) {
 						$head = TRUE;
 					}
 				}
@@ -703,30 +703,30 @@ switch ($_GET['action'])
 						
 						case team:
 						
-							$page_link = './?task=teams&id_user=' . $id_content;
+							$page_link = './?task=teams&user_id=' . $content_id;
 						
 						break;
 						
 						case group:
 						
-							$page_link = './?task=groups&id_user=' . $id_content;
+							$page_link = './?task=groups&user_id=' . $content_id;
 							
 						break;
 						
 						case event:
 						
-							$page_link = './?task=events&id_user=' . $id_content;
+							$page_link = './?task=events&user_id=' . $content_id;
 							
 						break;
 					}
 				}else{
 					$avatar = core::documentparser()->userAvatar($row);
-					$name = $row['firstname'] . ' '  . $row['lastname'].'<span class="status_user' . (core::user()->checkUserOnline($row['id_user']) ? ' online' : '') . '" data-num="' . $row['id_user'] . '"></span>';
-					$page_link = './?task=profile&id_user=' . $row['id_user'];
+					$name = $row['firstname'] . ' '  . $row['lastname'].'<span class="status_user' . (core::user()->checkUserOnline($row['user_id']) ? ' online' : '') . '" data-num="' . $row['user_id'] . '"></span>';
+					$page_link = './?task=profile&user_id=' . $row['user_id'];
 				}
 				
-				if($row['id_parent'] == 0){
-					$html .= '<div id="message-' . $row['id_comment'] . '" data-item="' . $row['id_parent'] . '" class="message">';
+				if($row['parent_id'] == 0){
+					$html .= '<div id="message-' . $row['id_comment'] . '" data-item="' . $row['parent_id'] . '" class="message">';
 					
 					if ($commentable_type == 'event' && $head){
 						$html .= '<div class="img-account">';
@@ -736,11 +736,11 @@ switch ($_GET['action'])
 					else
 						$html .= '<img src="' . $avatar . '" alt="" class="img-account">';
 				
-						if($row['id_content'] == $user['id']) {
+						if($row['content_id'] == $user['id']) {
 						$html .= '<div class="del_mess" data-item="' . $row['id_comment'] . '"></div>';
 					
-						if($row['id_user'] == $user['id']){
-							$html .= '<div class="del_mess" data-item="' . $row['id_parent'] . '"></div>';						
+						if($row['user_id'] == $user['id']){
+							$html .= '<div class="del_mess" data-item="' . $row['parent_id'] . '"></div>';						
 						}
 					}						
 				
@@ -751,42 +751,42 @@ switch ($_GET['action'])
 				
 					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
 						
-						$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 						$html .= '<li>';
-						$html .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['id_photo'] . '">';
+						$html .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
 						$html .= '</li>';
 					}		
 				
 					$html .= '</ul>';
 					$html .= '</p>';			
 					$html .= '<a id="reply-' . $row['id_comment'] . '" class="reply" data-item="' . $row['id_comment'] . '"> ' . core::getLanguage('str', 'reply'). '</a>';
-					if ($user['id'] != $row['id_user']) $html .=  '<a id="tell-comment-' . $row['id_comment'] . '" class="tell" data-item="' . $row['id_comment'] . '" data-type="comment">' . Comments::getNumberTell($row['id_comment'], 'comment') . '</a>';
+					if ($user['id'] != $row['user_id']) $html .=  '<a id="tell-comment-' . $row['id_comment'] . '" class="tell" data-item="' . $row['id_comment'] . '" data-type="comment">' . Comments::getNumberTell($row['id_comment'], 'comment') . '</a>';
 					$html .=  '<a id="like-comment-' . $row['id_comment'] . '" class="liked" data-item="' . $row['id_comment'] . '" data-type="comment">' . Comments::getNumberLiked($row['id_comment'], 'comment') . '</a>';
 					$html .= '</div>';
 				}
 				else{
-					$html .= '<div class="message-reply message" id="message-' . $row['id_comment'] . '" data-item="' . $row['id_parent'] . '">';
+					$html .= '<div class="message-reply message" id="message-' . $row['id_comment'] . '" data-item="' . $row['parent_id'] . '">';
 					
-					if($row['id_content'] == $user['id']) {
+					if($row['content_id'] == $user['id']) {
 						$html .= '<div class="del_mess" data-item="' . $row['id_comment'] . '"></div>';
 					
-						if($row['id_user'] == $user['id']){
-							$html .= '<div class="del_mess" data-item="' . $row['id_parent'] . '"></div>';						
+						if($row['user_id'] == $user['id']){
+							$html .= '<div class="del_mess" data-item="' . $row['parent_id'] . '"></div>';						
 						}
 					}
 				
 					$html .= '<div class="message" >';					
 					$html .= '<div class="message-account"> <img src="' . $avatar . '" alt="" class="img-account">';            	
-					$html .= '<h5 class="name"><a href="./?task=profile&id_user=' . $row['id_user'] . '">' . $name . '</a></h5>';
+					$html .= '<h5 class="name"><a href="./?task=profile&user_id=' . $row['user_id'] . '">' . $name . '</a></h5>';
 					$html .= '<p class="data">' . $row['created'] . '</p>';
 					$html .= '</div>';              
 					$html .= '<p class="message-reply-text">' . $row['content'] . '<br>'; 
 					$html .= '<ul class="attach_image">';
 				
 					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-						$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 						$html .= '<li>';
-						$html .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['id_photo'] . '">';
+						$html .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
 						$html .= '</li>';
 					}
 				
@@ -812,29 +812,29 @@ switch ($_GET['action'])
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		$type = $_REQUEST['type'] ? $_REQUEST['type'] : exit();
 	
 		$html = '';
 		$task = ($type == 'team') ? 'teams' : 'groups' ;
 	
-		foreach(Communities::getMyCommunitiesList($id_user, $type, $number, $offset) as $row){
+		foreach(Communities::getMyCommunitiesList($user_id, $type, $number, $offset) as $row){
 			
-			$html .= '<div id="community_' .$row['id_community'] . '" class="event-item">';
-			$html .= '<a class="img" href="./?task=' . $task . '&id_community=' . $row['id_community'] . '">';
+			$html .= '<div id="community_' .$row['community_id'] . '" class="event-item">';
+			$html .= '<a class="img" href="./?task=' . $task . '&community_id=' . $row['community_id'] . '">';
 			$html .= '<img border="0" alt="" src="' . core::documentparser()->communityAvatar($row) . '">';
 			$html .= '</a>';
 			$html .= '<div class="teg">';
-			$html .= '<p><a href="./?task=' . $task . '&id_community=' . $row['id_community'] . '"> ' . $row['name'] . '</a></p>';
+			$html .= '<p><a href="./?task=' . $task . '&community_id=' . $row['community_id'] . '"> ' . $row['name'] . '</a></p>';
 
-			 $status = Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id']));			
+			 $status = Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id']));			
 			
 			$html .= '<p>' . $row['sport_type'] . '<br> ' . $status . '<br>' . $row['place'] . '</p>';
 			$html .= '<p> ' .$row['about'] . '</p>';
-			$html .= '<p><i></i>'. str_replace('%MEMBERS%', Communities::countMemberCommunity($row['id_community'], 2), core::getLanguage('str', 'participants_friends')) . '</p>';
+			$html .= '<p><i></i>'. str_replace('%MEMBERS%', Communities::countMemberCommunity($row['community_id'], 2), core::getLanguage('str', 'participants_friends')) . '</p>';
 			
-			if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])) {
-				$html .= '<a href="./?task=' . $type . '&id_community=' .$row['id_community'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a>';
+			if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])) {
+				$html .= '<a href="./?task=' . $type . '&community_id=' .$row['community_id'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a>';
 			}				
 			
 			$html .= '<div class="transparent"> </div>';
@@ -855,16 +855,16 @@ switch ($_GET['action'])
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
-		$id_member = is_numeric($_REQUEST['id_member']) ? $_REQUEST['id_member'] : exit();
+		$member_id = is_numeric($_REQUEST['member_id']) ? $_REQUEST['member_id'] : exit();
 		$eventable_type = $_REQUEST['eventable_type'] ? $_REQUEST['eventable_type'] : exit();
 		
 		$html = '';
 		
-		foreach(Events::getMyEvents($id_member, $eventable_type, $number, $offset) as $row){
+		foreach(Events::getMyEvents($member_id, $eventable_type, $number, $offset) as $row){
 			
-			$html .= '<div class="event-item"> <a href="./?task=events&id_event=' . $row['id_event'] . '" class="img"><img src="' . core::documentparser()->eventAvatar($row['cover_page']) . '" alt="" style="margin-left: -100%;"></a>';
+			$html .= '<div class="event-item"> <a href="./?task=events&event_id=' . $row['event_id'] . '" class="img"><img src="' . core::documentparser()->eventAvatar($row['cover_page']) . '" alt="" style="margin-left: -100%;"></a>';
 			$html .= '<div class="teg">';
-			$html .= '<p><a href="./?task=events&id_event=' . $row['id_event'] . '">' . $row['name'] . '</a></p>'; 
+			$html .= '<p><a href="./?task=events&event_id=' . $row['event_id'] . '">' . $row['name'] . '</a></p>'; 
             $html .= ' <p>';  
 			
 			if($row['sport_type']) $html .= $row['sport_type'] . '<br>'; 
@@ -876,16 +876,16 @@ switch ($_GET['action'])
                 
 			$html .= '</p>';	  
 				
-			if(Events::getEventRole(Events::getMemberShipStatus($row['id_event'], $user['id'], 'user'))) $html .= '<p>' . Events::getEventRole(Events::getMemberShipStatus($row['id_event'], $user['id'], 'user')) . '</p>';
+			if(Events::getEventRole(Events::getMemberShipStatus($row['event_id'], $user['id'], 'user'))) $html .= '<p>' . Events::getEventRole(Events::getMemberShipStatus($row['event_id'], $user['id'], 'user')) . '</p>';
 			
-			$html .= '<p><i></i>' . str_replace('%MEMBERS%', Events::countMembers($row['id_event'], 'user'), core::getLanguage('str', 'participants_friends')) . '</p>';
+			$html .= '<p><i></i>' . str_replace('%MEMBERS%', Events::countMembers($row['event_id'], 'user'), core::getLanguage('str', 'participants_friends')) . '</p>';
 			
-			if(Events::checkOwnerEvent($row['id_event'], $user['id'], 'user'))  
-				$html .= '<a href="./?task=events&id_event='.$row['id_event'].'&q=edit">Редактировать</a>';
+			if(Events::checkOwnerEvent($row['event_id'], $user['id'], 'user'))  
+				$html .= '<a href="./?task=events&event_id='.$row['event_id'].'&q=edit">Редактировать</a>';
 			
-			if(Events::getEventStatus($row['id_event']) == 'continues') 
+			if(Events::getEventStatus($row['event_id']) == 'continues') 
 				$html .='<span>'.core::getLanguage('str', 'event_continues').'</span>';
-			else if(Events::getEventStatus($row['id_event']) == 'end')	
+			else if(Events::getEventStatus($row['event_id']) == 'end')	
 				$html .='<span>'.core::getLanguage('str', 'event_completed').'</span>'; 
 			
             $html .= '</div>';   
@@ -928,23 +928,23 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_receiver = Core_Array::getRequest('id_receiver');
+		$receiver_id = Core_Array::getRequest('receiver_id');
 		$content = htmlspecialchars(trim(Core_Array::getRequest('message')));
 		$attach = Core_Array::getRequest('attach') ? explode(",", Core_Array::getRequest('attach')) : '';
 		
-		core::user()->setUser_id($id_receiver);
+		core::user()->setUser_id($receiver_id);
 		$receiver = core::user()->getUserInfo();
 		$receiver_settings = core::user()->getUserSetting();
 		
 		if(empty($content)) $error = core::getLanguage('error', 'empty_coomment');	
-		if($data->checkBanMsgReceiver($id_receiver) === false or $data->checkDeletedMsgReceiver($id_receiver) === false)
-		if(core::user()->permissionUser($id_receiver, $receiver_settings['permission_send_message']) && $data->checkBlock($user['id'], $id_receiver)) $error = core::getLanguage('error', 'message_hasnt_been_sent');
+		if($data->checkBanMsgReceiver($receiver_id) === false or $data->checkDeletedMsgReceiver($receiver_id) === false)
+		if(core::user()->permissionUser($receiver_id, $receiver_settings['permission_send_message']) && $data->checkBlock($user['id'], $receiver_id)) $error = core::getLanguage('error', 'message_hasnt_been_sent');
 		
 		if(empty($error)){
 			$fields = array();
 			$fields['id'] = 0;			
-			$fields['id_sender'] = $user['id'];			
-			$fields['id_receiver'] = $id_receiver;			
+			$fields['sender_id'] = $user['id'];			
+			$fields['receiver_id'] = $receiver_id;			
 			$fields['content'] = $content;		
 			$fields['created_at'] = date("Y-m-d H:i:s");			
 			$fields['status'] = 0;			
@@ -957,8 +957,8 @@ switch ($_GET['action'])
 				$content = array();
 				$content['status'] = 1;
 				$content['id'] = $insert_id;
-				$content['id_receiver'] = $row['id_receiver'];				
-				$content['id_sender'] = $row['id_sender'];
+				$content['receiver_id'] = $row['receiver_id'];				
+				$content['sender_id'] = $row['sender_id'];
 				$content['avatar'] = core::documentparser()->userAvatar($row);
 				$content['firstname'] = $row['firstname'];
 				$content['lastname'] = $row['lastname'];
@@ -972,7 +972,7 @@ switch ($_GET['action'])
 						$image .= '<li>';
 						$message = Attach::uploadAttach($attach[$i], $insert_id,'message');
 						
-						if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $image .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big"  data-num='.$message['id_photo'].'>';
+						if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $image .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big"  data-num='.$message['photo_id'].'>';
 						
 						$image .= '</li>';
 					}
@@ -983,11 +983,11 @@ switch ($_GET['action'])
 				$content['content'] = core::documentparser()->link_replace($row['content']);
 				$content = json_encode($content);
 				
-				core::user()->setUser_id($id_receiver);
+				core::user()->setUser_id($receiver_id);
 				$receiver = core::user()->getUserInfo();	
 				$settings = core::user()->getUserSetting();
 			
-				if($settings['notification_private_messages'] != 'no' && !core::user()->checkUserOnline($id_receiver)){
+				if($settings['notification_private_messages'] != 'no' && !core::user()->checkUserOnline($receiver_id)){
 					$mail = $data->getMailNotification(2);	
 			
 					$subject = $mail['subject_ru'];
@@ -1007,7 +1007,7 @@ switch ($_GET['action'])
 					$message['name'] = $user['firstname'] . ' ' . $user['lastname'];
 					$message['copyright'] = core::getLanguage('str', 'copyright');
 					$message['avatar'] = core::documentparser()->userAvatar($user);
-					$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $id_receiver . '&q=messages&sel=' . $user['id'], $msg);
+					$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $receiver_id . '&q=messages&sel=' . $user['id'], $msg);
 
 					$message['msg'] = $msg;
 					
@@ -1035,25 +1035,25 @@ switch ($_GET['action'])
 
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();		
-		$id_receiver = is_numeric($_REQUEST['id_receiver']) ? $_REQUEST['id_receiver'] : exit();
+		$receiver_id = is_numeric($_REQUEST['receiver_id']) ? $_REQUEST['receiver_id'] : exit();
 		
-		$arr_messages = $data->getMessagesListAjax($offset, $number, $user['id'], $id_receiver);		
+		$arr_messages = $data->getMessagesListAjax($offset, $number, $user['id'], $receiver_id);		
 		
 		foreach($arr_messages as $row){
 			
 			$image = '<ul class="attach_image">';
 				
 			foreach(Attach::getAttachList($row['id'], 'message') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 						$image .= '<li>';
-						$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['id_photo'] . '">';
+						$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
 						$image .= '</li>';
 			}
 			$image.='</ul>';
 			$rows[] = array(
 			"id_message" => $row['id'],
 			"avatar" => core::documentparser()->userAvatar($row),
-			"id_sender" => $row['id_sender'],
+			"sender_id" => $row['sender_id'],
 			"firstname" => $row['firstname'],			
 			"lastname" => $row['lastname'],			
 			"created" => $row['created'],
@@ -1072,17 +1072,17 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_receiver = is_numeric($_REQUEST['id_receiver']) ? $_REQUEST['id_receiver'] : exit();
-		$last_message = $data->getLastMessage($id_receiver, $user['id']);
+		$receiver_id = is_numeric($_REQUEST['receiver_id']) ? $_REQUEST['receiver_id'] : exit();
+		$last_message = $data->getLastMessage($receiver_id, $user['id']);
 			
 		foreach($last_message as $row){
 			
 			$image = '<ul class="attach_image">';
 				
 			foreach(Attach::getAttachList($row['id'], 'message') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 						$image .= '<li>';
-						$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['id_photo'] . '">';
+						$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
 						$image .= '</li>';
 			}
 			$image.='</ul>';
@@ -1090,7 +1090,7 @@ switch ($_GET['action'])
 			$rows[] = array(
 			"id_message" => $row['id'],
 			"avatar" => core::documentparser()->userAvatar($row),
-			"id_sender" => $row['id_sender'],
+			"sender_id" => $row['sender_id'],
 			"firstname" => $row['firstname'],			
 			"lastname" => $row['lastname'],	
 			"image" => $image,	
@@ -1109,11 +1109,11 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		if($_REQUEST['id_user'] && $_REQUEST['id_user'] != $user['id']){
-			$id_friend = core::database()->escape((int)Core_Array::getRequest('id_user'));			
-			$result = $data->changeFriendsStatus($id_friend, $user['id'], 0);
+		if($_REQUEST['user_id'] && $_REQUEST['user_id'] != $user['id']){
+			$friend_id = core::database()->escape((int)Core_Array::getRequest('user_id'));			
+			$result = $data->changeFriendsStatus($friend_id, $user['id'], 0);
 
-			core::user()->setUser_id($id_friend);
+			core::user()->setUser_id($friend_id);
 			$friend = core::user()->getUserInfo();
 	
 			$settings = core::user()->getUserSetting();
@@ -1135,7 +1135,7 @@ switch ($_GET['action'])
 				$published = str_replace('%DATE%', date("Y-m-d"), $published); 
 				$published = str_replace('%TIME%', date("H:i"), $published);						
 				$message['date'] = $published;
-				$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'];
+				$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'];
 			
 				$msg = $row['content_ru'];
 				$msg = str_replace('%USER_FIRSTNAME%', $user['firstname'], $msg);
@@ -1163,17 +1163,17 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		if($_REQUEST['id_user'] && $_REQUEST['id_user'] != $user['id']){
-			$id_friend = core::database()->escape((int)Core_Array::getRequest('id_user'));
+		if($_REQUEST['user_id'] && $_REQUEST['user_id'] != $user['id']){
+			$friend_id = core::database()->escape((int)Core_Array::getRequest('user_id'));
 
-			core::user()->setUser_id($id_friend);
+			core::user()->setUser_id($friend_id);
 			$friend = core::user()->getUserInfo();	
 			$settings = core::user()->getUserSetting();				
 			
-			$result = $data->changeFriendsStatus($user['id'], $id_friend, 1);
+			$result = $data->changeFriendsStatus($user['id'], $friend_id, 1);
 			
 			if($result){
-				if($settings['notification_friends_request'] != 'no' && !core::user()->checkUserOnline($id_friend)){
+				if($settings['notification_friends_request'] != 'no' && !core::user()->checkUserOnline($friend_id)){
 					$row = $data->getMailNotification(12);
 
 					$subject = $row['subject_ru'];
@@ -1190,7 +1190,7 @@ switch ($_GET['action'])
 					$published = str_replace('%DATE%', date("Y-m-d"), $published); 
 					$published = str_replace('%TIME%', date("H:i"), $published);						
 					$message['date'] = $published;
-					$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'];
+					$message['link_to_profile'] = 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'];
 			
 					$msg = $row['content_ru'];
 					$msg = str_replace('%USER_FIRSTNAME%', $user['firstname'], $msg);
@@ -1219,10 +1219,10 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 
-		if($_REQUEST['id_user'] && $_REQUEST['id_user'] != $user['id']){
-			$id_user = core::database()->escape((int)Core_Array::getRequest('id_user'));
+		if($_REQUEST['user_id'] && $_REQUEST['user_id'] != $user['id']){
+			$user_id = core::database()->escape((int)Core_Array::getRequest('user_id'));
 			
-			$result = $data->blockUser($user['id'], $id_user);
+			$result = $data->blockUser($user['id'], $user_id);
 
 			$content = array("status" => 'success');		
 			
@@ -1235,10 +1235,10 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 
-		if($_REQUEST['id_user'] && $_REQUEST['id_user'] != $user['id']){
-			$id_user = core::database()->escape((int)Core_Array::getRequest('id_user'));
+		if($_REQUEST['user_id'] && $_REQUEST['user_id'] != $user['id']){
+			$user_id = core::database()->escape((int)Core_Array::getRequest('user_id'));
 			
-			$result = $data->unblockUser($user['id'], $id_user);		
+			$result = $data->unblockUser($user['id'], $user_id);		
 
 			$content = array("status" => 'success');		
 			
@@ -1251,10 +1251,10 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		if($_REQUEST['id_user']){
-			$id_friend = core::database()->escape((int)Core_Array::getRequest('id_user'));
+		if($_REQUEST['user_id']){
+			$friend_id = core::database()->escape((int)Core_Array::getRequest('user_id'));
 			
-			$result = $data->removeFriend($user['id'], $id_friend);
+			$result = $data->removeFriend($user['id'], $friend_id);
 			
 			$content = array("status" => 'success');
 			
@@ -1301,13 +1301,13 @@ switch ($_GET['action'])
 	
 		foreach(Friends::getPossibleFriendsList($user['id'], 6) as $row){
 			$rows[] = array(
-			"id_user" => $row['id_user'],			
+			"user_id" => $row['user_id'],			
 			"avatar" => core::documentparser()->userAvatar($row),
 			"firstname" => $row['firstname'],			
 			"lastname" => $row['lastname'],
 			"city" => $row['city'],
-			"status_user" => core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline',
-			"id_sender" => $user['id']);
+			"status_user" => core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline',
+			"sender_id" => $user['id']);
 		}		
 		
 		$content = '{"item":'.json_encode($rows).'}';		
@@ -1318,21 +1318,21 @@ switch ($_GET['action'])
 	
 	case getphotoinfo:
 	
-		$id_photo = is_numeric(Core_Array::getRequest('id_photo')) ? Core_Array::getRequest('id_photo') : exit();
-		$row = Photoalbum::getPhotoInfo($id_photo);		
+		$photo_id = is_numeric(Core_Array::getRequest('photo_id')) ? Core_Array::getRequest('photo_id') : exit();
+		$row = Photoalbum::getPhotoInfo($photo_id);		
 		$content = array();
 		
 		if($row){
 			$content['status'] = 1;
-			$content['id_photoalbum'] = $row['id_photoalbum'];		
+			$content['photoalbum_id'] = $row['photoalbum_id'];		
 			$content['small_photo'] = core::documentparser()->photogalleryPic($row['small_photo'], $row['photoalbumable_type']);
 			$content['photo'] = core::documentparser()->photogalleryPic($row['photo'], $row['photoalbumable_type']);		
 			$content['description'] = $row['description'];		
-			$content['id_owner'] = $row['id_owner'];
+			$content['owner_id'] = $row['owner_id'];
 			$content['firstname'] = $row['firstname'];
 			$content['lastname'] = $row['lastname'];
-			$content['liked'] = Photoalbum::getNumberLiked($id_photo);		
-			$content['tell'] = Photoalbum::getNumberTell($id_photo);		
+			$content['liked'] = Photoalbum::getNumberLiked($photo_id);		
+			$content['tell'] = Photoalbum::getNumberTell($photo_id);		
 			$content['created'] = core::documentparser()->mysql_russian_date($row['created']);
 		}
 		else $content['status'] = 0;
@@ -1343,25 +1343,25 @@ switch ($_GET['action'])
 	
 	case getvideoinfo:
 	
-		$id_video = is_numeric(Core_Array::getRequest('id_video')) ? Core_Array::getRequest('id_video') : exit();
-		$row = Videoalbum::getVideoInfo($id_video);
+		$video_id = is_numeric(Core_Array::getRequest('video_id')) ? Core_Array::getRequest('video_id') : exit();
+		$row = Videoalbum::getVideoInfo($video_id);
 		$content = array();
 		
 		if($row){
 			$content['status'] = 1;
-			$content['id_video'] = $row['id_video'];		
+			$content['video_id'] = $row['video_id'];		
 			$content['description'] = $row['description'];
-			$content['id_owner'] = $row['id_owner'];
+			$content['owner_id'] = $row['owner_id'];
 			$content['firstname'] = $row['firstname'];
 			$content['lastname'] = $row['lastname'];
-			$content['liked'] = Videoalbum::getNumberLiked($id_video);		
-			$content['tell'] = Videoalbum::getNumberTell($id_video);
-			$content['views'] = Videoalbum::getNumberVideoViews($id_video);			
-			$content['thumb'] = Videoalbum::getThumb($id_video);			
+			$content['liked'] = Videoalbum::getNumberLiked($video_id);		
+			$content['tell'] = Videoalbum::getNumberTell($video_id);
+			$content['views'] = Videoalbum::getNumberVideoViews($video_id);			
+			$content['thumb'] = Videoalbum::getThumb($video_id);			
 			$content['video'] = core::documentparser()->getVideoPlayer($row['provider'], $row['video']);		
 			$content['created'] = core::documentparser()->mysql_russian_date($row['created']);
 			
-			Videoalbum::countView(Core_Array::getRequest('id_video'), $user['id']);
+			Videoalbum::countView(Core_Array::getRequest('video_id'), $user['id']);
 		}
 		else $content['status'] = 0;
 		
@@ -1420,7 +1420,7 @@ switch ($_GET['action'])
 		if($_REQUEST['job_year_finish']) $fields['job']['year_finish'] = Core_Array::getRequest('job_year_finish');
 		if($_REQUEST['id_job_place']) $fields['job']['id_place']= Core_Array::getRequest('id_job_place');		
 		if($_REQUEST['sport_type']) $fields['sport']['sport_type'] = Core_Array::getRequest('sport_type');
-		if($_REQUEST['spoort_level']) $fields['sport']['id_sport_level'] = Core_Array::getRequest('spoort_level');		
+		if($_REQUEST['spoort_level']) $fields['sport']['sport_level_id'] = Core_Array::getRequest('spoort_level');		
 		if($_REQUEST['search_team']) $fields['sport']['search_team'] = Core_Array::getRequest('search_team');	
 		if($_REQUEST['id_sport_type']) $fields['sport']['id_sport_type'] = Core_Array::getRequest('id_sport_type');		
 		if($_REQUEST['id_education_block']) $fields['education']['id_block'] = Core_Array::getRequest('id_education_block');	
@@ -1499,11 +1499,11 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 		
-		$id_photoalbum = $_REQUEST['categorie'];
+		$photoalbum_id = $_REQUEST['categorie'];
 		$description = trim($_REQUEST['description']);
 		$photoalbumable_type = $_REQUEST['photoalbumable_type'];		
 		$path = core::documentparser()->getPhotogalleryPath($photoalbumable_type);			
-		$message = Photoalbum::uploadHandlePup(32, $path, 0, $id_photoalbum, $description, $user['id']);
+		$message = Photoalbum::uploadHandlePup(32, $path, 0, $photoalbum_id, $description, $user['id']);
 		
 		core::documentparser()->showJSONContent(json_encode($message));	
 		
@@ -1523,7 +1523,7 @@ switch ($_GET['action'])
 			$fields['name'] = core::getLanguage('str', 'my_album_attach');
 			$fields['created_at'] = date("Y-m-d H:i:s");
 			$fields['photoalbumable_type'] = 'user_attach';
-			$fields['id_owner'] = $user['id'];		
+			$fields['owner_id'] = $user['id'];		
 				
 			Photoalbum::createAlbum($fields);	
 		}
@@ -1653,10 +1653,10 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_event = is_numeric($_REQUEST['id_event']) ? $_REQUEST['id_event'] : exit();
+		$event_id = is_numeric($_REQUEST['event_id']) ? $_REQUEST['event_id'] : exit();
 		$status = is_numeric($_REQUEST['status']) ? $_REQUEST['status'] : exit();
 	
-		$result = Events::changeMemberStatus($id_event, $user['id'], 'user', $status);		
+		$result = Events::changeMemberStatus($event_id, $user['id'], 'user', $status);		
 	
 		if($result)
 			$content = array("result" => 'success');
@@ -1690,10 +1690,10 @@ switch ($_GET['action'])
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
-		$id_owner = is_numeric($_REQUEST['id_owner']) ? $_REQUEST['id_owner'] : exit();
+		$owner_id = is_numeric($_REQUEST['owner_id']) ? $_REQUEST['owner_id'] : exit();
 		$type = $_REQUEST['type'] ? $_REQUEST['type'] : exit();	
 	
-		$arr_photos = Photoalbum::getPhotosList($id_owner, $type, $number, $offset);		
+		$arr_photos = Photoalbum::getPhotosList($owner_id, $type, $number, $offset);		
 		
 		if($arr_photos){
 			
@@ -1704,13 +1704,13 @@ switch ($_GET['action'])
 				$big_image = core::documentparser()->photogalleryPic($row['photo'], $type);
 				
 				if($small_photo){
-					$html .= '<div class="hov" id="photo-block-' . $row['id_photo'] . '">'; 
-					$html .= '<a class="photo_big" title="' . $row['description'] . '" href="' . $big_image . '" data-lightbox="roadtrip" data-num=' . $row['id_photo'] . '> <img src="' . $small_photo . '" alt="">';
+					$html .= '<div class="hov" id="photo-block-' . $row['photo_id'] . '">'; 
+					$html .= '<a class="photo_big" title="' . $row['description'] . '" href="' . $big_image . '" data-lightbox="roadtrip" data-num=' . $row['photo_id'] . '> <img src="' . $small_photo . '" alt="">';
 					$html .= '<div class="transparent"></div>';
 					$html .= '</a>';
 
-					if($row['id_owner'] == $user['id']) {
-						$html .= '<span class="icons-hid"><i id="my-video-' . $row['id_photo'] . '" class="remove_pic" id="' . $row['id_photo'] . '" data-item="' . $row['id_photo'] . '"><img src="templates/images/icon-krest.png" alt=""></i></span>';
+					if($row['owner_id'] == $user['id']) {
+						$html .= '<span class="icons-hid"><i id="my-video-' . $row['photo_id'] . '" class="remove_pic" id="' . $row['photo_id'] . '" data-item="' . $row['photo_id'] . '"><img src="templates/images/icon-krest.png" alt=""></i></span>';
 					}
 					
 					$html .= '</div>';
@@ -1731,10 +1731,10 @@ switch ($_GET['action'])
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
-		$id_owner = is_numeric($_REQUEST['id_owner']) ? $_REQUEST['id_owner'] : exit();
+		$owner_id = is_numeric($_REQUEST['owner_id']) ? $_REQUEST['owner_id'] : exit();
 		$type = $_REQUEST['type'] ? $_REQUEST['type'] : exit();
 		
-		$arr_videos = Videoalbum::getVideosList($id_owner, $type, $number, $offset);
+		$arr_videos = Videoalbum::getVideosList($owner_id, $type, $number, $offset);
 		
 		if($arr_videos){
 			
@@ -1743,11 +1743,11 @@ switch ($_GET['action'])
 			foreach($arr_videos as $row){
 				$thumb = core::documentparser()->getThumb($row['provider'], $row['video']);
 				
-				$html .= '<div id="video-block-' . $row['id_video'] . '" class="hov">';
-				$html .= '<div class="video-box"><img src="' . $thumb . '" alt="" class="video_prev" data-num="' . $row['id_video'] . '">';
+				$html .= '<div id="video-block-' . $row['video_id'] . '" class="hov">';
+				$html .= '<div class="video-box"><img src="' . $thumb . '" alt="" class="video_prev" data-num="' . $row['video_id'] . '">';
 				$html .= '</div>'; 
-				$html .= '<span class="icons-hid"><i id="my-video-' . $row['id_video'] . '" class="remove_video" data-item="' . $row['id_video'] . '"> <img  src="templates/images/icon-krest.png" alt=""></i></span> ';
-				$html .= '<span class="video-capt"><i></i>' . Videoalbum::getNumberVideoViews($row['id_video']) . '</span>';
+				$html .= '<span class="icons-hid"><i id="my-video-' . $row['video_id'] . '" class="remove_video" data-item="' . $row['video_id'] . '"> <img  src="templates/images/icon-krest.png" alt=""></i></span> ';
+				$html .= '<span class="video-capt"><i></i>' . Videoalbum::getNumberVideoViews($row['video_id']) . '</span>';
 				$html .= '</div>';
 			}			
 			
@@ -1783,7 +1783,7 @@ switch ($_GET['action'])
 					$html .= '<div class="transparent"></div>';
 					$html .= '</a>';	
 
-					if($row['id_owner'] == $user['id']) {
+					if($row['owner_id'] == $user['id']) {
 						$html .= '<span class="icons-hid"><i id="my-video-' . $row['id'] . '" class="remove_pic" id="' . $row['id'] . '" data-item="' . $row['id'] . '"><img src="templates/images/icon-krest.png" alt=""></i></span> ';
 					}
 					
@@ -1814,11 +1814,11 @@ switch ($_GET['action'])
 			$html = '';
 		
 			foreach($arr_videos as $row){
-				$html .= '<div id="video-block-' . $row['id_video'] . '" class="hov">';
-				$html .= '<div class="video-box"><img src="' . core::documentparser()->getThumb($row['provider'], $row['video']) . '" alt="" class="video_prev" data-num="' . $row['id_video'] . '">';
+				$html .= '<div id="video-block-' . $row['video_id'] . '" class="hov">';
+				$html .= '<div class="video-box"><img src="' . core::documentparser()->getThumb($row['provider'], $row['video']) . '" alt="" class="video_prev" data-num="' . $row['video_id'] . '">';
 				$html .= '</div>';
-				$html .= '<span class="icons-hid"><i id="my-video-' . $row['id_video'] . '" class="remove_video" data-item="' . $row['id_video'] . '" data-tooltip="Удалить видео"> <img  src="templates/images/icon-krest.png" alt=""></i></span> ';
-				$html .= '<span class="video-capt"><i></i>' . Videoalbum::getNumberVideoViews($row['id_video']) . '</span>';
+				$html .= '<span class="icons-hid"><i id="my-video-' . $row['video_id'] . '" class="remove_video" data-item="' . $row['video_id'] . '" data-tooltip="Удалить видео"> <img  src="templates/images/icon-krest.png" alt=""></i></span> ';
+				$html .= '<span class="video-capt"><i></i>' . Videoalbum::getNumberVideoViews($row['video_id']) . '</span>';
 				$html .= '</div>';
 			}
 			
@@ -1836,8 +1836,8 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_community = is_numeric($_REQUEST['id_community']) ? $_REQUEST['id_community'] : exit();		
-		$community = Communities::getCommunityInfo($id_community);
+		$community_id = is_numeric($_REQUEST['community_id']) ? $_REQUEST['community_id'] : exit();		
+		$community = Communities::getCommunityInfo($community_id);
 		
 		if($community['type'] == 'group') {
 			$mailnotification = $data->getMailNotification(9);
@@ -1846,9 +1846,9 @@ switch ($_GET['action'])
 			$mailnotification = $data->getMailNotification(10);
 		}		
 		
-		foreach($data->sendCommunityInvitation($id_community, $user['id']) as $row){
+		foreach($data->sendCommunityInvitation($community_id, $user['id']) as $row){
 		
-			if(Communities::change_community_role($id_community, $row['id_user'], 5)){
+			if(Communities::change_community_role($community_id, $row['user_id'], 5)){
 				$message = array();
 			
 				$subject = str_replace('%USER_FIRSTNAME%', $user['firstname'], $mailnotification['subject_ru']);
@@ -1866,13 +1866,13 @@ switch ($_GET['action'])
 				$message['date'] = $published;
 						
 				$msg = $mailnotification['content_ru'];			
-				$msg = str_replace('%PAGE%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'], $msg);			
+				$msg = str_replace('%PAGE%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'], $msg);			
 				$msg = str_replace('%NAME%', $community['name'], $msg);				
 			
 				if($community['type'] == 'team')  
-					$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&id_community=' . $id_community, $msg);
+					$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $community_id, $msg);
 				else if($community['type'] == 'group')
-					$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $id_community, $msg);			
+					$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $community_id, $msg);			
 				
 				//$msg = str_replace('%AVATAR%',  core::documentparser()->eventAvatar('http://' . $_SERVER['SERVER_NAME'] . '/' . core::documentparser()->communityAvatar($community))->resize(100, 100)->output_base64(), $msg);
 				
@@ -1899,19 +1899,19 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_event = is_numeric($_REQUEST['id_event']) ? $_REQUEST['id_event'] : exit();
+		$event_id = is_numeric($_REQUEST['event_id']) ? $_REQUEST['event_id'] : exit();
 	
-		$event = Events::getEventInfo($id_event);
+		$event = Events::getEventInfo($event_id);
 		
 		$mailnotification = $data->getMailNotification(11);
 		
-		foreach($data->sendEventInvitation($id_event, 'user', $user['id']) AS $row){
-			$result = Events::change_member_role($id_event, $row['id_user'], 'user', 4);
+		foreach($data->sendEventInvitation($event_id, 'user', $user['id']) AS $row){
+			$result = Events::change_member_role($event_id, $row['user_id'], 'user', 4);
 			
 			if($result){
 				$message = array();
 				
-				$event = Events::getEventInfo($id_event);
+				$event = Events::getEventInfo($event_id);
 				
 				$subject = str_replace('%USER_FIRSTNAME%', $user['firstname'], $mailnotification['subject_ru']);
 				$subject = str_replace('%USER_LASTNAME%', $user['lastname'], $subject);
@@ -1927,9 +1927,9 @@ switch ($_GET['action'])
 				$message['date'] = $published;			
 				
 				$msg = $mailnotification['content_ru'];			
-				$msg = str_replace('%PAGE%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&id_user=' . $user['id'], $msg);			
+				$msg = str_replace('%PAGE%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $user['id'], $msg);			
 				$msg = str_replace('%NAME%', $event['name'], $msg);				
-				$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&id_event=' . $id_event, $msg);
+				$msg = str_replace('%LINK%', 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $event_id, $msg);
 				$msg = str_replace('%AVATAR%', 'cid:photo', $msg);				
 		
 				$message['photo'] = core::documentparser()->eventAvatar($event['cover_page']);	
@@ -1950,9 +1950,9 @@ switch ($_GET['action'])
 	
 	case check_user_online:
 	
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		
-		if(core::user()->checkUserOnline($id_user))
+		if(core::user()->checkUserOnline($user_id))
 			$content = array("status" => 'online');
 		
 		else
@@ -1979,7 +1979,7 @@ switch ($_GET['action'])
 				$news['title'][] = $title;
 				$news['link'][] = $link;		
 				$news['description'][] = $description;
-				$news['pubdate'][] = $pubDate;
+				$news['created_at'][] = $pubDate;
 			}
 		}
 		
@@ -2003,166 +2003,166 @@ switch ($_GET['action'])
 		
 		$arrs = array();
 		foreach(Comments::getCommentEvent($user['id'], $number, $offset) as $row){
-			$id_event = $row['id_event'];
+			$event_id = $row['event_id'];
 			$id_author = $row['id_author'];
 			
-			if (Events::checkOwnerEvent($id_event, $id_author, 'user'))	{
+			if (Events::checkOwnerEvent($event_id, $id_author, 'user'))	{
 				$publication_name = $row['name'];
 				$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 				$publication_msg .= '<ul class="attach_image">';
 				
 				foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-					$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 				}
 				
 				$publication_msg .= '</ul>'	;
-				$arrs[] = array('name' => $publication_name,'type' => 'event','id_author' => $id_event, 'msg' => $publication_msg, 'avatar' => core::documentparser()->eventAvatar($row['cover_page']), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+				$arrs[] = array('name' => $publication_name,'type' => 'event','id_author' => $event_id, 'msg' => $publication_msg, 'avatar' => core::documentparser()->eventAvatar($row['cover_page']), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 			}
 		}
 		
 		foreach(Comments::getCommentCommunity($user['id'], $number, $offset) as $row){
-			$id_community = $row['id_community'];
+			$community_id = $row['community_id'];
 			$id_author = $row['id_author'];
 			
-			if(Communities::checkOwnerCommunity($id_community, $id_author) or Communities::checkAdminCommunity($id_community, $id_author)){
+			if(Communities::checkOwnerCommunity($community_id, $id_author) or Communities::checkAdminCommunity($community_id, $id_author)){
 				$publication_name = $row['name'];
 				$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 				$publication_msg .= '<ul class="attach_image">';
 				
 				foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-					$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 				}
 				
 				$publication_msg .= '</ul>'	;
-				$arrs[] = array('name' => $publication_name,'type' => $row['commentable_type'], 'id_author' => $id_community, 'msg' => $publication_msg, 'avatar' => core::documentparser()->communityAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+				$arrs[] = array('name' => $publication_name,'type' => $row['commentable_type'], 'id_author' => $community_id, 'msg' => $publication_msg, 'avatar' => core::documentparser()->communityAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 			}
 		}
 		
 		foreach(Comments::getUserComment($user['id'], $number, $offset) as $row){
 			$publication_name =  $row['firstname'] . " " . $row['lastname'];
-			$publication_id_author = $row['id_user'];
+			$publication_id_author = $row['user_id'];
 			$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 			$publication_msg .= '<ul class="attach_image">';
 			
-			foreach(Attach::getAttachList($row['id_content'], 'comment') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+			foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
+				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 			}	
 			
 			$publication_msg .= '</ul></div></div>'	;
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		}
 
 		foreach(Videoalbum::getUserPublishVideo($user['id'], $number, $offset) as $row){
 			$publication_name =  $row['firstname'] . " " . $row['lastname'];
-			$publication_id_author = $row['id_user'];
+			$publication_id_author = $row['user_id'];
 			$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($row['provider'], $row['video']), core::getLanguage('str', 'useraction_published_video')); 
-			$publication_msg = str_replace('%ID%', $row['id_video'], $publication_msg); 	
+			$publication_msg = str_replace('%ID%', $row['video_id'], $publication_msg); 	
 	
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_video'], 'likeable_type' => 'video', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['video_id'], 'likeable_type' => 'video', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		}
 
 		foreach(Photoalbum::getUserPublishPhoto($user['id'], $number, $offset) as $row){
 			$publication_name =  $row['firstname'] . " " . $row['lastname'];
-			$publication_id_author = $row['id_user'];
+			$publication_id_author = $row['user_id'];
 			$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($row['small_photo'], $row['photoalbumable_type']), core::getLanguage('str', 'useraction_added_photo')); 
-			$publication_msg = str_replace('%ID%', $row['id_photo'], $publication_msg); 
+			$publication_msg = str_replace('%ID%', $row['photo_id'], $publication_msg); 
 	
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_photo'], 'likeable_type' => 'photo', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['photo_id'], 'likeable_type' => 'photo', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		}		
 		
 		foreach(core::user()->getMyFriendsLastFriend($number, $offset) as $row){
 			$publication_name = $row['lastname'] . " " . $row['firstname'];
-			$publication_id_author = $row['id_user'];
+			$publication_id_author = $row['user_id'];
 	
 			$userfriend = $row['friend_lastname'] . " " . $row['friend_firstname'];
 	
 			$publication_msg = str_replace('%USERFRIEND%', $userfriend, core::getLanguage('str', 'useraction_make_friends')); 
-			$publication_msg = str_replace('%ID_FRIEND%', $row['id_friend'], $publication_msg); 
+			$publication_msg = str_replace('%ID_FRIEND%', $row['friend_id'], $publication_msg); 
 	
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => '', 'likeable_type' => '', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => '', 'likeable_type' => '', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		}		
 
 		foreach(Comments::getUserGetVideoComment($user['id'], $number, $offset) as $row){
 			$publication_name =  $row['firstname'] . " " . $row['lastname'];
-			$publication_id_author = $row['id_user'];
+			$publication_id_author = $row['user_id'];
 			$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_commented_video'));  
-			$video = Videoalbum::getVideoInfo($row['id_content']);
+			$video = Videoalbum::getVideoInfo($row['content_id']);
 		
-			if($video['id_owner']){
+			if($video['owner_id']){
 
 				$avatar = core::documentparser()->userAvatar($video);
 				$date = core::documentparser()->mysql_russian_date($row['added']);
 				$author_name = $video['firstname'] . " " . $video['lastname'];	
 				$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($video['provider'], $video['video']), $publication_msg);
 				$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);
-				$publication_msg = str_replace('%ID_AUTHOR%', $video['id_owner'], $publication_msg);
-				$publication_msg = str_replace('%ID%', $video['id_video'], $publication_msg);
+				$publication_msg = str_replace('%ID_AUTHOR%', $video['owner_id'], $publication_msg);
+				$publication_msg = str_replace('%ID%', $video['video_id'], $publication_msg);
 				$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg); 
 			}
 
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		} 
 
 		foreach(Comments::getUserGetPhotoComment($user['id'], $number, $offset) as $row){
 			$publication_name =  $row['firstname'] . " " . $row['lastname'];
-			$publication_id_author = $row['id_user'];
+			$publication_id_author = $row['user_id'];
 			$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_commented_photo'));
 	
-			$photo = Photoalbum::getPhotoInfo($row['id_content']);
+			$photo = Photoalbum::getPhotoInfo($row['content_id']);
 		
-			if($photo['id_owner']){
+			if($photo['owner_id']){
 				$avatar = core::documentparser()->userAvatar($photo);
 				$date = core::documentparser()->mysql_russian_date($row['added']);
 				$author_name = $photo['firstname'] . " " . $photo['lastname'];	
 			
 				$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($photo['small_photo'], $photo['photoalbumable_type']), $publication_msg);
-				$publication_msg = str_replace('%ID_AUTHOR%',$photo['id_owner'], $publication_msg); 
+				$publication_msg = str_replace('%ID_AUTHOR%',$photo['owner_id'], $publication_msg); 
 				$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);	
-				$publication_msg = str_replace('%ID%', $row['id_photo'], $publication_msg); 
+				$publication_msg = str_replace('%ID%', $row['photo_id'], $publication_msg); 
 				$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg); 
 			}
 	
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);	
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);	
 		}
 
 		foreach(core::user()->getUserFriendsLiked($number, $offset) as $row){
 			$publication_name =  $row['firstname'] . " " . $row['lastname'];
-			$publication_id_author = $row['id_user'];	
-			$id_content = $row['id_content'];
+			$publication_id_author = $row['user_id'];	
+			$content_id = $row['content_id'];
 			$pubmsg['publication_date'][] = core::documentparser()->mysql_russian_date($row['added']);
 			$pubmsg['timeorder'][] = $row['timeorder'];
 	
 			if($row['likeable_type'] == 'comment'){
-				$comment = Comments::getCommentInfo($row['id_content']);
+				$comment = Comments::getCommentInfo($row['content_id']);
 		
-				if($comment['id_user']){
+				if($comment['user_id']){
 					$author_name = $comment['firstname'] . " " . $comment['lastname'];
 					$avatar = core::documentparser()->userAvatar($comment);
-					$link = './?task=profile&id_user='.$comment['id_user'];
+					$link = './?task=profile&user_id='.$comment['user_id'];
 					
 					if ($comment['commentable_type']=='group'||$comment['commentable_type']=='team'){
 
-						$community = Communities::getCommunityInfo($comment['id_content']);
+						$community = Communities::getCommunityInfo($comment['content_id']);
 						
-						if(Communities::checkOwnerCommunity($comment['id_content'], $comment['id_user']) or Communities::checkAdminCommunity($comment['id_content'], $comment['id_user'])){
+						if(Communities::checkOwnerCommunity($comment['content_id'], $comment['user_id']) or Communities::checkAdminCommunity($comment['content_id'], $comment['user_id'])){
 							$author_name = $community['name'];	
 							$avatar = core::documentparser()->communityAvatar($community);
-							$link = './?task='.$community['type'].'s&id_community='.$comment['id_content'];
+							$link = './?task='.$community['type'].'s&community_id='.$comment['content_id'];
 						}
 					}
 					
 					if ($comment['commentable_type']=='event'){
-						$event = Events::getEventInfo($comment['id_content']);
+						$event = Events::getEventInfo($comment['content_id']);
 						
-						if (Events::checkOwnerEvent($comment['id_content'], $comment['id_user'], 'user')){
+						if (Events::checkOwnerEvent($comment['content_id'], $comment['user_id'], 'user')){
 							$author_name = $event['name'];	
 							$avatar = core::documentparser()->eventAvatar($event['cover_page']);
-							$link = './?task=events&id_event='.$comment['id_content'];
+							$link = './?task=events&event_id='.$comment['content_id'];
 						}
 					}
 					$date = core::documentparser()->mysql_russian_date($row['added']);
@@ -2174,79 +2174,79 @@ switch ($_GET['action'])
 					$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 					$publication_msg .= '<ul class="attach_image">';
 					
-					foreach(Attach::getAttachList($row['id_content'], 'comment') as $row2){
-						$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-						$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+					foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+						$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 					}
 					
 					$publication_msg .= '</ul></div></div>'	; 
 				}	
 			}	
 			else if($row['likeable_type'] == 'video'){
-				$video = Videoalbum::getVideoInfo($row['id_content']);
+				$video = Videoalbum::getVideoInfo($row['content_id']);
 		
-				if($video['id_owner']){
+				if($video['owner_id']){
 					$avatar = core::documentparser()->userAvatar($video);
 					$date = core::documentparser()->mysql_russian_date($row['added']);
 					$author_name = $video['firstname'] . " " . $video['lastname'];	
 					$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($video['provider'], $video['video']), core::getLanguage('str', 'useraction_liked_video'));
 					$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);
-					$publication_msg = str_replace('%ID_AUTHOR%', $video['id_owner'], $publication_msg);
-					$publication_msg = str_replace('%ID%', $video['id_video'], $publication_msg);
+					$publication_msg = str_replace('%ID_AUTHOR%', $video['owner_id'], $publication_msg);
+					$publication_msg = str_replace('%ID%', $video['video_id'], $publication_msg);
 					$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 					$publication_msg = str_replace('%DATE%', $date , $publication_msg);  
 				}	
 			}	
 			else if($row['likeable_type'] == 'photo'){	
-				$photo = Photoalbum::getPhotoInfo($row['id_content']);
+				$photo = Photoalbum::getPhotoInfo($row['content_id']);
 		
-				if($photo['id_owner']){
+				if($photo['owner_id']){
 					$avatar = core::documentparser()->userAvatar($photo);
 					$date = core::documentparser()->mysql_russian_date($row['added']);
 					$author_name = $photo['firstname'] . " " . $photo['lastname'];	
 			
 					$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($photo['small_photo'], $photo['photoalbumable_type']), core::getLanguage('str', 'useraction_liked_photo'));
-					$publication_msg = str_replace('%ID_AUTHOR%',$photo['id_owner'], $publication_msg); 
+					$publication_msg = str_replace('%ID_AUTHOR%',$photo['owner_id'], $publication_msg); 
 					$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);	
-					$publication_msg = str_replace('%ID%', $id_content, $publication_msg); 
+					$publication_msg = str_replace('%ID%', $content_id, $publication_msg); 
 					$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 					$publication_msg = str_replace('%DATE%', $date , $publication_msg); 
 				}		
 			}	
 	
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $id_content, 'likeable_type' => $row['likeable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $content_id, 'likeable_type' => $row['likeable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		}
 		foreach(core::user()->getUserShare($number, $offset) as $row){
 			$publication_name = $row['firstname'] . " " . $row['lastname'];
-			$publication_id_author = $row['id_user'];	
-			$id_content = $row['id_content'];
+			$publication_id_author = $row['user_id'];	
+			$content_id = $row['content_id'];
 			$pubmsg['publication_date'][] = core::documentparser()->mysql_russian_date($row['added']);
 			$pubmsg['timeorder'][] = $row['timeorder'];	
 			
 			if($row['shareable_type'] == 'comment'){
-				$comment = Comments::getCommentInfo($row['id_content']);
+				$comment = Comments::getCommentInfo($row['content_id']);
 				
-				if($comment['id_user']){
+				if($comment['user_id']){
 					$author_name = $comment['firstname'] . " " . $comment['lastname'];
 					$avatar = core::documentparser()->userAvatar($comment);
-					$link = './?task=profile&id_user='.$comment['id_user'];
+					$link = './?task=profile&user_id='.$comment['user_id'];
 					
 					if ($comment['commentable_type']=='group'||$comment['commentable_type']=='team'){
-						$community = Communities::getCommunityInfo($comment['id_content']);
+						$community = Communities::getCommunityInfo($comment['content_id']);
 						
-						if(Communities::checkOwnerCommunity($comment['id_content'], $comment['id_user']) or Communities::checkAdminCommunity($comment['id_content'], $comment['id_user'])){
+						if(Communities::checkOwnerCommunity($comment['content_id'], $comment['user_id']) or Communities::checkAdminCommunity($comment['content_id'], $comment['user_id'])){
 							$author_name = $community['name'];	
 							$avatar = core::documentparser()->communityAvatar($community);
-							$link = './?task='.$community['type'].'s&id_community='.$comment['id_content'];
+							$link = './?task='.$community['type'].'s&community_id='.$comment['content_id'];
 						}
 					}
 					if ($comment['commentable_type'] == 'event'){
-						$event = Events::getEventInfo($comment['id_content']);
+						$event = Events::getEventInfo($comment['content_id']);
 						
-						if (Events::checkOwnerEvent($comment['id_content'], $comment['id_user'], 'user')){
+						if (Events::checkOwnerEvent($comment['content_id'], $comment['user_id'], 'user')){
 							$author_name = $event['name'];	
 							$avatar = core::documentparser()->eventAvatar($event['cover_page']);
-							$link = './?task=events&id_event='.$comment['id_content'];
+							$link = './?task=events&event_id='.$comment['content_id'];
 						}
 					}
 					$date = core::documentparser()->mysql_russian_date($row['added']);		
@@ -2258,9 +2258,9 @@ switch ($_GET['action'])
 					$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 					$publication_msg .= '<ul class="attach_image">';
 					
-					foreach(Attach::getAttachList($row['id_content'], 'comment') as $row2){
-						$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
-						$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['id_photo'].'" /></li>';
+					foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+						$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
 					}	
 					
 					$publication_msg .= '</ul>'	;
@@ -2268,37 +2268,37 @@ switch ($_GET['action'])
 				}	
 			}	
 			else if($row['shareable_type'] == 'video'){
-				$video = Videoalbum::getVideoInfo($row['id_content']);
+				$video = Videoalbum::getVideoInfo($row['content_id']);
 				$avatar = core::documentparser()->userAvatar($video);
 				$date = core::documentparser()->mysql_russian_date($row['added']);	
 				
-				if($video['id_owner']){
+				if($video['owner_id']){
 					$author_name = $video['firstname'] . " " . $video['lastname'];	
 					$publication_msg = str_replace('%VIDEO%', core::documentparser()->getThumb($video['provider'], $video['video']), core::getLanguage('str', 'useraction_shared_video'));
 					$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);
-					$publication_msg = str_replace('%ID_AUTHOR%', $video['id_owner'], $publication_msg);
-					$publication_msg = str_replace('%ID%', $video['id_video'], $publication_msg); 	 
+					$publication_msg = str_replace('%ID_AUTHOR%', $video['owner_id'], $publication_msg);
+					$publication_msg = str_replace('%ID%', $video['video_id'], $publication_msg); 	 
 					$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 					$publication_msg = str_replace('%DATE%', $date , $publication_msg);		
 				}	
 			}	
 			else if($row['shareable_type'] == 'photo'){	
-				$photo = Photoalbum::getPhotoInfo($row['id_content']);
+				$photo = Photoalbum::getPhotoInfo($row['content_id']);
 				$avatar = core::documentparser()->userAvatar($photo);
 				$date = core::documentparser()->mysql_russian_date($row['added']);	
 				
-				if($photo['id_owner']){
+				if($photo['owner_id']){
 					$author_name = $photo['firstname'] . " " . $photo['lastname'];	
 					$publication_msg = str_replace('%PHOTO%', core::documentparser()->photogalleryPic($photo['small_photo'], $photo['photoalbumable_type']), core::getLanguage('str', 'useraction_shared_photo'));
-					$publication_msg = str_replace('%ID_AUTHOR%',$photo['id_owner'], $publication_msg); 
+					$publication_msg = str_replace('%ID_AUTHOR%',$photo['owner_id'], $publication_msg); 
 					$publication_msg = str_replace('%AUTHOR%', $author_name, $publication_msg);	
-					$publication_msg = str_replace('%ID%', $id_content, $publication_msg);  	 
+					$publication_msg = str_replace('%ID%', $content_id, $publication_msg);  	 
 					$publication_msg = str_replace('%AVATAR%', $avatar, $publication_msg);	
 					$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 				}		
 			}	
 			
-			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'id_content' => $id_content, 'likeable_type' => $row['shareable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
+			$arrs[] = array('name' => $publication_name, 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $content_id, 'likeable_type' => $row['shareable_type'], 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
 		}
 		
 		if($arrs){
@@ -2309,16 +2309,16 @@ switch ($_GET['action'])
 				$html .= '<div class="news-block-item" data-toggle="modal" data-target="#second-post">';
 				$html .= '<div class="news-block-head">';
 				if ($row['type']=='user'){
-					$html .= '<a href="./?task=profile&id_user=' . $row['id_author'] . '"><div class="head-img"><img src="' . $row['avatar'] . '" alt=""></div></a>';
-					$html .= '<a href="./?task=profile&id_user=' . $row['id_author'] . '"><p class="head-topic">' . $row['name'] . '<span class="status_user" data-num="' . $row['id_author'] . '"></span></p></a>';	
+					$html .= '<a href="./?task=profile&user_id=' . $row['id_author'] . '"><div class="head-img"><img src="' . $row['avatar'] . '" alt=""></div></a>';
+					$html .= '<a href="./?task=profile&user_id=' . $row['id_author'] . '"><p class="head-topic">' . $row['name'] . '<span class="status_user" data-num="' . $row['id_author'] . '"></span></p></a>';	
 				}
 				else if ($row['type']=='event'){
-					$html .= '<a href="./?task=events&id_event=' . $row['id_author'] . '"><div class="head-img"><img src="' . $row['avatar'] . '" alt=""></div></a>';
-					$html .= '<a href="./?task=events&id_event=' . $row['id_author'] . '"><p class="head-topic">' . $row['name'] . '</p></a>';
+					$html .= '<a href="./?task=events&event_id=' . $row['id_author'] . '"><div class="head-img"><img src="' . $row['avatar'] . '" alt=""></div></a>';
+					$html .= '<a href="./?task=events&event_id=' . $row['id_author'] . '"><p class="head-topic">' . $row['name'] . '</p></a>';
 				}
 				else{
-					$html .= '<a href="./?task='.$row['type'].'s&id_community=' . $row['id_author'] . '"><div class="head-img"><img src="' . $row['avatar'] . '" alt=""></div></a>';
-					$html .= '<a href="./?task='.$row['type'].'s&id_community=' . $row['id_author'] . '"><p class="head-topic">' . $row['name'] . '</p></a>';
+					$html .= '<a href="./?task='.$row['type'].'s&community_id=' . $row['id_author'] . '"><div class="head-img"><img src="' . $row['avatar'] . '" alt=""></div></a>';
+					$html .= '<a href="./?task='.$row['type'].'s&community_id=' . $row['id_author'] . '"><p class="head-topic">' . $row['name'] . '</p></a>';
 				}
 
 				$html .= '<p class="data">' . $row['publication_date'] . '</p>';			
@@ -2329,7 +2329,7 @@ switch ($_GET['action'])
 				$html .= $row['msg'];			
 				$html .= '</div>';	
 				
-				if($row['likeable_type']) $html .= ' <a id="like-' . $row['likeable_type'] . '-' . $row['id_content'] . '" class="liked" data-item="' . $row['id_content'] . '" data-type="' . $row['likeable_type'] . '">' . Comments::getNumberLiked($row['id_content'], $row['likeable_type']) . '</a>';				
+				if($row['likeable_type']) $html .= ' <a id="like-' . $row['likeable_type'] . '-' . $row['content_id'] . '" class="liked" data-item="' . $row['content_id'] . '" data-type="' . $row['likeable_type'] . '">' . Comments::getNumberLiked($row['content_id'], $row['likeable_type']) . '</a>';				
 				
 				$html .= '</div>';					
 				$html .= '</div>';					
@@ -2403,11 +2403,11 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_community = is_numeric($_REQUEST['id_community']) ? $_REQUEST['id_community'] : exit();
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();
+		$community_id = is_numeric($_REQUEST['community_id']) ? $_REQUEST['community_id'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		
-		if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id']))
-			if(Communities::change_community_role($id_community, $id_user, 4))
+		if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id']))
+			if(Communities::change_community_role($community_id, $user_id, 4))
 				$content = array("result" => 'success');
 			else
 				$content = array("result" => 'error');
@@ -2422,11 +2422,11 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_community = is_numeric($_REQUEST['id_community']) ? $_REQUEST['id_community'] : exit();
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();
+		$community_id = is_numeric($_REQUEST['community_id']) ? $_REQUEST['community_id'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		
-		if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id']))
-			if(Communities::remove_community_role($id_community, $id_user))
+		if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id']))
+			if(Communities::remove_community_role($community_id, $user_id))
 				$content = array("result" => 'success');
 			else
 				$content = array("result" => 'error');
@@ -2441,11 +2441,11 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_community = is_numeric($_REQUEST['id_community']) ? $_REQUEST['id_community'] : exit();
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();
+		$community_id = is_numeric($_REQUEST['community_id']) ? $_REQUEST['community_id'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		
-		if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id']))
-			if(Communities::change_community_role($id_community, $id_user, 3))
+		if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id']))
+			if(Communities::change_community_role($community_id, $user_id, 3))
 				$content = array("result" => 'success');
 			else
 				$content = array("result" => 'error');
@@ -2460,11 +2460,11 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_community = is_numeric($_REQUEST['id_community']) ? $_REQUEST['id_community'] : exit();
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();
+		$community_id = is_numeric($_REQUEST['community_id']) ? $_REQUEST['community_id'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		
-		if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id']))
-			if(Communities::change_community_role($id_community, $id_user, 2))
+		if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id']))
+			if(Communities::change_community_role($community_id, $user_id, 2))
 				$content = array("result" => 'success');
 			else
 				$content = array("result" => 'error');
@@ -2479,11 +2479,11 @@ switch ($_GET['action'])
 	
 		Auth::authorization();
 	
-		$id_community = is_numeric($_REQUEST['id_community']) ? $_REQUEST['id_community'] : exit();
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();
+		$community_id = is_numeric($_REQUEST['community_id']) ? $_REQUEST['community_id'] : exit();
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		
-		if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id']))
-			if(Communities::remove_community_role($id_community, $id_user))
+		if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id']))
+			if(Communities::remove_community_role($community_id, $user_id))
 				$content = array("result" => 'success');
 			else
 				$content = array("result" => 'error');
@@ -2498,16 +2498,16 @@ switch ($_GET['action'])
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
-		$id_member = is_numeric($_REQUEST['id_member']) ? $_REQUEST['id_member'] : exit();
+		$member_id = is_numeric($_REQUEST['member_id']) ? $_REQUEST['member_id'] : exit();
 		$eventable_type = !empty($_REQUEST['eventable_type']) ? $_REQUEST['eventable_type'] : exit();
 		
 		$html = '';
 		
-		foreach(Events::getSearchEventsList($id_member, $eventable_type, $number, $offset) as $row){
-			$html .= '<div class="event-item"> <a href="./?task=events&id_event=' . $row['id_event'] . '" class="img"><img src="' . core::documentparser()->eventAvatar($row['cover_page']) . '" alt="" style="margin-left: -100%;"></a>';
-            $html .= '<a class="addEvent" data-tooltip="Присоединиться" data-item="'.$row['id_event'].'" data-status="1"><img src="./templates/images/icon-ok.png"/></a>';
+		foreach(Events::getSearchEventsList($member_id, $eventable_type, $number, $offset) as $row){
+			$html .= '<div class="event-item"> <a href="./?task=events&event_id=' . $row['event_id'] . '" class="img"><img src="' . core::documentparser()->eventAvatar($row['cover_page']) . '" alt="" style="margin-left: -100%;"></a>';
+            $html .= '<a class="addEvent" data-tooltip="Присоединиться" data-item="'.$row['event_id'].'" data-status="1"><img src="./templates/images/icon-ok.png"/></a>';
 			$html .= '<div class="teg">';
-			$html .= '<p><a href="./?task=events&id_event=' . $row['id_event'] . '">' . $row['name'] . '</a></p>'; 
+			$html .= '<p><a href="./?task=events&event_id=' . $row['event_id'] . '">' . $row['name'] . '</a></p>'; 
             $html .= ' <p>';  
 			
 			if($row['sport_type']) $html .= $row['sport_type'] . '<br>'; 
@@ -2527,14 +2527,14 @@ switch ($_GET['action'])
                 
 			$html .= '</p>';	  
 				
-			if(Events::getEventRole(Events::getMemberShipStatus($row['id_event'], $user['id'], 'user'))) $html .= '<p>' . Events::getEventRole(Events::getMemberShipStatus($row['id_event'], $user['id'], 'user')) . '</p>';
+			if(Events::getEventRole(Events::getMemberShipStatus($row['event_id'], $user['id'], 'user'))) $html .= '<p>' . Events::getEventRole(Events::getMemberShipStatus($row['event_id'], $user['id'], 'user')) . '</p>';
 			
-			if(Events::getEventStatus($row['id_event']) == 'continues') 
+			if(Events::getEventStatus($row['event_id']) == 'continues') 
 				$status = core::getLanguage('str', 'event_continues');			
-			else if(Events::getEventStatus($row['id_event']) == 'end')	
+			else if(Events::getEventStatus($row['event_id']) == 'end')	
 				$status = core::getLanguage('str', 'event_completed');		
 			
-			$html .= '<p><i></i>' . str_replace('%MEMBERS%', Events::countMembers($row['id_event'], 'user'), core::getLanguage('str', 'participants_friends')) . '</p>';
+			$html .= '<p><i></i>' . str_replace('%MEMBERS%', Events::countMembers($row['event_id'], 'user'), core::getLanguage('str', 'participants_friends')) . '</p>';
 			$html .= '<span>' . $status . '</span>';
             $html .= '</div>';   	
 			$html .= '</div>';			
@@ -2553,14 +2553,14 @@ switch ($_GET['action'])
 
 		Auth::authorization();
 	
-		$id_event = is_numeric($_REQUEST['id_event']) ? $_REQUEST['id_event'] : exit();
+		$event_id = is_numeric($_REQUEST['event_id']) ? $_REQUEST['event_id'] : exit();
 		$status = is_numeric($_REQUEST['status']) ? $_REQUEST['status'] : exit();
-		$id_community = is_numeric($_REQUEST['id_community']) ? $_REQUEST['id_community'] : exit();
+		$community_id = is_numeric($_REQUEST['community_id']) ? $_REQUEST['community_id'] : exit();
 		
-		$community = Communities::getCommunityInfo($id_community);	
+		$community = Communities::getCommunityInfo($community_id);	
 		
-		if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id'])){
-			if(Events::changeMemberStatus($id_event, $id_community, $community['type'], $status))
+		if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id'])){
+			if(Events::changeMemberStatus($event_id, $community_id, $community['type'], $status))
 				$content = array("result" => 'success');
 			else
 				$content = array("result" => 'error');
@@ -2598,7 +2598,7 @@ switch ($_GET['action'])
 			
             $html .= '<p>' . $row['about'] . '</p>';
 			  
-            if($row['id_owner'] == $user['id']) {
+            if($row['owner_id'] == $user['id']) {
 				if($row['type'] == 'shop') $html .=  '<a href="./?task=shops&id_sport_block=' . $row['id'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a> </div>';
 				else if($row['type'] == 'fitness') $html .=  '<a href="./?task=fitness&id_sport_block=' . $row['id'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a> </div>';
 				else if($row['type'] == 'playgrounds') $html .=  '<a href="./?task=playgrounds&id_sport_block=' . $row['id'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a> </div>';
@@ -2624,9 +2624,9 @@ switch ($_GET['action'])
 		$html = '';
 		
 		foreach(Events::getPopularEventList($number, $offset) as $row){
-			$html .= '<div class="event-item"> <a href="./?task=events&id_event=' . $row['id'] . '" class="img"><img src="' . core::documentparser()->eventAvatar($row['cover_page']) . '" alt="" style="margin-left: -100%;"></a>';      
+			$html .= '<div class="event-item"> <a href="./?task=events&event_id=' . $row['id'] . '" class="img"><img src="' . core::documentparser()->eventAvatar($row['cover_page']) . '" alt="" style="margin-left: -100%;"></a>';      
 			$html .= '<div class="teg">';
-			$html .= '<p><a href="./?task=events&id_event=' . $row['id'] . '">' . $row['name'] . '</a></p>';
+			$html .= '<p><a href="./?task=events&event_id=' . $row['id'] . '">' . $row['name'] . '</a></p>';
 			$html .= '<p>';
               
             if(!empty($row['sport_type'])) $html .= $row['sport_type'] . "<br>";
@@ -2651,7 +2651,7 @@ switch ($_GET['action'])
 				
 			$html .= '<p><i></i>' . str_replace('%MEMBERS%', Events::countMembers($row['id'], 'user'), core::getLanguage('str', 'participants_friends')) . '</p>';
                 
-			if(Events::checkOwnerEvent($row['id_event'], $user['id'], 'user')) $html .=	'<a href="./?task=events&id_event=' . $row['id'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a>';
+			if(Events::checkOwnerEvent($row['event_id'], $user['id'], 'user')) $html .=	'<a href="./?task=events&event_id=' . $row['id'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a>';
 				
 			if(Events::getEventStatus($row['id']) == 'continues') 
 				$html .= '<span>' . core::getLanguage('str', 'event_continues') . '</span>';
@@ -2682,21 +2682,21 @@ switch ($_GET['action'])
 	
 		foreach(Communities::getPopularCommunitiesList($type, $number, $offset) as $row){
 			
-			$html .= '<div id="community_' .$row['id_community'] . '" class="event-item">';
-			$html .= '<a class="img" href="./?task=' . $task . '&id_community=' . $row['id_community'] . '">';
+			$html .= '<div id="community_' .$row['community_id'] . '" class="event-item">';
+			$html .= '<a class="img" href="./?task=' . $task . '&community_id=' . $row['community_id'] . '">';
 			$html .= '<img border="0" alt="" src="' . core::documentparser()->communityAvatar($row) . '">';
 			$html .= '</a>';
 			$html .= '<div class="teg">';
-			$html .= '<p><a href="./?task=' . $type . '&id_community=' . $row['id_community'] . '"> ' . $row['name'] . '</a></p>';
+			$html .= '<p><a href="./?task=' . $type . '&community_id=' . $row['community_id'] . '"> ' . $row['name'] . '</a></p>';
 
-			$status = Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id']));			
+			$status = Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id']));			
 			
 			$html .= '<p>' . $row['sport_type'] . '<br> ' . $status . '<br>' . $row['place'] . '</p>';
 			$html .= '<p> ' .$row['about'] . '</p>';
-			$html .= '<p><i></i>'. str_replace('%MEMBERS%', Communities::countMemberCommunity($row['id_community'], 2), core::getLanguage('str', 'participants_friends')) . '</p>';
+			$html .= '<p><i></i>'. str_replace('%MEMBERS%', Communities::countMemberCommunity($row['community_id'], 2), core::getLanguage('str', 'participants_friends')) . '</p>';
 			
-			if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])) {
-				$html .= '<a href="./?task=' . $type . '&id_community=' .$row['id_community'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a>';
+			if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])) {
+				$html .= '<a href="./?task=' . $type . '&community_id=' .$row['community_id'] . '&q=edit">' . core::getLanguage('str', 'edit') . '</a>';
 			}				
 			
 			$html .= '<div class="transparent"> </div>';
@@ -2746,10 +2746,10 @@ switch ($_GET['action'])
 	
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
-		$id_user = is_numeric($_REQUEST['id_user']) ? $_REQUEST['id_user'] : exit();			
+		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();			
 		
-		if($id_user != $user['id']){
-			core::user()->setUser_id($id_user);
+		if($user_id != $user['id']){
+			core::user()->setUser_id($user_id);
 			$profile_usersetting = core::user()->getUserSetting();	
 		
 			if(core::user()->permissionUser($user['id'], $profile_usersetting['permission_view_friends'])) 
@@ -2759,15 +2759,15 @@ switch ($_GET['action'])
 		}	
 		
 		if($permit !== false){
-			foreach(Friends::getFriendsList($id_user, $number, $offset) as $row){
+			foreach(Friends::getFriendsList($user_id, $number, $offset) as $row){
 				$rows[] = array(
-				"id_user" => $row['id_user'],			
+				"user_id" => $row['user_id'],			
 				"avatar" => core::documentparser()->userAvatar($row),
 				"firstname" => $row['firstname'],			
 				"lastname" => $row['lastname'],
 				"city" => $row['city'],
-				"status_user" => core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline',
-				"id_sender" => $user['id']);
+				"status_user" => core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline',
+				"sender_id" => $user['id']);
 			}	
 			
 			$content = '{"item":'.json_encode($rows).'}';		

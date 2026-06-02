@@ -4,11 +4,11 @@ defined('PLAYTOGET') || exit('Playtoget: access denied!');
 
 class Model_photoalbums extends Model
 {
-	public function NumberTotalPopPhotos($id_user)
+	public function NumberTotalPopPhotos($user_id)
 	{
-		$id_user = core::database()->escape($id_user);
+		$user_id = core::database()->escape($user_id);
 		
-		$query = "SELECT * FROM " . core::database()->getTableName('photos') ." WHERE id_owner=" . $id_user;
+		$query = "SELECT * FROM " . core::database()->getTableName('photos') ." WHERE owner_id=" . $user_id;
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getRecordCount($result);

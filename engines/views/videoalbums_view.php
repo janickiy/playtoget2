@@ -10,7 +10,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -57,7 +57,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['name'] = $name;	
 				$fields['created_at'] = date("Y-m-d H:i:s");	
 				$fields['videoalbumable_type'] = 'user';
-				$fields['id_owner'] = $user['id'];	
+				$fields['owner_id'] = $user['id'];	
 		
 				$result = Videoalbum::createAlbum($fields);	
 
@@ -88,7 +88,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['name'] = $name;
 				$fields['updated_at'] = date("Y-m-d H:i:s");		
 		
-				$result = Videoalbum::editAlbum($fields, $id_album, $user['id_user']);
+				$result = Videoalbum::editAlbum($fields, $id_album, $user['user_id']);
 		
 				if($result){
 					header("Location: ./?task=videoalbums");
@@ -112,11 +112,11 @@ if($_SESSION['user_authorization'] == "ok"){
 			if($set_video['video']){
 				$fields = array();
 				$fields['id'] = 0;
-				$fields['id_videoalbum'] = Core_Array::getRequest('id_videoalbum');
+				$fields['videoalbum_id'] = Core_Array::getRequest('videoalbum_id');
 				$fields['provider'] = $set_video['provider'];			
 				$fields['video'] = $set_video['video'];			
 				$fields['description'] = $description;			
-				$fields['id_owner'] = $user['id'];
+				$fields['owner_id'] = $user['id'];
 				$fields['created_at'] = date("Y-m-d H:i:s");
 			
 				$result = Videoalbum::addVideo($fields);
@@ -187,7 +187,7 @@ if($_SESSION['user_authorization'] == "ok"){
 			$fields['name'] = core::getLanguage('str', 'my_album');		
 			$fields['created_at'] = date("Y-m-d H:i:s");
 			$fields['videoalbumable_type'] = 'user';		
-			$fields['id_owner'] = $user['id'];	
+			$fields['owner_id'] = $user['id'];	
 		
 			Videoalbum::createAlbum($fields);		
 		}
@@ -203,7 +203,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		$tpl->assign('STR_VIDEO', core::getLanguage('str', 'video'));	
 		$tpl->assign('STR_DESCRIPTION', core::getLanguage('str', 'description'));		
 		$tpl->assign('STR_ALBUM', core::getLanguage('str', 'album'));	
-		$tpl->assign('OPTION_ID', $_POST['id_videoalbum']);	
+		$tpl->assign('OPTION_ID', $_POST['videoalbum_id']);	
 		$tpl->assign('VIDEO', $_POST['video']);	
 		$tpl->assign('DESCRIPTION', $_POST['description']);
 		$tpl->assign('BUTTON_ADD', core::getLanguage('button', 'add'));
@@ -230,11 +230,11 @@ if($_SESSION['user_authorization'] == "ok"){
 	}
 	else{
 	
-		$id_user = $_GET['id_user'] ? core::database()->escape((int)Core_Array::getRequest('id_user')) : $user['id'];
-		$tpl->assign('ID_OWNER', $id_user);
+		$user_id = $_GET['user_id'] ? core::database()->escape((int)Core_Array::getRequest('user_id')) : $user['id'];
+		$tpl->assign('ID_OWNER', $user_id);
 		$tpl->assign('VIDEOALBUMABLE_TYPE', 'user');				
 		
-		if(!$_GET['id_user'] or $_GET['id_user'] == $user['id']) $tpl->assign('SHOW_ADD_VIDEO_MENU', 'show');	
+		if(!$_GET['user_id'] or $_GET['user_id'] == $user['id']) $tpl->assign('SHOW_ADD_VIDEO_MENU', 'show');	
 		
 		include_once "user_profile_info.inc";	
 	
@@ -264,7 +264,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));			
 				$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id']));
 
-				if($row['id_owner'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
+				if($row['owner_id'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
 
 				$rowBlock->assign('STR_REMOVE_VIDEO', core::getLanguage('str', 'remove_video'));			
 				$tpl->assign('row_videos_list', $rowBlock);
@@ -278,14 +278,14 @@ if($_SESSION['user_authorization'] == "ok"){
 			$tpl->assign('STR_CREATE_NEW_ALBUM', core::getLanguage('str', 'create_new_album'));
 			$tpl->assign('STR_OR', core::getLanguage('str', 'or'));	
 			$tpl->assign('STR_SHOW_MORE', core::getLanguage('str', 'show_more'));		
-			$tpl->assign('STR_MY_ALBUMS', $_GET['id_user'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));
+			$tpl->assign('STR_MY_ALBUMS', $_GET['user_id'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));
 			$tpl->assign('STR_POPULAR_VIDEOS',  core::getLanguage('str', 'popular_videos'));
-			$tpl->assign('STR_MY_VIDEOS', $_GET['id_user'] ? core::getLanguage('str', 'user_videos') : core::getLanguage('str', 'my_videos'));		
-			$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($id_user, 'user'));
+			$tpl->assign('STR_MY_VIDEOS', $_GET['user_id'] ? core::getLanguage('str', 'user_videos') : core::getLanguage('str', 'my_videos'));		
+			$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($user_id, 'user'));
 			$tpl->assign('NUMBER_POPULAR_VIDEOS', Videoalbum::getNumberPopVideos('user'));		
-			$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($id_user, 'user'));		
+			$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($user_id, 'user'));		
 		
-			if(!$_GET['id_user'] or $_GET['id_user'] == $user['id']) {
+			if(!$_GET['user_id'] or $_GET['user_id'] == $user['id']) {
 		
 				$arr_pop_videos = Videoalbum::getPopularVideos('user', 6, 0);		
 		
@@ -293,17 +293,17 @@ if($_SESSION['user_authorization'] == "ok"){
 					foreach($arr_pop_videos as $row){
 						$rowBlock = $tpl->fetch('row_pop_videos_list');
 						$rowBlock->assign('ID', $row['id']);
-						$rowBlock->assign('ID_VIDEO', $row['id_video']);
+						$rowBlock->assign('ID_VIDEO', $row['video_id']);
 						$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));	
 						$rowBlock->assign('VIDEO', core::documentparser()->getVideoPlayer($row['provider'], $row['video']));					
-						$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id_video']));	
+						$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['video_id']));	
 						$rowBlock->assign('DESCRIPTION', $row['description']);
 						$tpl->assign('row_pop_videos_list', $rowBlock);
 					}
 				}else $tpl->assign('NO_POP_VIDEOS', core::getLanguage('str', 'empty'));		
 			}else $tpl->assign('NO_POP_VIDEOS', core::getLanguage('str', 'empty'));			
 		
-			$arr_albums = Videoalbum::getAlbumList($id_user, 'user');
+			$arr_albums = Videoalbum::getAlbumList($user_id, 'user');
 		
 			if($arr_albums){
 				foreach($arr_albums as $row){
@@ -322,25 +322,25 @@ if($_SESSION['user_authorization'] == "ok"){
 					$rowBlock->assign('STR_REMOVE', core::getLanguage('str', 'remove'));
 				
 					if(Videoalbum::checkOwner($row['id'], $user['id'])) $rowBlock->assign('SHOW_EDIT_LINKS', 'show');					
-					if($_GET['id_user']) $rowBlock->assign('PROFILE_USER_ID', $_GET['id_user']);				
+					if($_GET['user_id']) $rowBlock->assign('PROFILE_USER_ID', $_GET['user_id']);				
 				
 					$tpl->assign('row_my_videoalbum_list', $rowBlock);			
 				}
 			}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 		
-			$arr_my_videos = Videoalbum::getVideosList($id_user, 'user', 6, 0);
+			$arr_my_videos = Videoalbum::getVideosList($user_id, 'user', 6, 0);
 		
 			if($arr_my_videos){
 				foreach($arr_my_videos as $row){
 					$rowBlock = $tpl->fetch('row_my_videos_list');					
 					$rowBlock->assign('ID', $row['id']);
-					$rowBlock->assign('ID_VIDEO', $row['id_video']);					
+					$rowBlock->assign('ID_VIDEO', $row['video_id']);					
 					$rowBlock->assign('DESCRIPTION', $arow['description']);
 					$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));
 					$rowBlock->assign('VIDEO', core::documentparser()->getVideoPlayer($row['provider'], $row['video']));					
-					$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id_video']));
+					$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['video_id']));
 				
-					if($row['id_owner'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
+					if($row['owner_id'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
 				
 					$rowBlock->assign('STR_REMOVE_VIDEO', core::getLanguage('str', 'remove_video'));				
 					$tpl->assign('row_my_videos_list', $rowBlock);
@@ -386,8 +386,8 @@ else{
 	include_once "left_block.inc";
 	include_once "right_block.inc";	
 	
-	$id_user = core::database()->escape((int)Core_Array::getRequest('id_user'));
-	$tpl->assign('ID_OWNER', $id_user);
+	$user_id = core::database()->escape((int)Core_Array::getRequest('user_id'));
+	$tpl->assign('ID_OWNER', $user_id);
 	$tpl->assign('VIDEOALBUMABLE_TYPE', 'user');
 		
 	include_once "user_profile_info.inc";	
@@ -420,13 +420,13 @@ else{
 		$tpl->assign('PATH_VIDEO', $path_video);
 		$tpl->assign('STR_OR', core::getLanguage('str', 'or'));	
 		$tpl->assign('STR_SHOW_MORE', core::getLanguage('str', 'show_more'));		
-		$tpl->assign('STR_MY_ALBUMS', $_GET['id_user'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));
-		$tpl->assign('STR_MY_VIDEOS', $_GET['id_user'] ? core::getLanguage('str', 'user_videos') : core::getLanguage('str', 'my_videos'));		
-		$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($id_user, 'user'));
-		$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($id_user, 'user'));			
+		$tpl->assign('STR_MY_ALBUMS', $_GET['user_id'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));
+		$tpl->assign('STR_MY_VIDEOS', $_GET['user_id'] ? core::getLanguage('str', 'user_videos') : core::getLanguage('str', 'my_videos'));		
+		$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($user_id, 'user'));
+		$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($user_id, 'user'));			
 		$tpl->assign('NO_POP_VIDEOS', core::getLanguage('str', 'empty'));			
 		
-		$arr_albums = Videoalbum::getAlbumList($id_user, 'user');
+		$arr_albums = Videoalbum::getAlbumList($user_id, 'user');
 		
 		if($arr_albums){
 			foreach($arr_albums as $row){
@@ -444,25 +444,25 @@ else{
 				$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));					
 				$rowBlock->assign('STR_REMOVE', core::getLanguage('str', 'remove'));
 				
-				if($_GET['id_user']) $rowBlock->assign('PROFILE_USER_ID', $_GET['id_user']);
+				if($_GET['user_id']) $rowBlock->assign('PROFILE_USER_ID', $_GET['user_id']);
 				
 				$tpl->assign('row_my_videoalbum_list', $rowBlock);			
 			}
 		}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 		
-		$arr_my_videos = Videoalbum::getVideosList($id_user, 'user', 6, 0);
+		$arr_my_videos = Videoalbum::getVideosList($user_id, 'user', 6, 0);
 		
 		if($arr_my_videos){
 				foreach($arr_my_videos as $row){
 					$rowBlock = $tpl->fetch('row_my_videos_list');					
 					$rowBlock->assign('ID', $row['id']);
-					$rowBlock->assign('ID_VIDEO', $row['id_video']);					
+					$rowBlock->assign('ID_VIDEO', $row['video_id']);					
 					$rowBlock->assign('DESCRIPTION', $arow['description']);
 					$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));
 					$rowBlock->assign('VIDEO', core::documentparser()->getVideoPlayer($row['provider'], $row['video']));					
-					$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id_video']));
+					$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['video_id']));
 				
-					if($row['id_owner'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
+					if($row['owner_id'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
 				
 					$rowBlock->assign('STR_REMOVE_VIDEO', core::getLanguage('str', 'remove_video'));				
 					$tpl->assign('row_my_videos_list', $rowBlock);

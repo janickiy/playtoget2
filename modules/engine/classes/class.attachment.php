@@ -4,10 +4,10 @@ defined('PLAYTOGET') || exit('Playtoget: access denied!');
 
 class Attach
 {
-	static function removeAttach($id_content, $type)
+	static function removeAttach($content_id, $type)
 	{
-		if(is_numeric($id_content) && !empty($type)){
-			$query = "SELECT * FROM " . core::database()->getTableName('attachment') . " WHERE type='" . $type . "' AND id_content = " . $id_content;
+		if(is_numeric($content_id) && !empty($type)){
+			$query = "SELECT * FROM " . core::database()->getTableName('attachment') . " WHERE type='" . $type . "' AND content_id = " . $content_id;
 			$result = core::database()->querySQL($query);
 		
 			$path = core::documentparser()->getAttachPath($type);
@@ -18,38 +18,38 @@ class Attach
 				if(file_exists($path . $row['photo'])) unlink($path . $row['photo']);		
 			}
 
-			core::database()->delete(core::database()->getTableName('attachment'), "type='" . $type . "' AND id_content = " . $id_content, '');
+			core::database()->delete(core::database()->getTableName('attachment'), "type='" . $type . "' AND content_id = " . $content_id, '');
 		}		
 	}	
 	
-	static function uploadAttach($id_photo,$id_content,$type)  
+	static function uploadAttach($photo_id,$content_id,$type)  
     {  
 
-    	$photo = Photoalbum::getPhotoInfo($id_photo);
+    	$photo = Photoalbum::getPhotoInfo($photo_id);
 
 		if (file_exists(PATH_COMMENT_ATTACHMENTS.$photo['photo'])){
 						$fields = array();
 						$fields['id'] = 0;			
 						$fields['type'] = $type;
-						$fields['id_content'] = $id_content;
-						$fields['id_photo'] = $id_photo;									
+						$fields['content_id'] = $content_id;
+						$fields['photo_id'] = $photo_id;									
 						
 						$insert_id = core::database()->insert($fields, core::database()->getTableName('attachment'));
 						$info = 'FILE_SUCCESSFULLY_DOWNLOADED';
 						$path_small_photo = $photo['photo'];
 						$path_photo = $photo['small_photo'];
-						$id_photo = $photo['id_photo'];
+						$photo_id = $photo['photo_id'];
 					}  
                     else 
                         $error = 'COULDNT_LOAD_FILE';
 
-    	return array('info' => $info, 'id_photo' => $id_photo, 'small_photo' => $path_small_photo, 'photo' => $path_photo, 'error' => $error);
+    	return array('info' => $info, 'photo_id' => $photo_id, 'small_photo' => $path_small_photo, 'photo' => $path_photo, 'error' => $error);
     }		
 	
-	static function getAttachList($id_content, $type)
+	static function getAttachList($content_id, $type)
 	{		
-		if(is_numeric($id_content) && $type){
-			$query = "SELECT * FROM " . core::database()->getTableName('attachment') . " WHERE type='" . $type . "' AND id_content=" . $id_content;
+		if(is_numeric($content_id) && $type){
+			$query = "SELECT * FROM " . core::database()->getTableName('attachment') . " WHERE type='" . $type . "' AND content_id=" . $content_id;
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getColumnArray($result);

@@ -16,7 +16,8 @@ class Rss
 				$fields['title'] = $arrs['title'][$i];
 				$fields['link'] = $arrs['link'][$i];
 				$fields['description'] = $arrs['description'][$i];
-				$fields['pubdate'] = date('Y-m-d H:i:s', strtotime($arrs['pubdate'][$i]));
+				$fields['created_at'] = date('Y-m-d H:i:s', strtotime($arrs['created_at'][$i]));
+				$fields['updated_at'] = date('Y-m-d H:i:s');
 				
 				core::database()->insert($fields, core::database()->getTableName('news_rss_sport'));				
 			}
@@ -28,7 +29,7 @@ class Rss
 	
 	static function getRssNews($limit = 5)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('news_rss_sport') . " ORDER BY id DESC LIMIT " . $limit . "";
+		$query = "SELECT * FROM " . core::database()->getTableName('news_rss_sport') . " ORDER BY created_at DESC, id DESC LIMIT " . $limit . "";
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getColumnArray($result);

@@ -6,13 +6,13 @@ class Auth
 {
 	static function authorization()
 	{
-		if($_SESSION['user_authorization'] != "ok" && empty($_SESSION['id_user'])){
-			if(self::LoginUser($_COOKIE['id_user'], $_COOKIE['token'], $_COOKIE['id_session'])){
+		if($_SESSION['user_authorization'] != "ok" && empty($_SESSION['user_id'])){
+			if(self::LoginUser($_COOKIE['user_id'], $_COOKIE['token'], $_COOKIE['session_id'])){
 				$_SESSION['user_authorization'] = "ok";
-				$_SESSION['id_user'] = $_COOKIE['id_user'];
+				$_SESSION['user_id'] = $_COOKIE['user_id'];
 				
 				$fields = array();
-				$fields['id_user'] = $_COOKIE['id_user'];
+				$fields['user_id'] = $_COOKIE['user_id'];
 				$fields['ip'] = core::documentparser()->getIP();
 				$fields['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 				$fields['last_sign_in_at'] = date("Y-m-d H:i:s");
@@ -24,10 +24,10 @@ class Auth
 			}
 		}
 		else{
-			if(!self::LoginUser($_COOKIE['id_user'], $_COOKIE['token'], $_COOKIE['id_session'])) self::Logout();
+			if(!self::LoginUser($_COOKIE['user_id'], $_COOKIE['token'], $_COOKIE['session_id'])) self::Logout();
 		}		
 		
-		if($_POST['login'] && ($_SESSION['user_authorization'] != "ok" and empty($_SESSION['id_user']))){
+		if($_POST['login'] && ($_SESSION['user_authorization'] != "ok" and empty($_SESSION['user_id']))){
 			
 			$username = trim(core::database()->escape($_POST['username']));
 			$password = trim($_POST['password']);
@@ -163,14 +163,14 @@ class Auth
 		}					
 	}
 	
-	static function LoginUser($id_user, $token, $id_session){
-		$id_user = core::database()->escape($id_user);
-		$id_session = core::database()->escape($id_session);
+	static function LoginUser($user_id, $token, $session_id){
+		$user_id = core::database()->escape($user_id);
+		$session_id = core::database()->escape($session_id);
 	
 		$result = FALSE;
 		
-		if($id_user && $token && $id_session){
-			$query = "SELECT * FROM " . core::database()->getTableName('sessions') . " WHERE (id_user=" . $id_user . ") AND (id_session=" . $id_session . ") AND (expiration_date > NOW())";
+		if($user_id && $token && $session_id){
+			$query = "SELECT * FROM " . core::database()->getTableName('sessions') . " WHERE (user_id=" . $user_id . ") AND (session_id=" . $session_id . ") AND (expiration_date > NOW())";
 			$rt = core::database()->querySQL($query);
 			$row = core::database()->getRow($rt);
 
@@ -185,22 +185,22 @@ class Auth
 		return core::database()->insert($fields, core::database()->getTableName("log"));
 	}
 	
-	static function Login($id_user, $remember_me)
+	static function Login($user_id, $remember_me)
 	{
 		$expiration_date = $remember_me ? time()+(3600 * 24 * 365) : time() + (60 * 30);
 		$token = core::documentparser()->generateCode(25);
 					
 		$fields = array();
-		$fields['id_session'] = 0;
+		$fields['session_id'] = 0;
 		$fields['token'] = $token;
-		$fields['id_user'] = $id_user;
+		$fields['user_id'] = $user_id;
 		$fields['expiration_date'] = $remember_me ? date("Y-m-d H:i:s", mktime(date("H"), date("i"), date("s"), date("m"), date("d"), date("Y")+1)) : date("Y-m-d H:i:s", mktime(date("H"), date("i")+30, date("s"), date("m"), date("d"), date("Y")));
 					
-		$id_session = core::database()->insert($fields, core::database()->getTableName("sessions"));
+		$session_id = core::database()->insert($fields, core::database()->getTableName("sessions"));
 				
-		if($id_session){
+		if($session_id){
 			$fields = array();
-			$fields['id_user'] = $id_user;
+			$fields['user_id'] = $user_id;
 			$fields['ip'] = core::documentparser()->getIP();
 			$fields['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 			$fields['last_sign_in_at'] = date("Y-m-d H:i:s");
@@ -211,33 +211,33 @@ class Auth
 					
 			if((substr($domain, 0, 4)) == "www.") $domain = str_replace('www.','',$domain);		
 					
-			setcookie ("id_user", $id_user, $expiration_date, '/', "." . $domain, 0);
-			setcookie ("id_session", $id_session, $expiration_date, '/', "." . $domain, 0);
+			setcookie ("user_id", $user_id, $expiration_date, '/', "." . $domain, 0);
+			setcookie ("session_id", $session_id, $expiration_date, '/', "." . $domain, 0);
 			setcookie ("token", $token, $expiration_date, '/', "." . $domain, 0);				
 				
 			$_SESSION['user_authorization'] = "ok";
-			$_SESSION['id_user'] = $id_user;
+			$_SESSION['user_id'] = $user_id;
 		}			
 	}
 	
 	static function Logout()
 	{
 		unset($_SESSION['user_authorization']);
-		unset($_SESSION['id_user']);
+		unset($_SESSION['user_id']);
 		
-		$id_user = core::database()->escape($_COOKIE['id_user']);
-		$id_session = core::database()->escape($_COOKIE['id_session']);
+		$user_id = core::database()->escape($_COOKIE['user_id']);
+		$session_id = core::database()->escape($_COOKIE['session_id']);
 		
-		if($id_user && $id_session){
-			$result = core::database()->delete(core::database()->getTableName('sessions'), "id_session=" . $id_session . " and id_user=" . $id_user."");			
+		if($user_id && $session_id){
+			$result = core::database()->delete(core::database()->getTableName('sessions'), "session_id=" . $session_id . " and user_id=" . $user_id."");			
 		}		
 		
 		$domain = $_SERVER['SERVER_NAME'];		
 					
 		if((substr($domain, 0, 4)) == "www.") $domain = str_replace('www.','',$domain);	
 		
-		setcookie ("id_user", "", time() - 3600, '/', "." .$domain, 0);
-		setcookie ("id_session", "", time() - 3600, '/', "." . $domain, 0);
+		setcookie ("user_id", "", time() - 3600, '/', "." .$domain, 0);
+		setcookie ("session_id", "", time() - 3600, '/', "." . $domain, 0);
 		setcookie ("token", "", time() - 3600, '/', "." . $domain, 0);	
 	}
 }

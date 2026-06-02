@@ -12,7 +12,7 @@
 		        </div>
 
 		        <div class='text-right-block'>
-					<a href="/?task=events&id_event=${ID}"><h5>${NAME}</h5></a>
+					<a href="/?task=events&event_id=${ID}"><h5>${NAME}</h5></a>
 					<p>${PARTICIPANTS_FRIENDS}</p>
 				</div>
 

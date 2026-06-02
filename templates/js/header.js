@@ -13,7 +13,7 @@ function initHeaderSocket() {
 
 
     socket.on('typing', function (msg) {
-        if (msg.id_receiver == window.user) {
+        if (msg.receiver_id == window.user) {
             $('.typing').addClass('show');
             clearTimeout(time);
             time = setTimeout(function () {
@@ -26,13 +26,13 @@ function initHeaderSocket() {
 
     socket.on('message', function (msg) {
         console.log(msg)
-        if (msg.id_receiver == window.user) {
+        if (msg.receiver_id == window.user) {
 
             $.ajax({
                 type: 'POST',
                 url: './?task=ajax_action&action=get_last_message',
                 data: {
-                    id_receiver: msg.id_sender,
+                    receiver_id: msg.sender_id,
                 },
                 success: function (data) {
                     console.log(data);
@@ -45,7 +45,7 @@ function initHeaderSocket() {
                     Message += '<div class="message ">';
                     Message += '<div class="message-account">';
                     Message += '<img src="' + data.item[0].avatar + '" alt="" class="img-account">';
-                    Message += '<h5 class="name"><a href="./?task=profile&id_user=' + data.item[0].id_sender + '">' + data.item[0].firstname + ' ' + data.item[0].lastname + '</a></h5>';
+                    Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.item[0].sender_id + '">' + data.item[0].firstname + ' ' + data.item[0].lastname + '</a></h5>';
                     Message += '<p class="data">' + data.item[0].created + '</p>';
                     Message += '</div>';
                     Message += '<p class="message-reply-text">' + data.item[0].content + '<br>';
@@ -53,7 +53,7 @@ function initHeaderSocket() {
                     Message += '</div>';
                     Message += '</div>';
 
-                    const fact = $("div").is("#message-list[data-num='" + data.item[0].id_sender + "']");
+                    const fact = $("div").is("#message-list[data-num='" + data.item[0].sender_id + "']");
                     console.log(fact)
                     if (fact) {
                         $('#message-list').append(Message);
@@ -69,21 +69,21 @@ function initHeaderSocket() {
                         })
                     } else {
                         const dialog = $('div').is('#old_dialogue');
-                        const dialog_con = $('div').is('.dialogues[data-num=' + data.item[0].id_sender + ']');
+                        const dialog_con = $('div').is('.dialogues[data-num=' + data.item[0].sender_id + ']');
 
                         if (dialog) {
 
                             $('#old_dialogue').find('.no_dialogues').remove();
                             if (!dialog_con) {
-                                let dialogues = '<div class="row dialogues " data-num=' + data.item[0].id_sender + '>';
+                                let dialogues = '<div class="row dialogues " data-num=' + data.item[0].sender_id + '>';
                                 dialogues += '<div class="col-md-4">';
-                                dialogues += '<a href="./?task=profile&id_user=' + data.item[0].id_sender + '">';
+                                dialogues += '<a href="./?task=profile&user_id=' + data.item[0].sender_id + '">';
                                 dialogues += '<img src="' + data.item[0].avatar + '" width="50" alt="" class="img-account" style="float: left;">'
                                 dialogues += '<div class="fromwho">' + data.item[0].firstname + '<br>' + data.item[0].lastname + '<br>';
                                 dialogues += '<span>' + data.item[0].created + '</span></div>';
                                 dialogues += '</a></div>';
                                 dialogues += '<div class="col-md-8 ">';
-                                dialogues += '<a href="./?task=profile&id_user=' + data.item[0].id_sender + '&q=messages&sel=' + data.item[0].id_sender + '" >';
+                                dialogues += '<a href="./?task=profile&user_id=' + data.item[0].sender_id + '&q=messages&sel=' + data.item[0].sender_id + '" >';
                                 dialogues += '<img src="' + data.item[0].avatar + '" alt="" class="img-mess-dialog">';
                                 dialogues += '<span class="ahref status_red ">' + data.item[0].content + '</span>';
                                 dialogues += '</a></div></div>';
@@ -93,7 +93,7 @@ function initHeaderSocket() {
                                     $(this).emotions();
                                 })
                             } else {
-                                $('.dialogues[data-num=' + data.item[0].id_sender + ']').find('.ahref').html(data.item[0].content);
+                                $('.dialogues[data-num=' + data.item[0].sender_id + ']').find('.ahref').html(data.item[0].content);
                             }
                         } else {
                             const count = parseInt($('#message_count').html()) + 1;
@@ -125,9 +125,9 @@ $(document).ready(function () {
             return;
         }
 
-        const id_sender = $('[name=id_sender]').val();
-        const id_receiver = $('[name=id_receiver]').val();
-        socket.emit('typing', {id_sender: id_sender, id_receiver: id_receiver});
+        const sender_id = $('[name=sender_id]').val();
+        const receiver_id = $('[name=receiver_id]').val();
+        socket.emit('typing', {sender_id: sender_id, receiver_id: receiver_id});
     })
 
 

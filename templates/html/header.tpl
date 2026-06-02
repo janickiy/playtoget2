@@ -79,14 +79,14 @@
 					</div>
 					<div class="profile-user">
 						<a href=""><div class="mini_thumb_avatar "><img width="50px" height="50px" border="0" src="${TOP_AVATAR}" alt=""></div></a>
-						<a href="./?task=profile&id_user=${ID_USER}">${TOP_FIRSTNAME}<br>${TOP_LASTNAME}</a>
+						<a href="./?task=profile&user_id=${ID_USER}">${TOP_FIRSTNAME}<br>${TOP_LASTNAME}</a>
 					</div>
 					<a class="menu-icon" href="#go-nav"></a>
 					<div class="top-header-menu ">
 						<ul> 
-							<li><a href=""><div class="mini_thumb_avatar"><img width="50px" height="50px" border="0" src="${TOP_AVATAR}" alt=""></div></a><a href="./?task=profile&id_user=${ID_USER}">${TOP_FIRSTNAME}<span></span>${TOP_LASTNAME}<span></span></a></li>
+							<li><a href=""><div class="mini_thumb_avatar"><img width="50px" height="50px" border="0" src="${TOP_AVATAR}" alt=""></div></a><a href="./?task=profile&user_id=${ID_USER}">${TOP_FIRSTNAME}<span></span>${TOP_LASTNAME}<span></span></a></li>
 							<li><a href="./"><img src="./templates/images/menu-home.png" alt=""></a></li>
-							<li><a href="./?task=profile&id_user=${ID_USER}&q=dialogues"><img src="./templates/images/message.png" alt=""></a> 
+							<li><a href="./?task=profile&user_id=${ID_USER}&q=dialogues"><img src="./templates/images/message.png" alt=""></a> 
 								<!-- IF '${NUMBERMESSAGE}' != '0' -->
 									<span id='message_count'>${NUMBERMESSAGE}</span>
 								<!-- ELSE -->
@@ -114,7 +114,7 @@
 							<span class="for-submenu">
 								<a>${MENU_PROFILE}</a>
 								<ul class="top-mnu-submenu">
-									<li><a href="./?task=profile&id_user=${ID_USER}">${MENU_PROFILE}</a></li>
+									<li><a href="./?task=profile&user_id=${ID_USER}">${MENU_PROFILE}</a></li>
 									<li><a href="./?task=edit_profile">${MENU_EDITPROFILE}</a></li>
 								</ul>
 							</span>

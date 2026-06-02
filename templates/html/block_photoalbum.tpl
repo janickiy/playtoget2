@@ -36,7 +36,7 @@
 
 <div class="my-albums">
   <!-- BEGIN row_my_album_list -->
-  <div class="album"> <a href="${PHOTOALBUM_PATH}&id_album=${ID}<!-- IF '${PROFILE_USER_ID}' != '' -->&id_user=${PROFILE_USER_ID}<!-- END IF -->">
+  <div class="album"> <a href="${PHOTOALBUM_PATH}&id_album=${ID}<!-- IF '${PROFILE_USER_ID}' != '' -->&user_id=${PROFILE_USER_ID}<!-- END IF -->">
     <div class="img-container"><img border="0" src="${IMAGE}" alt=""></div>
     <p>${NAME}</p>
     </a>

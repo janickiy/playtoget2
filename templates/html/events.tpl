@@ -3,7 +3,7 @@
 <!--START CONTENT-->
 <script>
 window.avatar = '${TOP_AVATAR}';
-window.id_user = '${ID_USER}';
+window.user_id = '${ID_USER}';
 window.placeholder = '${STR_YOUR_COMMENT}';
 window.error = '${STR_THERE_ARE_NO_MORE_ENTRIES}';
 window.init = '${STR_CLICK}';
@@ -67,10 +67,10 @@ $(function() {
           <div class="sport_group_title">${EVENT_DESCRIPTION} </div>
           <!-- END IF -->
           <ul class="sport_group_list">
-            <li><a href="./?task=events&id_event=${ID_EVENT}" <!-- IF '${QUERY}' == '' -->class="active-link"<!-- END IF -->><i class='icon_list icon-4'></i><span>${STR_FEED}</span></a></li>
-            <li><a href="./?task=events&id_event=${ID_EVENT}&q=members" <!-- IF '${QUERY}' == 'members' -->class="active-link"<!-- END IF -->><i class='icon_list icon-5'></i><span>${STR_MEMBERS}</span></a></li>
-            <li><a href="./?task=events&id_event=${ID_EVENT}&q=photoalbums" <!-- IF '${QUERY}' == 'photoalbums' -->class="active-link"<!-- END IF -->><i class='icon_list icon-2'></i><span>${STR_PHOTO}</span></a></li>
-            <li><a href="./?task=events&id_event=${ID_EVENT}&q=videoalbums" 
+            <li><a href="./?task=events&event_id=${ID_EVENT}" <!-- IF '${QUERY}' == '' -->class="active-link"<!-- END IF -->><i class='icon_list icon-4'></i><span>${STR_FEED}</span></a></li>
+            <li><a href="./?task=events&event_id=${ID_EVENT}&q=members" <!-- IF '${QUERY}' == 'members' -->class="active-link"<!-- END IF -->><i class='icon_list icon-5'></i><span>${STR_MEMBERS}</span></a></li>
+            <li><a href="./?task=events&event_id=${ID_EVENT}&q=photoalbums" <!-- IF '${QUERY}' == 'photoalbums' -->class="active-link"<!-- END IF -->><i class='icon_list icon-2'></i><span>${STR_PHOTO}</span></a></li>
+            <li><a href="./?task=events&event_id=${ID_EVENT}&q=videoalbums" 
               <!-- IF '${QUERY}' == 'videoalbums' -->
               class="active-link"
               <!-- END IF -->
@@ -83,7 +83,7 @@ $(function() {
           </div>
           <div class="possible-friend">
             <!-- BEGIN row_members -->
-            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&id_user=${ID_USER}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&id_user=${ID_USER}">
+            <div class="col-xs-6 possible-friend-cart"> <a class="possible-avatar" href="./?task=profile&user_id=${ID_USER}"> <img src="${AVATAR}" alt=""> </a> <a href="./?task=profile&user_id=${ID_USER}">
               <h5><strong>${FIRSTNAME} <span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online
                 <!-- END IF -->
                 ' data-num='${ID_USER}'></span><br />
@@ -94,7 +94,7 @@ $(function() {
               <!-- END IF -->
               <p>${STATUS}</p>
               <!-- IF '${SEL}' != '' -->
-              <a href="./?task=profile&id_user=${ID_USER}&q=messages&sel=${SEL}"><b></b></a><br>
+              <a href="./?task=profile&user_id=${ID_USER}&q=messages&sel=${SEL}"><b></b></a><br>
               <!-- END IF -->
             </div>
             <!-- END row_members -->
@@ -106,9 +106,9 @@ $(function() {
           </div>
           <div class="event-container">
             <!-- BEGIN row_teams -->
-            <div class="event-item"> <a href="./?task=teams&id_community=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
+            <div class="event-item"> <a href="./?task=teams&community_id=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
               <div class="teg">
-                <p><a href="./?task=teams&id_community=${ID}">${NAME}</a></p>
+                <p><a href="./?task=teams&community_id=${ID}">${NAME}</a></p>
                 <p>${TYPE}</p>
                 <p>
                   <!-- IF '${SPORT_TYPE}' != '' -->
@@ -133,9 +133,9 @@ $(function() {
           </div>
           <div class="event-container">
             <!-- BEGIN row_groups -->
-            <div class="event-item"> <a href="./?task=teams&id_community=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
+            <div class="event-item"> <a href="./?task=teams&community_id=${ID}" class="img"><img border="0" src="${AVATAR}" alt=""></a>
               <div class="teg">
-                <p><a href="./?task=teams&id_community=${ID}">${NAME}</a></p>
+                <p><a href="./?task=teams&community_id=${ID}">${NAME}</a></p>
                 <p>${TYPE}</p>
                 <p>
                   <!-- IF '${SPORT_TYPE}' != '' -->
@@ -202,9 +202,9 @@ $(function() {
           <div class="message-content">
             <form autocomplete="off" id="addCommentForm" method="POST" action="" enctype="multipart/form-data">
               <input type="hidden" name="commentable_type" value="event">
-              <input type="hidden" name="id_content" value="${ID_EVENT}">
-              <input type="hidden" name="id_user" value="${ID_USER}">
-              <input type="hidden" name="id_parent" value="0">
+              <input type="hidden" name="content_id" value="${ID_EVENT}">
+              <input type="hidden" name="user_id" value="${ID_USER}">
+              <input type="hidden" name="parent_id" value="0">
 			  <!-- IF '${ADMIN}' == 'yes' --><input type="hidden" name="author_community" value="1"><!-- END IF -->			  
               <input type="file"  class="file_name" name="file_name[]" data-num="${ID_EVENT}" multiple/>
               <textarea id="comment" name="comment" data-num="${ID_EVENT}" class='ahref_input' placeholder="${STR_WHATS_INTERESTING}"></textarea>
@@ -236,7 +236,7 @@ $(function() {
               <!-- IF '${NAME}' -->
               <a href="#">${NAME}</a>
               <!-- ELSE -->
-              <a href="./?task=profile&id_user=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a><span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online
+              <a href="./?task=profile&user_id=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a><span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online
               <!-- END IF -->
               ' data-num='${ID_USER}'></span>
               <!-- END IF -->
@@ -276,7 +276,7 @@ $(function() {
                   <!-- IF '${NAME}' -->
                   <a href="#">${NAME}</a>
                   <!-- ELSE -->
-                  <a href="./?task=profile&id_user=${ID_USER}">${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online
+                  <a href="./?task=profile&user_id=${ID_USER}">${FIRSTNAME}<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online
                   <!-- END IF -->
                   ' data-num='${ID_USER}'></span><br>
                   ${LASTNAME}</a>
@@ -316,9 +316,9 @@ $(document).on( "click", ".reply", function() {
 	ReplyForm += '</div>';				
 	ReplyForm += '<form autocomplete="off" id="reply-form-' + IdComment + '" data-num = '+ IdComment +' action="" enctype="multipart/form-data">';
 	ReplyForm += '<input type="hidden" name="commentable_type" value="event">';
-	ReplyForm += '<input type="hidden" name="id_content" value="${ID_EVENT}">';
-	ReplyForm += '<input type="hidden" name="id_user" value="${ID_USER}">';
-	ReplyForm += '<input type="hidden" name="id_parent" value="' + IdComment + '">';
+	ReplyForm += '<input type="hidden" name="content_id" value="${ID_EVENT}">';
+	ReplyForm += '<input type="hidden" name="user_id" value="${ID_USER}">';
+	ReplyForm += '<input type="hidden" name="parent_id" value="' + IdComment + '">';
 	<!-- IF '${ADMIN}' == 'yes' -->
 	ReplyForm += '<input type="hidden" name="author_community" value="1">';
 	<!-- END IF -->	
@@ -419,9 +419,9 @@ $(document).scroll(function() {
               <!-- IF '${NO_POP_EVENTS}' == '' -->
               <div class="event-container">
                 <!-- BEGIN pop_event_row -->
-                <div class="event-item"> <a href="./?task=events&id_event=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
+                <div class="event-item"> <a href="./?task=events&event_id=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
                   <div class="teg">
-                    <p><a href="./?task=events&id_event=${ID}">${NAME}</a></p>
+                    <p><a href="./?task=events&event_id=${ID}">${NAME}</a></p>
                     <p>
                       <!-- IF '${SPORT_TYPE}' != '' -->
                       ${SPORT_TYPE}<br>
@@ -439,7 +439,7 @@ $(document).scroll(function() {
                     <!-- END IF -->
                     <p><i></i>${PARTICIPANTS_FRIENDS}</p>
                     <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                    <a href="./?task=events&id_event=${ID}&q=edit">${STR_EDIT}</a>
+                    <a href="./?task=events&event_id=${ID}&q=edit">${STR_EDIT}</a>
                     <!-- END IF -->
                     <span>${STATUS}</span> </div>
                 </div>
@@ -458,9 +458,9 @@ $(document).scroll(function() {
               <!-- IF '${NO_MY_EVENTS}' == '' -->
               <div class="event-container">
                 <!-- BEGIN my_event_row -->
-                <div class="event-item"> <a href="./?task=events&id_event=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
+                <div class="event-item"> <a href="./?task=events&event_id=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
                   <div class="teg">
-                    <p><a href="./?task=events&id_event=${ID}">${NAME}</a></p>
+                    <p><a href="./?task=events&event_id=${ID}">${NAME}</a></p>
                     <p>
                       <!-- IF '${SPORT_TYPE}' != '' -->
                       ${SPORT_TYPE}<br>
@@ -478,7 +478,7 @@ $(document).scroll(function() {
                     <!-- END IF -->
                     <p><i></i>${PARTICIPANTS_FRIENDS}</p>
                     <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-                    <a href="./?task=events&id_event=${ID}&q=edit">${STR_EDIT}</a>
+                    <a href="./?task=events&event_id=${ID}&q=edit">${STR_EDIT}</a>
                     <!-- END IF -->
                     <span>${STATUS}</span> </div>
                 </div>
@@ -497,9 +497,9 @@ $(document).scroll(function() {
               <!-- IF '${NO_INVITED_ME}' == '' -->
               <div class="event-container">
                 <!-- BEGIN invited_me_events_row -->
-                <div class="event-item"> <a href="./?task=events&id_event=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
+                <div class="event-item"> <a href="./?task=events&event_id=${ID}" class="img"><img src="${AVATAR}" alt="" class='marginLeft-100'></a>
                   <div class="teg">
-                    <p><a href="./?task=events&id_event=${ID}">${NAME}</a></p>
+                    <p><a href="./?task=events&event_id=${ID}">${NAME}</a></p>
                     <p>
                       <!-- IF '${SPORT_TYPE}' != '' -->
                       ${SPORT_TYPE}<br>

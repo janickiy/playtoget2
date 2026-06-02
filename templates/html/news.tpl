@@ -3,7 +3,7 @@
 <!--START CONTENT-->
 <script>
 	window.avatar = '${TOP_AVATAR}';
-	window.id_user = '${ID_USER}';
+	window.user_id = '${ID_USER}';
 	window.placeholder = '${STR_YOUR_COMMENT}';
 	window.error = '${STR_THERE_ARE_NO_MORE_ENTRIES}';
 	window.init = '${STR_CLICK}';
@@ -52,27 +52,27 @@
 					<div class="news-block-item" data-toggle="modal" data-target="#second-post">
 						<div class="news-block-head">
 						<!-- IF '${PUBLICATION_TYPE}'=='user' --> 
-							<a href="./?task=profile&id_user=${PUBLICATION_AUTHOR_ID}">
+							<a href="./?task=profile&user_id=${PUBLICATION_AUTHOR_ID}">
 								<div class="head-img"><img src="${PUBLICATION_AVATAR}" alt=""></div>
 							</a>
-							<a href="./?task=profile&id_user=${PUBLICATION_AUTHOR_ID}">
+							<a href="./?task=profile&user_id=${PUBLICATION_AUTHOR_ID}">
 								<p class="head-topic">${PUBLICATION_NAME}
 									<span class='status_user<!-- IF '${STATUS_USER}' == 'online' --> online<!-- END IF -->' data-num='${PUBLICATION_AUTHOR_ID}'></span>
 								</p>
 							</a>
 						<!-- ELSE -->
 							<!-- IF '${PUBLICATION_TYPE}'=='event' -->
-							<a href="./?task=${PUBLICATION_TYPE}s&id_event=${PUBLICATION_AUTHOR_ID}">
+							<a href="./?task=${PUBLICATION_TYPE}s&event_id=${PUBLICATION_AUTHOR_ID}">
 								<div class="head-img"><img src="${PUBLICATION_AVATAR}" alt=""></div>
 							</a>
-							<a href="./?task=${PUBLICATION_TYPE}s&id_event=${PUBLICATION_AUTHOR_ID}">
+							<a href="./?task=${PUBLICATION_TYPE}s&event_id=${PUBLICATION_AUTHOR_ID}">
 								<p class="head-topic">${PUBLICATION_NAME}</p>
 							</a>
 							<!-- ELSE -->
-							<a href="./?task=${PUBLICATION_TYPE}s&id_community=${PUBLICATION_AUTHOR_ID}">
+							<a href="./?task=${PUBLICATION_TYPE}s&community_id=${PUBLICATION_AUTHOR_ID}">
 								<div class="head-img"><img src="${PUBLICATION_AVATAR}" alt=""></div>
 							</a>
-							<a href="./?task=${PUBLICATION_TYPE}s&id_community=${PUBLICATION_AUTHOR_ID}">
+							<a href="./?task=${PUBLICATION_TYPE}s&community_id=${PUBLICATION_AUTHOR_ID}">
 								<p class="head-topic">${PUBLICATION_NAME}</p>
 							</a>
 							<!-- END IF -->

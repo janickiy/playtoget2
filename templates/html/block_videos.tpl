@@ -1,5 +1,5 @@
 <h2>${TITLE_PAGE}</h2>
-<p><a href="${PATH_VIDEO}<!-- IF '${PROFILE_USER_ID}' != '' -->&id_user=${PROFILE_USER_ID}<!-- END IF -->">${STR_ALL_VIDEOS}</a></p>
+<p><a href="${PATH_VIDEO}<!-- IF '${PROFILE_USER_ID}' != '' -->&user_id=${PROFILE_USER_ID}<!-- END IF -->">${STR_ALL_VIDEOS}</a></p>
 <div class="photo-container video-container vid-no-border">
   <!-- BEGIN row_videos_list -->
   <div id="video-block-${ID}" class="hov"><div class="video-box"><img src="${THUMB}" alt="" class="video_prev" data-num="${ID}"></div>

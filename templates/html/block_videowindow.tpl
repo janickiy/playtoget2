@@ -3,13 +3,13 @@
   <div class='overlay-back back_one'>Закрыть</div>
   <div class='prev'></div>
   <div class='photo_big_wrap'>
-    <input type='hidden' id='id_owner'/>
+    <input type='hidden' id='owner_id'/>
     <div class="loading-bar"><img border="0" src="./templates/images/select2-spinner.gif" width=20px></div>
     <img id='prev_video' src='./templates/images/prev.png'/> <img id='next_video' src='./templates/images/next.png'/>
     <div class='video_wrap'></div>
     <div class="text">
       <div class="message">
-        <div class='text-block' id='name_video'><a href="./?task=profile&id_user=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a></div>
+        <div class='text-block' id='name_video'><a href="./?task=profile&user_id=${ID_USER}">${FIRSTNAME} ${LASTNAME}</a></div>
         <div class='text-block' id='date_video'><span class="data">25.01.2016</span></div>
         <!-- IF '${OPEN_PAGE}' == '' -->
         <div class='text-block foto_like'> <a class="tell"  data-type="video">0</a> <a class="liked"  data-type="video">0</a> </div>
@@ -23,9 +23,9 @@
     <div class="text">
       <form autocomplete="off" id="addCommentForm" class="form-horizontal" method="POST" action="">
         <input type='hidden' name="commentable_type" value="video"/>
-        <input type='hidden' name="id_content" id='id_content' value="${ID}"/>
-        <input type='hidden' name="id_user" value="${ID_USER}"/>
-        <input type='hidden' name="id_parent" value="0"/>
+        <input type='hidden' name="content_id" id='content_id' value="${ID}"/>
+        <input type='hidden' name="user_id" value="${ID_USER}"/>
+        <input type='hidden' name="parent_id" value="0"/>
         <div class="form-group">
         <!-- IF '${OPEN_PAGE}' == '' -->
           <label class="col-lg-3 control-label" for="comment">Оставить комментарий</label>

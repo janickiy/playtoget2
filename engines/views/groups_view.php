@@ -10,7 +10,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -87,7 +87,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				
 					Places::addGeoTarget($insert_id, 'group', $id_place);	
 				
-					header('Location: http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $insert_id);		
+					header('Location: http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $insert_id);		
 					exit();
 				}		
 				else
@@ -99,14 +99,14 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'create_photoalbum':
 	
-			if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $id_community, $user['id'])){
+			if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $community_id, $user['id'])){
 				$name = htmlspecialchars(trim(Core_Array::getRequest('name')));
-				$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+				$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 		
 				$errors = array();
 		
 				if(empty($name)) $errors[] = core::getLanguage('error', 'empty_album_name');
-				if(!empty($name) && Photoalbum::checkNameExists($name, $id_community, 'group')) $errors[] = core::getLanguage('error', 'album_name_exists');
+				if(!empty($name) && Photoalbum::checkNameExists($name, $community_id, 'group')) $errors[] = core::getLanguage('error', 'album_name_exists');
 		
 				if(count($errors) == 0){
 					$fields = array();
@@ -115,12 +115,12 @@ if($_SESSION['user_authorization'] == "ok"){
 					$fields['name'] = $name;	
 					$fields['created_at'] = date("Y-m-d H:i:s");	
 					$fields['photoalbumable_type'] = 'group';
-					$fields['id_owner'] = $id_community;
+					$fields['owner_id'] = $community_id;
 			
 					$result = Photoalbum::createAlbum($fields);	
 
 					if($result)	{
-						header("Location: ./?task=groups&id_community=" . $id_community . "&q=photoalbums");
+						header("Location: ./?task=groups&community_id=" . $community_id . "&q=photoalbums");
 						exit;
 					}
 					else{
@@ -135,14 +135,14 @@ if($_SESSION['user_authorization'] == "ok"){
 		case 'edit_photoalbum':
 	
 			$name = htmlspecialchars(trim($_POST['name']));
-			$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+			$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 			$id_album = core::database()->escape((int)Core_Array::getRequest('id_album'));
 		
 			$errors = array();
 		
 			if(empty($name)) $errors[] = core::getLanguage('error', 'empty_album_name');
 
-			if(count($errors) == 0 and (Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id']))){
+			if(count($errors) == 0 and (Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id']))){
 				$fields = array();
 				$fields['name'] = $name;
 				$fields['updated_at'] = date("Y-m-d H:i:s");			
@@ -150,7 +150,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$result = Photoalbum::editAlbum($fields, $id_album);
 			
 				if($result)	{
-					header("Location: ./?task=groups&id_community=" . $id_community . "&q=photoalbums");
+					header("Location: ./?task=groups&community_id=" . $community_id . "&q=photoalbums");
 					exit;
 				}
 				else{
@@ -163,15 +163,15 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'remove_photoalbum':
 	
-			$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+			$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 			$id_album = core::database()->escape((int)Core_Array::getRequest('id_album'));
 
-			if(Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id'])){
+			if(Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id'])){
 		
 				$result = Photoalbum::removeAlbum((int)Core_Array::getRequest('id_album'));
 			
 				if($result)	{
-					header("Location: ./?task=groups&id_community=" . $id_community . "&q=photoalbums");
+					header("Location: ./?task=groups&community_id=" . $community_id . "&q=photoalbums");
 					exit;
 				}
 				else{
@@ -184,16 +184,16 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'create_videoalbum':
 	
-			if(Communities::getPermissionVideo($communities_settings['permission_photo'], $id_community, $user['id'])){
+			if(Communities::getPermissionVideo($communities_settings['permission_photo'], $community_id, $user['id'])){
 	
 				$errors = array();
 	
-				$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+				$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 				$name = htmlspecialchars(trim(Core_Array::getRequest('name')));
-				$id_community = Core_Array::getRequest('id_community');
+				$community_id = Core_Array::getRequest('community_id');
 				
 				if(empty($name)) $errors[] = core::getLanguage('error', 'empty_album_name');
-				if(!empty($name) && Videoalbum::checkNameExists($name, $id_community, 'group')) $errors[] = core::getLanguage('error', 'album_name_exists');
+				if(!empty($name) && Videoalbum::checkNameExists($name, $community_id, 'group')) $errors[] = core::getLanguage('error', 'album_name_exists');
 	
 				if(count($errors) == 0){
 					$fields = array();
@@ -202,12 +202,12 @@ if($_SESSION['user_authorization'] == "ok"){
 					$fields['name'] = $name;	
 					$fields['created_at'] = date("Y-m-d H:i:s");	
 					$fields['videoalbumable_type'] = 'group';
-					$fields['id_owner'] = $id_community;	
+					$fields['owner_id'] = $community_id;	
 		
 					$result = Videoalbum::createAlbum($fields);	
 
 					if($result)	{
-						header("Location: ./?task=groups&id_community=" . $id_community . "&q=videoalbums");
+						header("Location: ./?task=groups&community_id=" . $community_id . "&q=videoalbums");
 						exit;
 					}
 					else{
@@ -220,7 +220,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'edit_videoalbum':
 	
-			$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+			$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 			$id_album = core::database()->escape((int)Core_Array::getRequest('id_album'));
 			$name = htmlspecialchars(trim(Core_Array::getRequest('name')));
 		
@@ -228,15 +228,15 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			if(empty($name)) $errors[] = core::getLanguage('error', 'empty_album_name');
 
-			if(count($errors) == 0 and (Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id']))){
+			if(count($errors) == 0 and (Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id']))){
 				$fields = array();
 				$fields['name'] = $name;
 				$fields['updated_at'] = date("Y-m-d H:i:s");			
 			
-				$result = Videoalbum::editAlbum($fields, $id_album, $id_community);
+				$result = Videoalbum::editAlbum($fields, $id_album, $community_id);
 			
 				if($result)	{
-					header("Location: ./?task=groups&id_community=" . $id_community . "&q=videoalbums");
+					header("Location: ./?task=groups&community_id=" . $community_id . "&q=videoalbums");
 					exit;
 				}
 				else{
@@ -249,14 +249,14 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'remove_videoalbum':
 	
-			if(Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id'])){
-				$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+			if(Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id'])){
+				$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 				$id_album = core::database()->escape((int)Core_Array::getRequest('id_album'));
 		
-				$result = Videoalbum::removeAlbum($id_album, $id_community);	
+				$result = Videoalbum::removeAlbum($id_album, $community_id);	
 	
 				if($result)	{
-					header("Location: ./?task=groups&id_community=" . $id_community . "&q=videoalbums");
+					header("Location: ./?task=groups&community_id=" . $community_id . "&q=videoalbums");
 					exit;
 				}
 				else{
@@ -268,11 +268,11 @@ if($_SESSION['user_authorization'] == "ok"){
 	
 		case 'add_video':
 		
-			if(Communities::getPermissionVideo($communities_settings['permission_video'], $id_community, $user['id'])){ 
+			if(Communities::getPermissionVideo($communities_settings['permission_video'], $community_id, $user['id'])){ 
 		
 				$video = htmlspecialchars(trim(Core_Array::getRequest('video')));
 				$description = htmlspecialchars(trim(Core_Array::getRequest('description')));
-				$id_community = Core_Array::getRequest('id_community');
+				$community_id = Core_Array::getRequest('community_id');
 				$set_video = core::documentparser()->detect_video_id($video);
 		
 				$errors[] = array();
@@ -280,17 +280,17 @@ if($_SESSION['user_authorization'] == "ok"){
 				if($set_video['video']){
 					$fields = array();
 					$fields['id'] = 0;
-					$fields['id_videoalbum'] = Core_Array::getRequest('id_videoalbum');
+					$fields['videoalbum_id'] = Core_Array::getRequest('videoalbum_id');
 					$fields['provider'] = $set_video['provider'];			
 					$fields['video'] = $set_video['video'];			
 					$fields['description'] = $description;			
-					$fields['id_owner'] = $id_community;
+					$fields['owner_id'] = $community_id;
 					$fields['created_at'] = date("Y-m-d H:i:s");
 			
 					$result = Videoalbum::addVideo($fields);
 			
 					if($result)	{
-						header("Location: ./?task=groups&id_community=" . $id_community . "&q=videoalbums");
+						header("Location: ./?task=groups&community_id=" . $community_id . "&q=videoalbums");
 						exit;
 					}
 					else{
@@ -307,17 +307,17 @@ if($_SESSION['user_authorization'] == "ok"){
 			$name = htmlspecialchars(trim(Core_Array::getRequest('name')));
 			$about = htmlspecialchars(trim(Core_Array::getRequest('about')));
 			$id_sport = Core_Array::getRequest('id_sport');
-			$id_community = core::database()->escape(Core_Array::getRequest('id_community'));
+			$community_id = core::database()->escape(Core_Array::getRequest('community_id'));
 			$file_ava = Core_Array::getRequest('file_ava');
 			$cover_page = Core_Array::getRequest('file_cover');
 			$id_place = Core_Array::getRequest('id_place');		
 		
-			if(Communities::checkOwnerCommunity($id_community, $user['id'])){
+			if(Communities::checkOwnerCommunity($community_id, $user['id'])){
 	
 				$errors = array();
 	
 				if(empty($name)) $errors[] = core::getLanguage('error', 'empty_group_name');	
-				if(count($errors) == 0 && Communities::checkOwnerCommunity($id_community, $user['id'])){
+				if(count($errors) == 0 && Communities::checkOwnerCommunity($community_id, $user['id'])){
 					$fields = array();
 					$fields['name'] = $name;
 					$fields['about'] = $about;
@@ -342,10 +342,10 @@ if($_SESSION['user_authorization'] == "ok"){
 						if($sport_type) $fields['sport_type'] = $sport_type;
 					}			
 			
-					$result = Communities::editCommunity($fields, $settings, 'group', $id_community);	
+					$result = Communities::editCommunity($fields, $settings, 'group', $community_id);	
 			
 					if($result){
-						header('Location: http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&id_community=' . $id_community);		
+						header('Location: http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $community_id);		
 						exit();
 					}else $error_msg = core::getLanguage('error', 'web_apps_error');
 				}else $error_msg = core::getLanguage('error', 'web_apps_error');
@@ -354,10 +354,10 @@ if($_SESSION['user_authorization'] == "ok"){
 		break;
 	}
 
-	if($_GET['id_community']){
-		$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));	
-		$community = Communities::getCommunityInfo($id_community);
-		$communities_settings = Communities::getCommunitySettings($id_community);
+	if($_GET['community_id']){
+		$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));	
+		$community = Communities::getCommunityInfo($community_id);
+		$communities_settings = Communities::getCommunitySettings($community_id);
 		$tpl->assign('COMMUNITY_DESCRIPTION', nl2br($community['about']));	
 		
 		if($community['banned'] == 1) $tpl->assign('BLOCK_PAGE', 'yes');
@@ -391,24 +391,24 @@ if($_SESSION['user_authorization'] == "ok"){
 
 	$tpl->assign('PHOTOALBUMABLE_TYPE', 'group');	
 
-	if($_GET['id_community']){	
+	if($_GET['community_id']){	
 	
-		$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+		$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 	
-		if(Communities::checkExistence($id_community, 'group') or !is_numeric(Core_Array::getRequest('id_community'))){
+		if(Communities::checkExistence($community_id, 'group') or !is_numeric(Core_Array::getRequest('community_id'))){
 			header("HTTP/1.1 404 Not Found");
 			header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 			exit;
 		}
 	
-		if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id'])){
+		if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id'])){
 			$tpl->assign('COMMENT_AVATAR', core::documentparser()->communityAvatar($community));
 		}
 		else{
 			$tpl->assign('COMMENT_AVATAR', core::documentparser()->userAvatar($user));
 		}
 	
-		if(Communities::checkOwnerCommunity($id_community, $user['id'])) {
+		if(Communities::checkOwnerCommunity($community_id, $user['id'])) {
 			$tpl->assign('ALLOW_EDIT', 'yes');
 			$tpl->assign('COMMUNITY_TYPE', $community['type']);		
 		}	
@@ -426,13 +426,13 @@ if($_SESSION['user_authorization'] == "ok"){
 			exit;
 		}	
 		
-		$tpl->assign('ID_COMMUNITY', $_GET['id_community']);
+		$tpl->assign('ID_COMMUNITY', $_GET['community_id']);
 		$tpl->assign('STR_COMMUNITY_FEED', core::getLanguage('str', 'feed'));	
 		$tpl->assign('STR_COMMUNITY_MEMBERS', core::getLanguage('str', 'members'));	
 		$tpl->assign('STR_COMMUNITY_PHOTO', core::getLanguage('str', 'photo'));	
 		$tpl->assign('STR_COMMUNITY_VIDEO', core::getLanguage('str', 'video'));
 		$tpl->assign('STR_COMMUNITY_EVENTS', core::getLanguage('str', 'events'));
-		$tpl->assign('ID_OWNER', $_GET['id_community']);
+		$tpl->assign('ID_OWNER', $_GET['community_id']);
 		$tpl->assign('VIDEOALBUMABLE_TYPE', 'group');	
 		$tpl->assign('STR_COMMUNITY_INFO', core::getLanguage('str', 'community_info'));	
 		$tpl->assign('STR_COMMUNITY_ADMINISTRATORS', core::getLanguage('str', 'community_administrators'));	
@@ -461,28 +461,28 @@ if($_SESSION['user_authorization'] == "ok"){
 		$tpl->assign('STR_ADD_TO_ADMINISTRATORS', core::getLanguage('str', 'add_to_administrators'));		
 		$tpl->assign('STR_BLOCK_USER', core::getLanguage('str', 'block_user'));		
 		
-		$photoalbum_path = './?task=groups&id_community=' . $id_community . '&q=photoalbums';	
-		$photoalbum_remove_path = './?task=groups&id_community=' . $id_community . '&action=remove_photoalbum';
-		$photoalbum_edit_path = './?task=groups&id_community=' . $id_community . '&q=edit_photoalbum';
-		$redirect_photo_album = '/?task=groups&id_community=' . $id_community . '&q=photoalbums';	
-		$path_video = './?task=groups&id_community=' . $id_community . '&q=videoalbums';	
-		$path_remove_video = './?task=groups&id_community=' . $id_community . '&q=videoalbums&action=remove_videoalbum';	
-		$path_edit_video = './?task=groups&id_community=' . $id_community . '&q=edit_videoalbum';	
+		$photoalbum_path = './?task=groups&community_id=' . $community_id . '&q=photoalbums';	
+		$photoalbum_remove_path = './?task=groups&community_id=' . $community_id . '&action=remove_photoalbum';
+		$photoalbum_edit_path = './?task=groups&community_id=' . $community_id . '&q=edit_photoalbum';
+		$redirect_photo_album = '/?task=groups&community_id=' . $community_id . '&q=photoalbums';	
+		$path_video = './?task=groups&community_id=' . $community_id . '&q=videoalbums';	
+		$path_remove_video = './?task=groups&community_id=' . $community_id . '&q=videoalbums&action=remove_videoalbum';	
+		$path_edit_video = './?task=groups&community_id=' . $community_id . '&q=edit_videoalbum';	
 	
-		if(Communities::getMemberShipStatus($id_community, $user['id']) == 1)		
+		if(Communities::getMemberShipStatus($community_id, $user['id']) == 1)		
 			$tpl->assign('COMMUNITY_MEMBER', 'owner');
-		else if(Communities::getMemberShipStatus($id_community, $user['id']) == 2)
+		else if(Communities::getMemberShipStatus($community_id, $user['id']) == 2)
 			$tpl->assign('COMMUNITY_MEMBER', 'member');
-		else if(Communities::getMemberShipStatus($id_community, $user['id']) == 3)
+		else if(Communities::getMemberShipStatus($community_id, $user['id']) == 3)
 			$tpl->assign('COMMUNITY_MEMBER', 'admin');
-		else if(Communities::getMemberShipStatus($id_community, $user['id']) == 4)
+		else if(Communities::getMemberShipStatus($community_id, $user['id']) == 4)
 			$tpl->assign('COMMUNITY_MEMBER', 'blocked');
-		else if(Communities::getMemberShipStatus($id_community, $user['id']) == 5)
+		else if(Communities::getMemberShipStatus($community_id, $user['id']) == 5)
 			$tpl->assign('COMMUNITY_MEMBER', 'invited');
-		else if(Communities::getMemberShipStatus($id_community, $user['id']) == '0'){
+		else if(Communities::getMemberShipStatus($community_id, $user['id']) == '0'){
 			$tpl->assign('COMMUNITY_MEMBER', 'applied');
 		}
-		else if(!Communities::getMemberShipStatus($id_community, $user['id']))
+		else if(!Communities::getMemberShipStatus($community_id, $user['id']))
 			$tpl->assign('COMMUNITY_MEMBER', 'none');			
 		
 		$tpl->assign('STR_COMMUNITY_SUSPENDED', core::getLanguage('str', 'community_suspended'));
@@ -492,23 +492,23 @@ if($_SESSION['user_authorization'] == "ok"){
 			case 'members':
 		
 				$tpl->assign('QUERY', $_GET['q']);
-				$tpl->assign('NUMBERMEMBER', Communities::countAllMemberCommunity($id_community));			
+				$tpl->assign('NUMBERMEMBER', Communities::countAllMemberCommunity($community_id));			
 				$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'members'));			
 				$tpl->assign('STR_MEMBERS', core::getLanguage('str', 'members'));
 			
-				$arr_members = Communities::getMemberAllList($id_community);			
+				$arr_members = Communities::getMemberAllList($community_id);			
 			
 				if($arr_members){
 					foreach($arr_members as $row){
 						$rowBlock = $tpl->fetch('row_members');	
-						$rowBlock->assign('ID_USER', $row['id_user']);			
+						$rowBlock->assign('ID_USER', $row['user_id']);			
 						$rowBlock->assign('SEL', $user['id']);
 						$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($row));	
-						$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $row['id_user'])));
+						$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $row['user_id'])));
 	
-						if(Communities::checkOwnerCommunity($id_community, $user['id']) && Communities::getUserStatus($id_community, $row['id_user']) != 1 && Communities::getUserStatus($id_community, $row['id_user']) != 3) $rowBlock->assign('SHOW_ADD_TO_ADMIN_LINK', 'yes');
-						if(Communities::getUserStatus($id_community, $row['id_user']) != 3 && Communities::checkOwnerCommunity($id_community, $user['id'])){
-							if(Communities::getUserStatus($id_community, $row['id_user']) != 1 and Communities::getUserStatus($id_community, $row['id_user']) != 3){
+						if(Communities::checkOwnerCommunity($community_id, $user['id']) && Communities::getUserStatus($community_id, $row['user_id']) != 1 && Communities::getUserStatus($community_id, $row['user_id']) != 3) $rowBlock->assign('SHOW_ADD_TO_ADMIN_LINK', 'yes');
+						if(Communities::getUserStatus($community_id, $row['user_id']) != 3 && Communities::checkOwnerCommunity($community_id, $user['id'])){
+							if(Communities::getUserStatus($community_id, $row['user_id']) != 1 and Communities::getUserStatus($community_id, $row['user_id']) != 3){
 								$rowBlock->assign('SHOW_USER_BLOCK_LINK', 'yes');
 							}
 						}
@@ -516,26 +516,26 @@ if($_SESSION['user_authorization'] == "ok"){
 						$rowBlock->assign('FIRSTNAME', $row['firstname']);					
 						$rowBlock->assign('LASTNAME', $row['lastname']);
 						$rowBlock->assign('CITY', $row['city']);					
-						$rowBlock->assign('ID_COMMUNITY', $id_community);
-						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline');
+						$rowBlock->assign('ID_COMMUNITY', $community_id);
+						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline');
 						$tpl->assign('row_members', $rowBlock);
 					}
 				}else $tpl->assign('NO_MEMBERS', core::getLanguage('str', 'empty'));			
 
-				if(Communities::checkOwnerCommunity($id_community, $user['id']) and Communities::checkAdminCommunity($id_community, $user['id'])){
-					$arr_members = Communities::getMemberList($id_community, 0);			
+				if(Communities::checkOwnerCommunity($community_id, $user['id']) and Communities::checkAdminCommunity($community_id, $user['id'])){
+					$arr_members = Communities::getMemberList($community_id, 0);			
 			
 					if($arr_members){
 						foreach($arr_members as $row){
 							$rowBlock = $tpl->fetch('row_application_members');	
-							$rowBlock->assign('ID_USER', $row['id_user']);			
+							$rowBlock->assign('ID_USER', $row['user_id']);			
 							$rowBlock->assign('SEL', $user['id']);
 							$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($row));					
 							$rowBlock->assign('FIRSTNAME', $row['firstname']);					
 							$rowBlock->assign('LASTNAME', $row['lastname']);
 							$rowBlock->assign('CITY', $row['city']);					
-							$rowBlock->assign('ID_COMMUNITY', $id_community);
-							$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline');
+							$rowBlock->assign('ID_COMMUNITY', $community_id);
+							$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline');
 							$tpl->assign('row_application_members', $rowBlock);
 						}
 					}else $tpl->assign('NO_APPLICATIONS', core::getLanguage('str', 'empty'));
@@ -545,7 +545,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'photoalbums':
 		
-				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -582,7 +582,7 @@ if($_SESSION['user_authorization'] == "ok"){
 							$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], $info['photoalbumable_type']));
 							$rowBlock->assign('DESCRIPTION', $row['description']);
 						
-							if($row['id_owner'] == $user['id'] or Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id'])) $rowBlock->assign('ALLOW_EDIT', 'yes');
+							if($row['owner_id'] == $user['id'] or Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id'])) $rowBlock->assign('ALLOW_EDIT', 'yes');
 							$rowBlock->assign('STR_REMOVE_PHOTO', core::getLanguage('str', 'remove_photo'));						
 							$tpl->assign('row_photos_list', $rowBlock);	
 						}
@@ -593,7 +593,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				
 					$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'community_photos'));
 		
-					if($communities_settings['permission_photo'] != 1 and (($communities_settings['permission_photo'] == 0 or !$communities_settings['permission_photo']) || Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id']))){ 
+					if($communities_settings['permission_photo'] != 1 and (($communities_settings['permission_photo'] == 0 or !$communities_settings['permission_photo']) || Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id']))){ 
 						$tpl->assign('SHOW_ADD_PHOTOS_MENU', 'show');
 					}
 				
@@ -606,11 +606,11 @@ if($_SESSION['user_authorization'] == "ok"){
 					$tpl->assign('STR_MY_ALBUMS', core::getLanguage('str', 'community_album'));	
 					$tpl->assign('STR_MY_PHOTOS', core::getLanguage('str', 'community_photos'));
 					$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos('group'));		
-					$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($id_community, 'group'));		
-					$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($id_community, 'group'));			
+					$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($community_id, 'group'));		
+					$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($community_id, 'group'));			
 					$tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));				
 		
-					$arr_albums = Photoalbum::getAlbumList($id_community, 'group');
+					$arr_albums = Photoalbum::getAlbumList($community_id, 'group');
 		
 					if($arr_albums){
 						foreach($arr_albums as $row){
@@ -626,7 +626,7 @@ if($_SESSION['user_authorization'] == "ok"){
 							$rowBlock->assign('PHOTOALBUM_REMOVE_PATH', $photoalbum_remove_path);				
 							$rowBlock->assign('PHOTOALBUM_EDIT_PATH', $photoalbum_edit_path);				
 				
-							if(($id_user == $row['id_owner'] and $communities_settings['permission_photo'] != 2) || Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id'])) $rowBlock->assign('SHOW_EDIT_LINKS', 'show');
+							if(($user_id == $row['owner_id'] and $communities_settings['permission_photo'] != 2) || Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id'])) $rowBlock->assign('SHOW_EDIT_LINKS', 'show');
 					
 							$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));					
 							$rowBlock->assign('STR_REMOVE', core::getLanguage('str', 'remove'));					
@@ -640,18 +640,18 @@ if($_SESSION['user_authorization'] == "ok"){
 						}
 					}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 	
-					$arr_photos = Photoalbum::getPhotosList($id_community, 'group', 6, 0);
+					$arr_photos = Photoalbum::getPhotosList($community_id, 'group', 6, 0);
 		
 					if($arr_photos){
 						foreach($arr_photos as $row){
 							$rowBlock = $tpl->fetch('row_my_photos_list');
 							$rowBlock->assign('ID', $row['id']);
-							$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+							$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 							$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'group'));				
 							$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'group'));
 							$rowBlock->assign('DESCRIPTION', $row['description']);
 						
-							if($row['id_owner'] == $user['id'] or Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id'])) $rowBlock->assign('ALLOW_EDIT', 'yes');
+							if($row['owner_id'] == $user['id'] or Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id'])) $rowBlock->assign('ALLOW_EDIT', 'yes');
 						
 							$rowBlock->assign('STR_REMOVE_PHOTO', core::getLanguage('str', 'remove_photo'));
 							$tpl->assign('row_my_photos_list', $rowBlock);
@@ -664,7 +664,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'edit_photoalbum':
 		
-				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -685,7 +685,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'create_photoalbum':
 		
-				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -703,7 +703,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'videoalbums':
 		
-				if(Communities::getPermissionVideo($communities_settings['permission_video'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionVideo($communities_settings['permission_video'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -721,7 +721,7 @@ if($_SESSION['user_authorization'] == "ok"){
 						exit;
 					}			
 		
-					$album = Videoalbum::getAlbumInfo($id_album, $id_community);
+					$album = Videoalbum::getAlbumInfo($id_album, $community_id);
 					$tpl->assign('TITLE_PAGE', $album['name']);								
 					$tpl->assign('STR_EDIT', core::getLanguage('str', 'edit'));
 					$tpl->assign('STR_REMOVE', core::getLanguage('str', 'remove'));					
@@ -735,7 +735,7 @@ if($_SESSION['user_authorization'] == "ok"){
 						$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));			
 						$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id']));	
 					
-						if($row['id_owner'] == $user['id'] || Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id'])){
+						if($row['owner_id'] == $user['id'] || Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id'])){
 							$rowBlock->assign('ALLOW_EDIT', 'show');
 						}
 						
@@ -748,7 +748,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				
 					$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'videoalbums'));	
 			
-					if($communities_settings['permission_video'] != 1 and (($communities_settings['permission_video'] == 0 or !$communities_settings['permission_video']) || Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id']))){
+					if($communities_settings['permission_video'] != 1 and (($communities_settings['permission_video'] == 0 or !$communities_settings['permission_video']) || Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id']))){
 						$tpl->assign('SHOW_ADD_VIDEO_MENU', 'show');
 					}				
 		
@@ -757,15 +757,15 @@ if($_SESSION['user_authorization'] == "ok"){
 					$tpl->assign('STR_ADD_NEW_VIDEO', core::getLanguage('str', 'add_new_video'));
 					$tpl->assign('STR_CREATE_NEW_ALBUM', core::getLanguage('str', 'create_new_album'));
 					$tpl->assign('STR_OR', core::getLanguage('str', 'or'));						
-					$tpl->assign('STR_MY_ALBUMS', $_GET['id_user'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'community_album'));
+					$tpl->assign('STR_MY_ALBUMS', $_GET['user_id'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'community_album'));
 					$tpl->assign('STR_POPULAR_VIDEOS',  core::getLanguage('str', 'popular_videos'));
-					$tpl->assign('STR_MY_VIDEOS', $_GET['id_user'] ? core::getLanguage('str', 'user_videos') : core::getLanguage('str', 'community_album'));		
-					$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($id_community, 'group'));
+					$tpl->assign('STR_MY_VIDEOS', $_GET['user_id'] ? core::getLanguage('str', 'user_videos') : core::getLanguage('str', 'community_album'));		
+					$tpl->assign('NUMBER_ALBUMS', Videoalbum::NumberAlbums($community_id, 'group'));
 					$tpl->assign('NUMBER_POPULAR_VIDEOS', Videoalbum::getNumberPopVideos('group'));		
-					$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($id_community, 'group'));			
+					$tpl->assign('NUMBER_MY_VIDEOS', Videoalbum::NumberVideos($community_id, 'group'));			
 					$tpl->assign('NO_POP_VIDEOS', core::getLanguage('str', 'empty'));	
 		
-					$arr_albums = Videoalbum::getAlbumList($id_community, 'group');
+					$arr_albums = Videoalbum::getAlbumList($community_id, 'group');
 		
 					if($arr_albums){
 						foreach($arr_albums as $row){
@@ -781,7 +781,7 @@ if($_SESSION['user_authorization'] == "ok"){
 							$rowBlock->assign('PATH_REMOVE_VIDEO', $path_remove_video);						
 							$rowBlock->assign('PATH_EDIT_VIDEO', $path_edit_video);	
 
-							if($row['id_owner'] == $user['id'] || Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id'])){
+							if($row['owner_id'] == $user['id'] || Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id'])){
 								$rowBlock->assign('SHOW_EDIT_LINKS', 'show');
 							}
 						
@@ -791,19 +791,19 @@ if($_SESSION['user_authorization'] == "ok"){
 						}
 					}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 		
-					$arr_my_videos = Videoalbum::getVideosList($id_community, 'group', 6, 0);
+					$arr_my_videos = Videoalbum::getVideosList($community_id, 'group', 6, 0);
 		
 					if($arr_my_videos){
 						foreach($arr_my_videos as $row){
 							$rowBlock = $tpl->fetch('row_my_videos_list');					
 							$rowBlock->assign('ID', $row['id']);
-							$rowBlock->assign('ID_VIDEO', $row['id_video']);					
+							$rowBlock->assign('ID_VIDEO', $row['video_id']);					
 							$rowBlock->assign('DESCRIPTION', $arow['description']);
 							$rowBlock->assign('THUMB', core::documentparser()->getThumb($row['provider'], $row['video']));
 							$rowBlock->assign('VIDEO', core::documentparser()->getVideoPlayer($row['provider'], $row['video']));					
-							$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['id_video']));
+							$rowBlock->assign('NUMBERVIEWS', Videoalbum::getNumberVideoViews($row['video_id']));
 
-							if($row['id_owner'] == $user['id'] || Communities::checkOwnerCommunity($id_community, $user['id']) || Communities::checkAdminCommunity($id_community, $user['id'])){
+							if($row['owner_id'] == $user['id'] || Communities::checkOwnerCommunity($community_id, $user['id']) || Communities::checkAdminCommunity($community_id, $user['id'])){
 								$rowBlock->assign('ALLOW_EDIT', 'show');
 							}
 						
@@ -819,7 +819,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'add_video':
 		
-				if(Communities::getPermissionVideo($communities_settings['permission_video'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionVideo($communities_settings['permission_video'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -828,18 +828,18 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('QUERY', $_GET['q']);				
 				$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'add_new_video'));
 	
-				if(Videoalbum::NumberAlbums($id_community, 'group') == 0){
+				if(Videoalbum::NumberAlbums($community_id, 'group') == 0){
 					$fields = array();
 					$fields['id'] = 0;		
 					$fields['name'] = core::getLanguage('str', 'community_album');		
 					$fields['created_at'] = date("Y-m-d H:i:s");
 					$fields['videoalbumable_type'] = 'group';		
-					$fields['id_owner'] = $id_community;	
+					$fields['owner_id'] = $community_id;	
 		
 					Videoalbum::createAlbum($fields);		
 				}
 
-				foreach(Videoalbum::getVideoAlbumOption($id_community, 'group') as $row){
+				foreach(Videoalbum::getVideoAlbumOption($community_id, 'group') as $row){
 					$rowBlock = $tpl->fetch('row_option_videoalbum');
 					$rowBlock->assign('ID', $row['id']);
 					$rowBlock->assign('NAME', $row['name']);				
@@ -850,7 +850,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('STR_VIDEO', core::getLanguage('str', 'video'));	
 				$tpl->assign('STR_DESCRIPTION', core::getLanguage('str', 'description'));		
 				$tpl->assign('STR_ALBUM', core::getLanguage('str', 'album'));	
-				$tpl->assign('OPTION_ID', $_POST['id_videoalbum']);	
+				$tpl->assign('OPTION_ID', $_POST['videoalbum_id']);	
 				$tpl->assign('VIDEO', $_POST['video']);	
 				$tpl->assign('DESCRIPTION', $_POST['description']);
 				$tpl->assign('BUTTON_ADD', core::getLanguage('button', 'add'));	
@@ -859,7 +859,7 @@ if($_SESSION['user_authorization'] == "ok"){
 			
 			case 'create_videoalbum':
 		
-				if(Communities::getPermissionVideo($communities_settings['permission_video'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionVideo($communities_settings['permission_video'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -877,7 +877,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'edit_videoalbum':	
 
-				if(Communities::getPermissionVideo($communities_settings['permission_video'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionVideo($communities_settings['permission_video'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -899,21 +899,21 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'group_events'));			
 				$tpl->assign('QUERY', $_GET['q']);
 			
-				if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id'])) $tpl->assign('SHOW_ADD_EVENTS_FORM', 'show');
-				$events = Events::getEventsOfMember($id_community, 'group');
+				if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id'])) $tpl->assign('SHOW_ADD_EVENTS_FORM', 'show');
+				$events = Events::getEventsOfMember($community_id, 'group');
 				
 				if ($events)
 					foreach($events as $row){
 						$rowBlock = $tpl->fetch('row_community_events');					
-						$rowBlock->assign('ID', $row['id_event']);	
+						$rowBlock->assign('ID', $row['event_id']);	
 						$rowBlock->assign('NAME', $row['name']);
 						$rowBlock->assign('AVATAR', core::documentparser()->eventAvatar($row['cover_page']));		
 						$rowBlock->assign('SPORT_TYPE', $row['sport_type']);
 						$rowBlock->assign('CITY', $row['place']);
 						$rowBlock->assign('DATE', core::documentparser()->mysql_russian_datetime($row['date']));
 						$rowBlock->assign('DESCRIPTION', $row['description']);
-						$rowBlock->assign('PARTICIPANTS_COMMUNITY', str_replace('%MEMBERS%', Events::countMembers($row['id_event'], 'group'), core::getLanguage('str', 'participants_groups')));
-						$rowBlock->assign('STATUS', Events::getEventStatus($row['id_event']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));
+						$rowBlock->assign('PARTICIPANTS_COMMUNITY', str_replace('%MEMBERS%', Events::countMembers($row['event_id'], 'group'), core::getLanguage('str', 'participants_groups')));
+						$rowBlock->assign('STATUS', Events::getEventStatus($row['event_id']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));
 						$tpl->assign('row_community_events', $rowBlock);
 					}
 				else{
@@ -924,7 +924,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'edit':
 		
-				if(!Communities::checkOwnerCommunity($id_community, $user['id'])){
+				if(!Communities::checkOwnerCommunity($community_id, $user['id'])){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -947,36 +947,36 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('COMMUNITY_SPORT', $_POST['sport'] ? $_POST['sport'] : $community['sport_type']);
 				$tpl->assign('COMMUNITY_ID_SPORT',  $_POST['id_sport']);	
 			
-				$arr_administrators = Communities::getMemberList($id_community, 3);			
+				$arr_administrators = Communities::getMemberList($community_id, 3);			
 			
 				if($arr_administrators){
 					foreach($arr_administrators as $row){
 						$rowBlock = $tpl->fetch('row_administrators');	
-						$rowBlock->assign('ID_USER', $row['id_user']);			
+						$rowBlock->assign('ID_USER', $row['user_id']);			
 						$rowBlock->assign('SEL', $user['id']);
 						$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($row));					
 						$rowBlock->assign('FIRSTNAME', $row['firstname']);					
 						$rowBlock->assign('LASTNAME', $row['lastname']);
 						$rowBlock->assign('CITY', $row['city']);	
-						$rowBlock->assign('ID_COMMUNITY', $id_community);
-						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline');
+						$rowBlock->assign('ID_COMMUNITY', $community_id);
+						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline');
 						$tpl->assign('row_administrators', $rowBlock);
 					}
 				}else $tpl->assign('NO_ADMINISTRATORS', core::getLanguage('str', 'empty'));			
 			
-				$arr_blocked = Communities::getMemberList($id_community, 4);			
+				$arr_blocked = Communities::getMemberList($community_id, 4);			
 			
 				if($arr_blocked){
 					foreach($arr_blocked as $row){
 						$rowBlock = $tpl->fetch('row_blocked');	
-						$rowBlock->assign('ID_USER', $row['id_user']);			
+						$rowBlock->assign('ID_USER', $row['user_id']);			
 						$rowBlock->assign('SEL', $user['id']);
 						$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($row));					
 						$rowBlock->assign('FIRSTNAME', $row['firstname']);					
 						$rowBlock->assign('LASTNAME', $row['lastname']);
 						$rowBlock->assign('CITY', $row['city']);					
-						$rowBlock->assign('ID_COMMUNITY', $id_community);
-						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline');
+						$rowBlock->assign('ID_COMMUNITY', $community_id);
+						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline');
 						$tpl->assign('row_blocked', $rowBlock);
 					}
 				}else $tpl->assign('NO_BLOCKED', core::getLanguage('str', 'empty'));			
@@ -991,7 +991,7 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			case 'add_photo':
 		
-				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $id_community, $user['id']) == false){
+				if(Communities::getPermissionPhoto($communities_settings['permission_photo'], $community_id, $user['id']) == false){
 					header("HTTP/1.1 404 Not Found");
 					header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 					exit;
@@ -1002,18 +1002,18 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('ACTION', $_SERVER['REQUEST_URI']);
 				$tpl->assign('REDIRECT_PHOTO_ALBUM', $redirect_photo_album);
 
-				if(Photoalbum::getNumberAlbums($id_community, 'group') == 0){
+				if(Photoalbum::getNumberAlbums($community_id, 'group') == 0){
 					$fields = array();
 					$fields['id'] = 0;
 					$fields['name'] = core::getLanguage('str', 'community_album');
 					$fields['created_at'] = date("Y-m-d H:i:s");
 					$fields['photoalbumable_type'] = 'group';
-					$fields['id_owner'] = $id_community;		
+					$fields['owner_id'] = $community_id;		
 			
 					Photoalbum::createAlbum($fields);	
 				}			
 			
-				$arr = Photoalbum::getAlbumsOptionList($id_community, 'group');
+				$arr = Photoalbum::getAlbumsOptionList($community_id, 'group');
 			
 				if(is_array($arr)){			
 				
@@ -1035,25 +1035,25 @@ if($_SESSION['user_authorization'] == "ok"){
 				$tpl->assign('STR_WHATS_INTERESTING', core::getLanguage('str', 'whats_interesting'));
 				$tpl->assign('STR_REPLY', core::getLanguage('str', 'reply'));			
 		
-				if(Communities::getPermissionWall($communities_settings['permission_wall'], $id_community, $user['id'])) {
+				if(Communities::getPermissionWall($communities_settings['permission_wall'], $community_id, $user['id'])) {
 					$tpl->assign('SHOW_COMMMENT_FORM', 'show');
 				}			
 				
-				if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id'])) $tpl->assign('ADMIN', 'yes');
+				if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id'])) $tpl->assign('ADMIN', 'yes');
 			
 				if($communities_settings['permission_wall'] != 1){
-					$arr = Comments::treeComments(0, Comments::getCommentList($id_community, 'group', 10, 0));
+					$arr = Comments::treeComments(0, Comments::getCommentList($community_id, 'group', 10, 0));
 
 					foreach($arr as $row){
 						$rowBlock = $tpl->fetch('row_comments');	
 						$rowBlock->assign('ID', $row['id_comment']);
-						$rowBlock->assign('ID_PARENT', $row['id_parent']);	
-						$rowBlock->assign('ID_USER', $row['id_user']);			
+						$rowBlock->assign('ID_PARENT', $row['parent_id']);	
+						$rowBlock->assign('ID_USER', $row['user_id']);			
 						$rowBlock->assign('ID_USER_SESSION', $user['id']);
-						$rowBlock->assign('ID_CONTENT', $row['id_content']);				
-						$rowBlock->assign('ID_COMMUNITY', $row['id_content']);
+						$rowBlock->assign('ID_CONTENT', $row['content_id']);				
+						$rowBlock->assign('ID_COMMUNITY', $row['content_id']);
 						$rowBlock->assign('COMMUNITY_NAME', $community['name']);
-						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline');
+						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline');
 		
 						$rowBlock->assign('COMMENT_AVATAR', Comments::getCommentAvatar($row['id_comment']));
 						$rowBlock->assign('COMMENT_NAME', Comments::getCommentAuthorName($row['id_comment']));	
@@ -1064,31 +1064,31 @@ if($_SESSION['user_authorization'] == "ok"){
 						$rowBlock->assign('NUMBERTELL', Comments::getNumberTell($row['id_comment'], 'comment'));
 						$rowBlock->assign('NUMBERLIKED', Comments::getNumberLiked($row['id_comment'], 'comment'));
 				
-						if($user['id'] == $row['id_user'])
+						if($user['id'] == $row['user_id'])
 							$rowBlock->assign('BUTTON_SHARE', 'hide');
 						else
 							$rowBlock->assign('BUTTON_SHARE', 'show');	
 				
-						if($row['id_parent'] == 0){
+						if($row['parent_id'] == 0){
 							foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
 								$rowAttach = $rowBlock->fetch('row_attach');
-								$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+								$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 								$rowAttach->assign('SMALL_PHOTO', PATH_COMMENT_ATTACHMENTS . $photo['small_photo']);
-								$rowAttach->assign('ID_PHOTO', $photo['id_photo']);
+								$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
 								$rowBlock->assign('row_attach', $rowAttach);
 							}
 						}
 						else{
 							foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
 								$rowAttach = $rowBlock->fetch('row_reply_attach');
-								$photo = Photoalbum::getPhotoInfo($row2['id_photo']);
+								$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
 								$rowAttach->assign('SMALL_PHOTO', PATH_COMMENT_ATTACHMENTS . $photo['small_photo']);
-								$rowAttach->assign('ID_PHOTO', $photo['id_photo']);
+								$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
 								$rowBlock->assign('row_reply_attach', $rowAttach);
 							}
 						}	
 					
-						if(Communities::getPermissionWall($communities_settings['permission_wall'], $id_community, $user['id']) && $communities_settings['permission_wall'] != 3) {
+						if(Communities::getPermissionWall($communities_settings['permission_wall'], $community_id, $user['id']) && $communities_settings['permission_wall'] != 3) {
 							$rowBlock->assign('SHOW_REPLY_FORM', 'show');
 						}
 	
@@ -1120,12 +1120,12 @@ if($_SESSION['user_authorization'] == "ok"){
 			$tpl->assign('BUTTON', core::getLanguage('button', 'create_team'));
 		}
 		else{
-			$id_user = $_GET['id_user'] ? core::database()->escape((int)Core_Array::getRequest('id_user')) : $user['id'];		
+			$user_id = $_GET['user_id'] ? core::database()->escape((int)Core_Array::getRequest('user_id')) : $user['id'];		
 		
 			$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'groups'));	
 			$tpl->assign('ACTION', $_SERVER['REQUEST_URI']);
 		
-			if(!$_GET['id_user']) $tpl->assign('SHOW_SEARCH_FORM', 'show'); 
+			if(!$_GET['user_id']) $tpl->assign('SHOW_SEARCH_FORM', 'show'); 
 			
 			$tpl->assign('STR_KEYWORD', core::getLanguage('str', 'keyword'));	
 			$tpl->assign('BUTTON_SEARCH_COMMUNITY', core::getLanguage('button', 'search_group'));	
@@ -1144,22 +1144,22 @@ if($_SESSION['user_authorization'] == "ok"){
 		
 			$tpl->assign('STR_POPULAR_COMMUNITY', core::getLanguage('str', 'popular_groups'));	
 			$tpl->assign('NUMBER_POPULAR_COMMUNITIES', Communities::getNumberPopularCommunities('group'));
-			$tpl->assign('STR_MY_COMMUNITIES', $_GET['id_user'] ? core::getLanguage('str', 'groups') : core::getLanguage('str', 'my_groups'));
-			$tpl->assign('NUMBER_MY_COMMUNITIES', Communities::getNumberMyCommunities($id_user, 'group'));	
+			$tpl->assign('STR_MY_COMMUNITIES', $_GET['user_id'] ? core::getLanguage('str', 'groups') : core::getLanguage('str', 'my_groups'));
+			$tpl->assign('NUMBER_MY_COMMUNITIES', Communities::getNumberMyCommunities($user_id, 'group'));	
 			$tpl->assign('STR_THERE_ARE_NO_MORE_ENTRIES', core::getLanguage('str', 'there_are_no_more_entries'));
 
-			if(!$_GET['id_user'] or $_GET['id_user'] == $user['id']) {
+			if(!$_GET['user_id'] or $_GET['user_id'] == $user['id']) {
 				if($arr_pop_community){
 					foreach($arr_pop_community as $row){
 						$rowBlock = $tpl->fetch('row_pop_communities_list');
 				
-						$rowBlock->assign('ID', $row['id_community']);
+						$rowBlock->assign('ID', $row['community_id']);
 						$rowBlock->assign('NAME', $row['name']);	
 						$rowBlock->assign('ABOUT', nl2br($row['about']));	
 
-						if(Communities::getCommunityType($row['id_community']) == 1)
+						if(Communities::getCommunityType($row['community_id']) == 1)
 							$rowBlock->assign('TYPE', core::getLanguage('str', 'private_community')); 
-						else if(Communities::getCommunityType($row['id_community']) == 2)
+						else if(Communities::getCommunityType($row['community_id']) == 2)
 							$rowBlock->assign('TYPE', core::getLanguage('str', 'closed_community')); 
 						else
 							$rowBlock->assign('TYPE', core::getLanguage('str', 'open_community'));
@@ -1167,15 +1167,15 @@ if($_SESSION['user_authorization'] == "ok"){
 						$rowBlock->assign('CITY', $row['place']);
 						$rowBlock->assign('SPORT_TYPE', $row['sport_type']);					
 						$rowBlock->assign('ID_USER', $user['id']);	
-						$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countAllMemberCommunity($row['id_community']), core::getLanguage('str', 'participants_friends')));
+						$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countAllMemberCommunity($row['community_id']), core::getLanguage('str', 'participants_friends')));
 					
-						if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])){
+						if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])){
 							$rowBlock->assign('ALLOW_EDIT', 'yes');
 						} 
 					
 						$rowBlock->assign('ID_USER', $user['id']);			
 						$rowBlock->assign('AVATAR', core::documentparser()->communityAvatar($row));		
-						$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id'])));					
+						$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id'])));					
 						$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));						
 						$tpl->assign('row_pop_communities_list', $rowBlock);
 					}	
@@ -1185,29 +1185,29 @@ if($_SESSION['user_authorization'] == "ok"){
 				}
 			} else $tpl->assign('NO_POP_COMMUNITIES', core::getLanguage('str', 'empty'));
 
-			$arr_my_community = Communities::getMyCommunitiesList($id_user, 'group', 5, 0);
+			$arr_my_community = Communities::getMyCommunitiesList($user_id, 'group', 5, 0);
 
 			if($arr_my_community){
 				foreach($arr_my_community as $row){
 					$rowBlock = $tpl->fetch('row_my_communities_list');	
 				
-					$rowBlock->assign('ID', $row['id_community']);		
+					$rowBlock->assign('ID', $row['community_id']);		
 					$rowBlock->assign('NAME', $row['name']);		
 					$rowBlock->assign('ABOUT', nl2br($row['about']));					
 					$rowBlock->assign('ID_USER', $user['id']);
 					$rowBlock->assign('CITY', $row['place']);
 					$rowBlock->assign('SPORT_TYPE', $row['sport_type']);	
-					$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countAllMemberCommunity($row['id_community']), core::getLanguage('str', 'participants_friends')));
+					$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countAllMemberCommunity($row['community_id']), core::getLanguage('str', 'participants_friends')));
 					
-					if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])) {
+					if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])) {
 						$rowBlock->assign('ALLOW_EDIT', 'yes');
 					}					
 				
-					$rowBlock->assign('STATUS', Communities::getCommunityRole($row['id_community'], $user['id']));					
+					$rowBlock->assign('STATUS', Communities::getCommunityRole($row['community_id'], $user['id']));					
 				
-					if(Communities::getCommunityType($row['id_community']) == 1)
+					if(Communities::getCommunityType($row['community_id']) == 1)
 						$rowBlock->assign('TYPE', core::getLanguage('str', 'private_community')); 
-					else if(Communities::getCommunityType($row['id_community']) == 2)
+					else if(Communities::getCommunityType($row['community_id']) == 2)
 						$rowBlock->assign('TYPE', core::getLanguage('str', 'closed_community')); 
 					else
 						$rowBlock->assign('TYPE', core::getLanguage('str', 'open_community'));
@@ -1227,13 +1227,13 @@ if($_SESSION['user_authorization'] == "ok"){
 			if($arr_invited_me_community){
 				foreach($arr_invited_me_community as $row){
 					$rowBlock = $tpl->fetch('row_invited_me_community_list');
-					$rowBlock->assign('ID', $row['id_community']);
+					$rowBlock->assign('ID', $row['community_id']);
 					$rowBlock->assign('NAME', $row['name']);	
 					$rowBlock->assign('ABOUT', nl2br($row['about']));	
 
-					if(Communities::getCommunityType($row['id_community']) == 1)
+					if(Communities::getCommunityType($row['community_id']) == 1)
 						$rowBlock->assign('TYPE', core::getLanguage('str', 'private_community')); 
-					else if(Communities::getCommunityType($row['id_community']) == 2)
+					else if(Communities::getCommunityType($row['community_id']) == 2)
 						$rowBlock->assign('TYPE', core::getLanguage('str', 'closed_community')); 
 					else
 						$rowBlock->assign('TYPE', core::getLanguage('str', 'open_community'));
@@ -1241,10 +1241,10 @@ if($_SESSION['user_authorization'] == "ok"){
 					$rowBlock->assign('CITY', $row['place']);
 					$rowBlock->assign('SPORT_TYPE', $row['sport_type']);					
 					$rowBlock->assign('ID_USER', $user['id']);	
-					$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countAllMemberCommunity($row['id_community']), core::getLanguage('str', 'participants_friends')));					
+					$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countAllMemberCommunity($row['community_id']), core::getLanguage('str', 'participants_friends')));					
 					$rowBlock->assign('ID_USER', $user['id']);			
 					$rowBlock->assign('AVATAR', core::documentparser()->communityAvatar($row));		
-					$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id'])));
+					$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id'])));
 					$tpl->assign('row_invited_me_community_list', $rowBlock);
 				}	
 			}
@@ -1287,15 +1287,15 @@ else{
 		$tpl->assign('row_js_list2', $rowBlock);
 	}	
 	
-	if(empty($_GET['id_community'])){
+	if(empty($_GET['community_id'])){
 		header("Location: http://" . $_SERVER['SERVER_NAME']);
 		exit;
 	}
 	else{
 		
-		$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));
+		$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));
 	
-		if(Communities::checkExistence($id_community, 'group') or !is_numeric($_GET['id_community'])){
+		if(Communities::checkExistence($community_id, 'group') or !is_numeric($_GET['community_id'])){
 			header("HTTP/1.1 404 Not Found");
 			header("Location: http://" . $_SERVER['SERVER_NAME'] . "/404.html"); 
 			exit;
@@ -1314,10 +1314,10 @@ else{
 			exit;
 		}
 		
-		if($_GET['id_community']){
-			$id_community = core::database()->escape((int)Core_Array::getRequest('id_community'));	
-			$community = Communities::getCommunityInfo($id_community);
-			$communities_settings = Communities::getCommunitySettings($id_community);
+		if($_GET['community_id']){
+			$community_id = core::database()->escape((int)Core_Array::getRequest('community_id'));	
+			$community = Communities::getCommunityInfo($community_id);
+			$communities_settings = Communities::getCommunitySettings($community_id);
 			$tpl->assign('COMMUNITY_DESCRIPTION', nl2br($community['about']));
 			$tpl->assign('DESCRIPTION', $community['about']);	
 		}
@@ -1333,14 +1333,14 @@ else{
 		$tpl->assign('STR_PLAYGROUNDS', core::getLanguage('str', 'playgrounds'));
 		$tpl->assign('STR_SHOPS', core::getLanguage('str', 'shops'));
 		$tpl->assign('STR_FITNESS', core::getLanguage('str', 'fitness'));
-		$tpl->assign('ID_COMMUNITY', $_GET['id_community']);
+		$tpl->assign('ID_COMMUNITY', $_GET['community_id']);
 		$tpl->assign('STR_COMMUNITY_FEED', core::getLanguage('str', 'feed'));	
 		$tpl->assign('STR_COMMUNITY_MEMBERS', core::getLanguage('str', 'members'));	
 		$tpl->assign('STR_COMMUNITY_PHOTO', core::getLanguage('str', 'photo'));	
 		$tpl->assign('STR_COMMUNITY_VIDEO', core::getLanguage('str', 'video'));
 		$tpl->assign('STR_COMMUNITY_EVENTS', core::getLanguage('str', 'events'));
 	
-		$tpl->assign('ID_OWNER', $_GET['id_community']);
+		$tpl->assign('ID_OWNER', $_GET['community_id']);
 		$tpl->assign('VIDEOALBUMABLE_TYPE', 'group');	
 		$tpl->assign('STR_COMMUNITY_INFO', core::getLanguage('str', 'community_info'));	
 		$tpl->assign('STR_COMMUNITY_ADMINISTRATORS', core::getLanguage('str', 'community_administrators'));	
@@ -1359,23 +1359,23 @@ else{
 			case 'members':
 		
 				$tpl->assign('QUERY', $_GET['q']);
-				$tpl->assign('NUMBERMEMBER', Communities::countAllMemberCommunity($id_community));			
+				$tpl->assign('NUMBERMEMBER', Communities::countAllMemberCommunity($community_id));			
 				$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'members'));			
 				$tpl->assign('STR_MEMBERS', core::getLanguage('str', 'members'));
 			
-				$arr_members = Communities::getMemberAllList($id_community);			
+				$arr_members = Communities::getMemberAllList($community_id);			
 			
 				if($arr_members){
 					foreach($arr_members as $row){
 						$rowBlock = $tpl->fetch('row_members');	
-						$rowBlock->assign('ID_USER', $row['id_user']);			
+						$rowBlock->assign('ID_USER', $row['user_id']);			
 						$rowBlock->assign('AVATAR', core::documentparser()->userAvatar($row));	
-						$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $row['id_user'])));
+						$rowBlock->assign('STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $row['user_id'])));
 						$rowBlock->assign('FIRSTNAME', $row['firstname']);					
 						$rowBlock->assign('LASTNAME', $row['lastname']);
 						$rowBlock->assign('CITY', $row['city']);					
-						$rowBlock->assign('ID_COMMUNITY', $id_community);
-						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['id_user']) ? 'online' : 'offline');
+						$rowBlock->assign('ID_COMMUNITY', $community_id);
+						$rowBlock->assign('STATUS_USER', core::user()->checkUserOnline($row['user_id']) ? 'online' : 'offline');
 						$tpl->assign('row_members', $rowBlock);
 					}
 				}else $tpl->assign('NO_MEMBERS', core::getLanguage('str', 'empty'));			
@@ -1429,11 +1429,11 @@ else{
 					$tpl->assign('STR_MY_ALBUMS', core::getLanguage('str', 'community_album'));	
 					$tpl->assign('STR_MY_PHOTOS', core::getLanguage('str', 'community_photos'));
 					$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos('group'));		
-					$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($id_community, 'group'));		
-					$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($id_community, 'group'));		
+					$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($community_id, 'group'));		
+					$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($community_id, 'group'));		
 					$tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));				
 		
-					$arr_albums = Photoalbum::getAlbumList($id_community, 'group');
+					$arr_albums = Photoalbum::getAlbumList($community_id, 'group');
 		
 					if($arr_albums){
 						foreach($arr_albums as $row){
@@ -1458,13 +1458,13 @@ else{
 						}
 					}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 	
-					$arr_photos = Photoalbum::getPhotosList($id_community, 'group', 6, 0);
+					$arr_photos = Photoalbum::getPhotosList($community_id, 'group', 6, 0);
 		
 					if($arr_photos){
 						foreach($arr_photos as $row){
 							$rowBlock = $tpl->fetch('row_my_photos_list');
 							$rowBlock->assign('ID', $row['id']);
-							$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+							$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 							$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'group'));				
 							$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'group'));
 							$rowBlock->assign('DESCRIPTION', $row['description']);
@@ -1483,22 +1483,22 @@ else{
 				$tpl->assign('TITLE_PAGE', core::getLanguage('title', 'group_events'));
 				$tpl->assign('QUERY', $_GET['q']);
 			
-				if(Communities::checkOwnerCommunity($id_community, $user['id']) or Communities::checkAdminCommunity($id_community, $user['id'])) $tpl->assign('SHOW_ADD_EVENTS_FORM', 'show');
+				if(Communities::checkOwnerCommunity($community_id, $user['id']) or Communities::checkAdminCommunity($community_id, $user['id'])) $tpl->assign('SHOW_ADD_EVENTS_FORM', 'show');
 			
-				$events = Events::getEventsOfMember($id_community, 'group');
+				$events = Events::getEventsOfMember($community_id, 'group');
 				
 				if ($events)
 					foreach($events as $row){
 						$rowBlock = $tpl->fetch('row_community_events');					
-						$rowBlock->assign('ID', $row['id_event']);	
+						$rowBlock->assign('ID', $row['event_id']);	
 						$rowBlock->assign('NAME', $row['name']);
 						$rowBlock->assign('AVATAR', core::documentparser()->eventAvatar($row['cover_page']));		
 						$rowBlock->assign('SPORT_TYPE', $row['sport_type']);
 						$rowBlock->assign('CITY', $row['place']);
 						$rowBlock->assign('DATE', core::documentparser()->mysql_russian_datetime($row['date']));
 						$rowBlock->assign('DESCRIPTION', $row['description']);
-						$rowBlock->assign('PARTICIPANTS_COMMUNITY', str_replace('%MEMBERS%', Events::countMembers($row['id_event'], 'group'), core::getLanguage('str', 'participants_groups')));
-						$rowBlock->assign('STATUS', Events::getEventStatus($row['id_event']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));
+						$rowBlock->assign('PARTICIPANTS_COMMUNITY', str_replace('%MEMBERS%', Events::countMembers($row['event_id'], 'group'), core::getLanguage('str', 'participants_groups')));
+						$rowBlock->assign('STATUS', Events::getEventStatus($row['event_id']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));
 						$tpl->assign('row_community_events', $rowBlock);
 					}
 				else{

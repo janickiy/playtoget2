@@ -16,10 +16,10 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="col-lg-3 control-label" for="id_videoalbum">${STR_ALBUM}</label>
+      <label class="col-lg-3 control-label" for="videoalbum_id">${STR_ALBUM}</label>
       <div class="col-lg-6">
         <div class="styled-select styled-select-4">
-        <select name="id_videoalbum">
+        <select name="videoalbum_id">
           <!-- BEGIN row_option_videoalbum -->
           <option value="${ID}" <!-- IF '${ID_PHOTOALBUM}' == '${ID}' -->selected="selected"<!-- END IF -->>${NAME}
           </option>

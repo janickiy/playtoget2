@@ -14,14 +14,14 @@ $(document).on('click', '#remove_this', function () {
             const status_user = data.item[i].status_user == 'online' ? 'online' : '';
 
             let makeup = '';
-            makeup += '<div class="col-xs-6 possible-friend-cart" data-num="' + data.item[i].id_user + '">';
-            makeup += '<a class="possible-avatar" href="./?task=profile&id_user=' + data.item[i].id_user + '"><img src="' + data.item[i].avatar + '" alt=""></a>';
-            makeup += '<a href="./?task=profile&id_user=' + data.item[i].id_user + '"><h5><strong>' + data.item[i].firstname + '<span class="status_user ' + status_user + '" data-num="' + data.item[i].id_user + '"></span> <br />' + data.item[i].lastname + '</strong></h5></a>';
+            makeup += '<div class="col-xs-6 possible-friend-cart" data-num="' + data.item[i].user_id + '">';
+            makeup += '<a class="possible-avatar" href="./?task=profile&user_id=' + data.item[i].user_id + '"><img src="' + data.item[i].avatar + '" alt=""></a>';
+            makeup += '<a href="./?task=profile&user_id=' + data.item[i].user_id + '"><h5><strong>' + data.item[i].firstname + '<span class="status_user ' + status_user + '" data-num="' + data.item[i].user_id + '"></span> <br />' + data.item[i].lastname + '</strong></h5></a>';
             if (data.item[i].city != '' && data.item[i].city != null) makeup += '<p>' + data.item[i].city + '</p>';
             makeup += '';
             makeup += '<div class="control">';
-            makeup += '<span><a onclick="add_as_friend(' + data.item[i].id_user + ');" data-tooltip="Добавить в друзья"><img src="./templates/images/icon-ok.png" alt=""/></a></span>';
-            makeup += '<span><img src="./templates/images/icon-krest.png" alt="" id="remove_this" data-num="' + data.item[i].id_user + '"  data-tooltip="Больше не показывать"/></span>';
+            makeup += '<span><a onclick="add_as_friend(' + data.item[i].user_id + ');" data-tooltip="Добавить в друзья"><img src="./templates/images/icon-ok.png" alt=""/></a></span>';
+            makeup += '<span><img src="./templates/images/icon-krest.png" alt="" id="remove_this" data-num="' + data.item[i].user_id + '"  data-tooltip="Больше не показывать"/></span>';
             makeup += '</div></div>';
 
             $('#possible-friend').append(makeup);
@@ -41,14 +41,14 @@ $(document).on("click", "#show-possible_friends", function () {
 
                 const status_user = data.item[i].status_user == 'online' ? 'online' : '';
 
-                makeup += '<div class="col-xs-6 possible-friend-cart" data-num="' + data.item[i].id_user + '">';
-                makeup += '<a class="possible-avatar" href="./?task=profile&id_user=' + data.item[i].id_user + '"><img src="' + data.item[i].avatar + '" alt=""></a>';
-                makeup += '<a href="./?task=profile&id_user=' + data.item[i].id_user + '"><h5><strong>' + data.item[i].firstname + '<span class="status_user ' + status_user + '" data-num="' + data.item[i].id_user + '"></span> <br />' + data.item[i].lastname + '</strong></h5></a>';
+                makeup += '<div class="col-xs-6 possible-friend-cart" data-num="' + data.item[i].user_id + '">';
+                makeup += '<a class="possible-avatar" href="./?task=profile&user_id=' + data.item[i].user_id + '"><img src="' + data.item[i].avatar + '" alt=""></a>';
+                makeup += '<a href="./?task=profile&user_id=' + data.item[i].user_id + '"><h5><strong>' + data.item[i].firstname + '<span class="status_user ' + status_user + '" data-num="' + data.item[i].user_id + '"></span> <br />' + data.item[i].lastname + '</strong></h5></a>';
                 if (data.item[i].city != '' && data.item[i].city != null) makeup += '<p>' + data.item[i].city + '</p>';
                 makeup += '';
                 makeup += '<div class="control">';
-                makeup += '<span><a onclick="add_as_friend(' + data.item[i].id_user + ');"  data-tooltip="Добавить в друзья"><img src="./templates/images/icon-ok.png" alt=""/></a></span>';
-                makeup += '<span><img src="./templates/images/icon-krest.png" alt="" id="remove_this" data-num="' + data.item[i].id_user + '"  data-tooltip="Больше не показывать"/></span>';
+                makeup += '<span><a onclick="add_as_friend(' + data.item[i].user_id + ');"  data-tooltip="Добавить в друзья"><img src="./templates/images/icon-ok.png" alt=""/></a></span>';
+                makeup += '<span><img src="./templates/images/icon-krest.png" alt="" id="remove_this" data-num="' + data.item[i].user_id + '"  data-tooltip="Больше не показывать"/></span>';
                 makeup += '</div></div>';
             }
 

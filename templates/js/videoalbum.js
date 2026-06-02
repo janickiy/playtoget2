@@ -52,12 +52,12 @@ function getVideoInfo(id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=getvideoinfo',
-        data: 'id_video=' + id,
+        data: 'video_id=' + id,
         success: function (data) {
             //console.log(data);
             if (data.status === 1) {
-                $('#id_owner').val(data.id_owner);
-                $('#name_video').html('<a href="./?task=profile&id_user=' + data.id_owner + '">' + data.firstname + ' ' + data.lastname + '</a>');
+                $('#owner_id').val(data.owner_id);
+                $('#name_video').html('<a href="./?task=profile&user_id=' + data.owner_id + '">' + data.firstname + ' ' + data.lastname + '</a>');
                 $('#date_video .data').html(data.created);
                 $('#video_big').find('.tell').html(data.tell).attr('id', 'tell-video-' + id).attr('data-item', id).attr('data-type', 'video');
                 $('#video_big').find('.liked').html(data.liked).attr('id', 'like-video-' + id).attr('data-item', id).attr('data-type', 'video');
@@ -89,7 +89,7 @@ $(document).on('click', '.video_prev', function () {
     $('.loading-bar').show();
     $('#video_big').find('.video_wrap').hide();
     const num = $(this).attr('data-num');
-    $('#video_big').find('#id_content').val(num);
+    $('#video_big').find('#content_id').val(num);
     $('body,html').css('overflow', 'hidden');
     $('#video_big').show();
     $('#video_big').animate({scrollTop: 0}, 0);
@@ -100,7 +100,7 @@ $(document).on('click', '.video_prev', function () {
 $(document).on('click', '#next_video', function () {
     $('.loading-bar').show();
     $('#video_big').find('.video_wrap').hide();
-    const id = $('#id_content').val();
+    const id = $('#content_id').val();
     let index_new = 0;
     const index = parseInt($.inArray(id, mass_video));
     if (index === count - 1) {
@@ -108,7 +108,7 @@ $(document).on('click', '#next_video', function () {
     } else {
         index_new = index + 1;
     }
-    $('#id_content').val(mass_video[index_new]);
+    $('#content_id').val(mass_video[index_new]);
     getVideoInfo(mass_video[index_new]);
 })
 
@@ -116,7 +116,7 @@ $(document).on('click', '#next_video', function () {
 $(document).on('click', '#prev_video', function () {
     $('.loading-bar').show();
     $('#video_big').find('.video_wrap').hide();
-    const id = $('#id_content').val();
+    const id = $('#content_id').val();
     let index_new = 0;
     const index = parseInt($.inArray(id, mass_video));
     if (index === 0) {
@@ -124,7 +124,7 @@ $(document).on('click', '#prev_video', function () {
     } else {
         index_new = index - 1;
     }
-    $('#id_content').val(mass_video[index_new]);
+    $('#content_id').val(mass_video[index_new]);
     getVideoInfo(mass_video[index_new]);
 })
 
@@ -148,7 +148,7 @@ $(document).on("click", ".show-pop-video-block", function () {
 
 $(document).on("click", ".reply", function () {
     const IdComment = $(this).attr('data-item');
-    const IdParent = $('#id_content').val();
+    const IdParent = $('#content_id').val();
     $('.reply').show();
     $(this).hide();
     $('.my-comment').remove();
@@ -159,9 +159,9 @@ $(document).on("click", ".reply", function () {
     ReplyForm += '</div>';
     ReplyForm += '<form autocomplete="off" id="reply-form-' + IdComment + '" data-num = ' + IdComment + ' action="">';
     ReplyForm += '<input type="hidden" name="commentable_type" value="video">';
-    ReplyForm += '<input type="hidden" name="id_content" value="' + IdParent + '">';
-    ReplyForm += '<input type="hidden" name="id_user" value="' + id_user + '">';
-    ReplyForm += '<input type="hidden" name="id_parent" value="' + IdComment + '">';
+    ReplyForm += '<input type="hidden" name="content_id" value="' + IdParent + '">';
+    ReplyForm += '<input type="hidden" name="user_id" value="' + user_id + '">';
+    ReplyForm += '<input type="hidden" name="parent_id" value="' + IdComment + '">';
     ReplyForm += '<input type="file" class="file_name" name="file_name[]" data-num="' + IdComment + '" multiple/>';
     ReplyForm += '<input id="comment" name="comment" type="text" data-num="' + IdComment + '" placeholder="' + placeholder + '">';
     ReplyForm += '<div class="smile-files">';

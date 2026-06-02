@@ -6,7 +6,7 @@ class Communities
 {
 	static function getAllCommunitiesList($type, $limit, $offset = 0)
 	{
-		$from = "" . core::database()->getTableName('communities') . " a LEFT JOIN " . core::database()->getTableName('community_roles') . " b ON b.id_community=a.id";
+		$from = "" . core::database()->getTableName('communities') . " a LEFT JOIN " . core::database()->getTableName('community_roles') . " b ON b.community_id=a.id";
 		
 		$place = core::database()->escape(Core_Array::getRequest('place'));
 		$sport = core::database()->escape(Core_Array::getRequest('sport'));
@@ -32,14 +32,14 @@ class Communities
 			if(!empty($place)) $additional_pars .= " AND (a.place LIKE '" . $place . "')";
 			if(!empty($sport)) $additional_pars .= " AND (a.sport_type LIKE '" . $sport . "')";
 			
-			$parameters = "*,DATE_FORMAT(created_at,'%d.%m.%y') as putdate_created, a.id as id_community";
+			$parameters = "*,DATE_FORMAT(created_at,'%d.%m.%y') as putdate_created, a.id as community_id";
 			$where = "WHERE (a.type='" . $type . "') AND (a.banned!=1) ".((!empty($tmp)) ? 'AND' : '')." " . $tmp . "" . $additional_pars . "";
 			$group = "GROUP BY a.id";
 			$order = "ORDER BY a.name";
 			$limit = "LIMIT ".$limit." OFFSET ".$offset."";
          
         } else {
-			$parameters = "*,DATE_FORMAT(created_at,'%d.%m.%y') as putdate_created, a.id as id_community";
+			$parameters = "*,DATE_FORMAT(created_at,'%d.%m.%y') as putdate_created, a.id as community_id";
 			$where = "WHERE (a.type='" . $type . "') AND (a.banned!=1)";
 			$group = "GROUP BY a.id";
 			$order = "ORDER BY a.name";
@@ -87,13 +87,13 @@ class Communities
         return core::database()->getRecordCount($result);		
 	}
 	
-	static function getMyCommunitiesList($id_user, $type, $limit=5, $offset=0)
+	static function getMyCommunitiesList($user_id, $type, $limit=5, $offset=0)
 	{
-		if($id_user && $type){
+		if($user_id && $type){
 		
-			$query = "SELECT *, c.id as id_community FROM " . core::database()->getTableName('communities') . " c 
-					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.id_community=c.id 
-					WHERE (r.id_user=" . $id_user . ") AND (c.type='" . $type . "') AND (c.banned!=1) AND (r.role IN (1,2,3))
+			$query = "SELECT *, c.id as community_id FROM " . core::database()->getTableName('communities') . " c 
+					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.community_id=c.id 
+					WHERE (r.user_id=" . $user_id . ") AND (c.type='" . $type . "') AND (c.banned!=1) AND (r.role IN (1,2,3))
 					GROUP BY c.id
 					ORDER by r.role 					
 					LIMIT " . $limit . " OFFSET " . $offset ."";
@@ -104,13 +104,13 @@ class Communities
 		}		
 	}
 
-	static function countMemberCommunity($id_community, $role){
+	static function countMemberCommunity($community_id, $role){
 		
-		if($id_community && $role){
+		if($community_id && $role){
 			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " a 
-					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.id_user 
-					WHERE role=" . $role . " AND a.id_community=" . $id_community . "
-					GROUP by a.id_user";
+					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.user_id 
+					WHERE role=" . $role . " AND a.community_id=" . $community_id . "
+					GROUP by a.user_id";
 					
 			$result = core::database()->querySQL($query);			
 		
@@ -118,13 +118,13 @@ class Communities
 		}		
 	}
 	
-	static function getMemberList($id_community, $role)
+	static function getMemberList($community_id, $role)
 	{
-		if($id_community && $role){
-			$query = "SELECT *, b.id AS id_user FROM " . core::database()->getTableName('community_roles') . " a 
-						LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.id_user 
-						WHERE role=" . $role . " AND a.id_community=" . $id_community . "
-						GROUP by a.id_user";
+		if($community_id && $role){
+			$query = "SELECT *, b.id AS user_id FROM " . core::database()->getTableName('community_roles') . " a 
+						LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.user_id 
+						WHERE role=" . $role . " AND a.community_id=" . $community_id . "
+						GROUP by a.user_id";
 					
 			$result = core::database()->querySQL($query);
 		
@@ -132,13 +132,13 @@ class Communities
 		}		
 	}
 	
-	static function getMemberAllList($id_community)
+	static function getMemberAllList($community_id)
 	{
-		if($id_community){
-			$query = "SELECT *, b.id AS id_user FROM " . core::database()->getTableName('community_roles') . " a 
-					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.id_user 
-					WHERE (role IN (1,2,3)) AND (a.id_community=" . $id_community . ")
-					GROUP by a.id_user
+		if($community_id){
+			$query = "SELECT *, b.id AS user_id FROM " . core::database()->getTableName('community_roles') . " a 
+					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.user_id 
+					WHERE (role IN (1,2,3)) AND (a.community_id=" . $community_id . ")
+					GROUP by a.user_id
 					ORDER by a.role
 					";
 					
@@ -148,13 +148,13 @@ class Communities
 		}		
 	}
 	
-	static function countAllMemberCommunity($id_community){
+	static function countAllMemberCommunity($community_id){
 		
-		if($id_community){
+		if($community_id){
 			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " a 
-					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.id_user 
-					WHERE (role IN (1,2,3)) AND (a.id_community=" . $id_community . ")
-					GROUP by a.id_user";
+					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.user_id 
+					WHERE (role IN (1,2,3)) AND (a.community_id=" . $community_id . ")
+					GROUP by a.user_id";
 					
 			$result = core::database()->querySQL($query);			
 		
@@ -162,12 +162,12 @@ class Communities
 		}
 	}
 	
-	static function getNumberMyCommunities($id_user, $type)
+	static function getNumberMyCommunities($user_id, $type)
 	{
-		if($id_user && $type){		
+		if($user_id && $type){		
 			$query = "SELECT * FROM " . core::database()->getTableName('communities') . " c 
-					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.id_community=c.id
-					WHERE (r.id_user=" . $id_user . ") AND (c.type='" . $type . "') AND (c.banned!=1) AND (role IN (1,2,3)) 
+					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.community_id=c.id
+					WHERE (r.user_id=" . $user_id . ") AND (c.type='" . $type . "') AND (c.banned!=1) AND (role IN (1,2,3)) 
 					GROUP BY c.id";
 	
 			$result = core::database()->querySQL($query);
@@ -176,10 +176,10 @@ class Communities
 		}
 	}	
 
-	static function getUserStatus($id_community, $id_user)
+	static function getUserStatus($community_id, $user_id)
 	{
-		if($id_user && $id_community) {
-			$query = "SELECT role FROM " . core::database()->getTableName('community_roles') . " WHERE id_community=" . $id_community . " AND id_user=" . $id_user;
+		if($user_id && $community_id) {
+			$query = "SELECT role FROM " . core::database()->getTableName('community_roles') . " WHERE community_id=" . $community_id . " AND user_id=" . $user_id;
 			$result = core::database()->querySQL($query);
 			$row = core::database()->getRow($result);
 		
@@ -200,7 +200,7 @@ class Communities
 	static function getCommunitySettings($id)
 	{
 		if($id){
-			$query = "SELECT * FROM " . core::database()->getTableName('communities_settings') . " WHERE id_community=" . $id;
+			$query = "SELECT * FROM " . core::database()->getTableName('communities_settings') . " WHERE community_id=" . $id;
 			$result = core::database()->querySQL($query);
 		
 			return core::database()->getRow($result);
@@ -210,8 +210,8 @@ class Communities
 	static function getPopularCommunitiesList($type, $limit = 5, $offset = 0)
 	{
 		if($type){
-			$query = "SELECT *, sum(b.id_user) pop, a.id AS id_community FROM " . core::database()->getTableName('communities') . " a 
-					INNER JOIN  " . core::database()->getTableName('community_roles') . " b ON b.id_community = a.id
+			$query = "SELECT *, sum(b.user_id) pop, a.id AS community_id FROM " . core::database()->getTableName('communities') . " a 
+					INNER JOIN  " . core::database()->getTableName('community_roles') . " b ON b.community_id = a.id
 					WHERE (a.type='" . $type. "') AND (a.banned!=1)
 					GROUP by a.id
 					ORDER by pop DESC
@@ -226,8 +226,8 @@ class Communities
 	static function getNumberPopularCommunities($type)
 	{
 		if($type){
-			$query = "SELECT sum(b.id_user) pop FROM " . core::database()->getTableName('communities') . " a 
-					INNER JOIN  " . core::database()->getTableName('community_roles') . " b ON b.id_community = a.id
+			$query = "SELECT sum(b.user_id) pop FROM " . core::database()->getTableName('communities') . " a 
+					INNER JOIN  " . core::database()->getTableName('community_roles') . " b ON b.community_id = a.id
 					WHERE (a.type='" . $type . "') AND (a.banned!=1)
 					GROUP by a.id";
 					
@@ -237,10 +237,10 @@ class Communities
 		}		
 	}
 	
-	static function checkOwnerCommunity($id_community, $id_user)
+	static function checkOwnerCommunity($community_id, $user_id)
 	{
-		if($id_community && $id_user){
-			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE (id_community=" . $id_community . ") and (id_user=" . $id_user . ") and (role=1)";
+		if($community_id && $user_id){
+			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE (community_id=" . $community_id . ") and (user_id=" . $user_id . ") and (role=1)";
 			$result = core::database()->querySQL($query);
 		
 			if(core::database()->getRecordCount($result) == 0) 
@@ -250,10 +250,10 @@ class Communities
 		}
 	}
 	
-	static function checkAdminCommunity($id_community, $id_user)
+	static function checkAdminCommunity($community_id, $user_id)
 	{
-		if($id_community && $id_user){
-			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE (id_community=" . $id_community . ") and (id_user=" . $id_user . ") and (role=2)";
+		if($community_id && $user_id){
+			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE (community_id=" . $community_id . ") and (user_id=" . $user_id . ") and (role=2)";
 			$result = core::database()->querySQL($query);
 		
 			if(core::database()->getRecordCount($result) == 0) 
@@ -273,7 +273,7 @@ class Communities
 			return core::getLanguage('str', 'admin');		
 	}
 	
-	static function addNewCommunity($fields, $id_user)
+	static function addNewCommunity($fields, $user_id)
 	{
 		$insert_id = core::database()->insert($fields, core::database()->getTableName('communities'));
 		
@@ -299,8 +299,8 @@ class Communities
 			
 			$fields = array();
 			$fields['id'] = 0;
-			$fields['id_user'] = $id_user;
-			$fields['id_community'] = $insert_id;
+			$fields['user_id'] = $user_id;
+			$fields['community_id'] = $insert_id;
 			$fields['role'] = 1;		
 			
 			core::database()->insert($fields, core::database()->getTableName('community_roles'));
@@ -309,7 +309,7 @@ class Communities
 		}			
 	}	
 	
-	static function editCommunity($fields, $settings, $type, $id_community)
+	static function editCommunity($fields, $settings, $type, $community_id)
 	{
 		if($fields['avatar'] && file_exists('tmp/' . $fields['avatar'])){
 			if($type == 'group')
@@ -317,7 +317,7 @@ class Communities
 			else if($type == 'team')
 				$path = PATH_TEAMCONTENT_AVATAR_IMAGES;
 			
-			$query = "SELECT avatar FROM " . core::database()->getTableName('communities') . " WHERE id=" . $id_community;
+			$query = "SELECT avatar FROM " . core::database()->getTableName('communities') . " WHERE id=" . $community_id;
 			$result =  core::database()->querySQL($query);
 			$row = core::database()->getRow($result);
 			
@@ -332,7 +332,7 @@ class Communities
 			else if($type == 'team')
 				$path = PATH_TEAMCONTENT_COVER_PAGE_IMAGES;
 			
-			$query = "SELECT cover_page FROM " . core::database()->getTableName('communities') . " WHERE id=" . $id_community;
+			$query = "SELECT cover_page FROM " . core::database()->getTableName('communities') . " WHERE id=" . $community_id;
 			$result =  core::database()->querySQL($query);
 			$row = core::database()->getRow($result);
 			
@@ -346,12 +346,12 @@ class Communities
 		core::database()->querySQL('SET AUTOCOMMIT=0');
 		core::database()->querySQL('START TRANSACTION');
 		
-		if(!core::database()->update($fields, core::database()->getTableName('communities'), "id=" . $id_community)) {
+		if(!core::database()->update($fields, core::database()->getTableName('communities'), "id=" . $community_id)) {
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}		
 			
-		$query = "SELECT * FROM " . core::database()->getTableName('communities_settings') . " WHERE id_community=" . $id_community;
+		$query = "SELECT * FROM " . core::database()->getTableName('communities_settings') . " WHERE community_id=" . $community_id;
 		$result = core::database()->querySQL($query);		
 		
 		if(core::database()->getRecordCount($result) == 0){
@@ -361,7 +361,7 @@ class Communities
 			$set_community['permission_photo'] = $settings['permission_photo'];			
 			$set_community['permission_video'] = $settings['permission_video'];			
 			$set_community['type'] = $settings['type'];			
-			$set_community['id_community'] = $id_community;
+			$set_community['community_id'] = $community_id;
 			
 			if(!core::database()->insert($set_community, core::database()->getTableName('communities_settings'))) {
 				$result = FALSE;
@@ -375,7 +375,7 @@ class Communities
 			$set_community['permission_video'] = $settings['permission_video'];			
 			$set_community['type'] = $settings['type'];					
 
-			if(!core::database()->update($set_community, core::database()->getTableName('communities_settings'), "id_community=" . $id_community)) {
+			if(!core::database()->update($set_community, core::database()->getTableName('communities_settings'), "community_id=" . $community_id)) {
 				$result = FALSE;			
 				core::database()->querySQL('ROLLBACK');
 			}
@@ -387,10 +387,10 @@ class Communities
 		return $result;
 	}	
 	
-	static function getMemberShipStatus($id_community, $id_user)
+	static function getMemberShipStatus($community_id, $user_id)
 	{
-		if($id_community && $id_user){
-			$query = "SELECT role FROM " . core::database()->getTableName('community_roles') . " WHERE id_community=" . $id_community . " AND id_user=" . $id_user;
+		if($community_id && $user_id){
+			$query = "SELECT role FROM " . core::database()->getTableName('community_roles') . " WHERE community_id=" . $community_id . " AND user_id=" . $user_id;
 			$result = core::database()->querySQL($query);
 		
 			$row = core::database()->getRow($result);
@@ -399,10 +399,10 @@ class Communities
 		}
 	}
 	
-	static function checkExistence($id_community, $type)
+	static function checkExistence($community_id, $type)
 	{
-		if($id_community && $type){
-			$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE type='" . $type . "' AND id=" . $id_community;
+		if($community_id && $type){
+			$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE type='" . $type . "' AND id=" . $community_id;
 			$result = core::database()->querySQL($query);
 		
 			if(core::database()->getRecordCount($result) == 0)
@@ -412,69 +412,69 @@ class Communities
 		}		
 	}
 	
-	static function getPermissionWall($permission, $id_community, $id_user)
+	static function getPermissionWall($permission, $community_id, $user_id)
 	{
 		if($permission == 1)
 			return FALSE;
 		else if($permission == 2){
-			if(Communities::checkOwnerCommunity($id_community, $id_user) or Communities::checkAdminCommunity($id_community, $id_user))
+			if(Communities::checkOwnerCommunity($community_id, $user_id) or Communities::checkAdminCommunity($community_id, $user_id))
 				return TRUE;
-			else if(Communities::getMemberShipStatus($id_community, $id_user) == 2)
+			else if(Communities::getMemberShipStatus($community_id, $user_id) == 2)
 				return TRUE;
 			else
 				return FALSE;
 		}		
 		else if($permission == 3){
-			if(Communities::checkOwnerCommunity($id_community, $id_user) or Communities::checkAdminCommunity($id_community, $id_user))
+			if(Communities::checkOwnerCommunity($community_id, $user_id) or Communities::checkAdminCommunity($community_id, $user_id))
 				return TRUE;
 			else
 				return FALSE;
 		}
-		else if(Communities::getMemberShipStatus($id_community, $id_user) == 4)
+		else if(Communities::getMemberShipStatus($community_id, $user_id) == 4)
 			return FALSE;
 		else 
 			return TRUE;
 	}
 	
-	static function getPermissionPhoto($permission, $id_community, $id_user)
+	static function getPermissionPhoto($permission, $community_id, $user_id)
 	{
 		if($permission == 1)
 			return FALSE;
 		else if($permission == 2)
-			if(Communities::checkOwnerCommunity($id_community, $id_user) or Communities::checkAdminCommunity($id_community, $id_user))
+			if(Communities::checkOwnerCommunity($community_id, $user_id) or Communities::checkAdminCommunity($community_id, $user_id))
 				return TRUE;
-			else if(Communities::getMemberShipStatus($id_community, $id_user) == 2)
+			else if(Communities::getMemberShipStatus($community_id, $user_id) == 2)
 				return TRUE;
 			else
 				return FALSE;
-		else if(Communities::getMemberShipStatus($id_community, $id_user) == 4)
+		else if(Communities::getMemberShipStatus($community_id, $user_id) == 4)
 			return FALSE;
 		else 
 			return TRUE;		
 	}		
 
-	static function getPermissionVideo($permission, $id_community, $id_user)
+	static function getPermissionVideo($permission, $community_id, $user_id)
 	{
 		if($permission == 1)
 			return FALSE;
 		else if($permission == 2)
-			if(Communities::checkOwnerCommunity($id_community, $id_user) or Communities::checkAdminCommunity($id_community, $id_user))
+			if(Communities::checkOwnerCommunity($community_id, $user_id) or Communities::checkAdminCommunity($community_id, $user_id))
 				return TRUE;
-			else if(Communities::getMemberShipStatus($id_community, $id_user) == 2)
+			else if(Communities::getMemberShipStatus($community_id, $user_id) == 2)
 				return TRUE;
 			else
 				return FALSE;
-		else if(Communities::getMemberShipStatus($id_community, $id_user) == 4)
+		else if(Communities::getMemberShipStatus($community_id, $user_id) == 4)
 			return FALSE;
 		else 
 			return TRUE;
 		
 	}	
 	
-	static function getCommunityType($id_community)
+	static function getCommunityType($community_id)
 	{
-		if($id_community){
-			$query = "SELECT type FROM " . core::database()->getTableName('communities_settings') . " WHERE id_community=" . $id_community;
+		if($community_id){
+			$query = "SELECT type FROM " . core::database()->getTableName('communities_settings') . " WHERE community_id=" . $community_id;
 			$result = core::database()->querySQL($query);
 		
 			$row = core::database()->getRow($result);
@@ -483,30 +483,30 @@ class Communities
 		}
 	}
 	
-	static function changememberstatus($id_community, $id_user, $status)
+	static function changememberstatus($community_id, $user_id, $status)
 	{
 		if($status == 1){
-			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE id_community=" . $id_community . " AND id_user=" . $id_user;
+			$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE community_id=" . $community_id . " AND user_id=" . $user_id;
 			$result = core::database()->querySQL($query);
 			
 			if(core::database()->getRecordCount($result) == 0){			
 				
-				$communitysettings = Communities::getCommunitySettings($id_community);
+				$communitysettings = Communities::getCommunitySettings($community_id);
 				
 				$fields = array();				
 				
 				if($communitysettings['type'] == 0 or !$communitysettings['type']){
 					$fields['id'] = 0;				
-					$fields['id_user'] = $id_user;
-					$fields['id_community'] = $id_community;
+					$fields['user_id'] = $user_id;
+					$fields['community_id'] = $community_id;
 					$fields['role'] = 2;
 					
 					$result = core::database()->insert($fields, core::database()->getTableName('community_roles'));
 				} 
 				else if($communitysettings['type'] == 1){
 					$fields['id'] = 0;				
-					$fields['id_user'] = $id_user;
-					$fields['id_community'] = $id_community;
+					$fields['user_id'] = $user_id;
+					$fields['community_id'] = $community_id;
 					$fields['role'] = 0;
 					
 					$result = core::database()->insert($fields, core::database()->getTableName('community_roles'));
@@ -518,7 +518,7 @@ class Communities
 					return FALSE;
 			}
 			else{
-				$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE id_community=" . $id_community . " AND id_user=" . $id_user;
+				$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE community_id=" . $community_id . " AND user_id=" . $user_id;
 				$result = core::database()->querySQL($query);
 				$row = core::database()->getRow($result);
 				
@@ -526,7 +526,7 @@ class Communities
 					$fields = array();
 					$fields['role'] = 2;
 			
-					$update = core::database()->update($fields, core::database()->getTableName('community_roles'), "id_community=" . $id_community . " AND id_user=" . $id_user); 
+					$update = core::database()->update($fields, core::database()->getTableName('community_roles'), "community_id=" . $community_id . " AND user_id=" . $user_id); 
 			
 					if($update) 
 						return TRUE;
@@ -538,7 +538,7 @@ class Communities
 			}
 		}
 		else if($status == 0){
-			if(core::database()->delete(core::database()->getTableName('community_roles'), "id_community=" . $id_community . " AND id_user=" . $id_user, '')){
+			if(core::database()->delete(core::database()->getTableName('community_roles'), "community_id=" . $community_id . " AND user_id=" . $user_id, '')){
 				return TRUE;
 			}
 			else{
@@ -547,16 +547,16 @@ class Communities
 		}
 	}
 
-	static function change_community_role($id_community, $id_user, $role)
+	static function change_community_role($community_id, $user_id, $role)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE id_community=" . $id_community . " AND id_user=" . $id_user;
+		$query = "SELECT * FROM " . core::database()->getTableName('community_roles') . " WHERE community_id=" . $community_id . " AND user_id=" . $user_id;
 		$result = core::database()->querySQL($query);
 			
 		if(core::database()->getRecordCount($result) == 0){			
 			$fields = array();
 			$fields['id'] = 0;				
-			$fields['id_user'] = $id_user;
-			$fields['id_community'] = $id_community;
+			$fields['user_id'] = $user_id;
+			$fields['community_id'] = $community_id;
 			$fields['role'] = $role;
 				
 			$result = core::database()->insert($fields, core::database()->getTableName('community_roles'));
@@ -570,16 +570,16 @@ class Communities
 			$fields = array();
 			$fields['role'] = $role;
 			
-			if(core::database()->update($fields, core::database()->getTableName('community_roles'), "id_community=" . $id_community . " AND id_user=" . $id_user))
+			if(core::database()->update($fields, core::database()->getTableName('community_roles'), "community_id=" . $community_id . " AND user_id=" . $user_id))
 				return TRUE;
 			else
 				return FALSE;	
 		}
 	}
 	
-	static function remove_community_role($id_community, $id_user)
+	static function remove_community_role($community_id, $user_id)
 	{
-		if(core::database()->delete(core::database()->getTableName('community_roles'), "id_community=" . $id_community . " AND id_user=" . $id_user, '')){
+		if(core::database()->delete(core::database()->getTableName('community_roles'), "community_id=" . $community_id . " AND user_id=" . $user_id, '')){
 			return TRUE;
 		}
 		else{
@@ -587,11 +587,11 @@ class Communities
 		}
 	}	
 	
-	static function getInvitedMeCommunity($id_user, $type, $limit, $offset = 0)
+	static function getInvitedMeCommunity($user_id, $type, $limit, $offset = 0)
 	{
-		$query = "SELECT *, c.id as id_community FROM " . core::database()->getTableName('communities') . " c 
-					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.id_community=c.id 
-					WHERE (r.id_user=" . $id_user . ") AND (c.type='" . $type . "') AND (r.role=5) AND (c.banned!=1)
+		$query = "SELECT *, c.id as community_id FROM " . core::database()->getTableName('communities') . " c 
+					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.community_id=c.id 
+					WHERE (r.user_id=" . $user_id . ") AND (c.type='" . $type . "') AND (r.role=5) AND (c.banned!=1)
 					GROUP BY c.id
 					ORDER by r.role 					
 					LIMIT " . $limit . " OFFSET " . $offset ."";
@@ -601,11 +601,11 @@ class Communities
 		return core::database()->getColumnArray($result);	
 	}
 	
-	static function getNumberInvitedMeCommunities($id_user, $type)
+	static function getNumberInvitedMeCommunities($user_id, $type)
 	{
 		$query = "SELECT * FROM " . core::database()->getTableName('communities') . " c 
-					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.id_community=c.id
-					WHERE (r.id_user=" . $id_user . ") AND (c.type='" . $type . "') AND (r.role=5) AND (c.banned!=1)
+					LEFT JOIN " . core::database()->getTableName('community_roles') . " r ON r.community_id=c.id
+					WHERE (r.user_id=" . $user_id . ") AND (c.type='" . $type . "') AND (r.role=5) AND (c.banned!=1)
 					GROUP BY c.id";
 	
 		$result = core::database()->querySQL($query);

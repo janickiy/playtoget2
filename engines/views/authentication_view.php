@@ -34,9 +34,9 @@ if (isset($_GET['code'])) {
 		if($token['email']){
 		
 			if($data->checkExistUser($token['email'])){
-				$id_user = $data->getUserId($token['email']);
+				$user_id = $data->getUserId($token['email']);
 				
-				Auth::Login($id_user, 1);
+				Auth::Login($user_id, 1);
 				
 				header("Location: http://playtoget.com");
 				exit;	

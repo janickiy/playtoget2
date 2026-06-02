@@ -302,8 +302,8 @@ $(function() {
                       <div class="possible-friend my-friend">			
             		  <!-- BEGIN row_block_users -->
                       <div class="col-xs-6 possible-friend-cart" data-num='${ID_USER}'> 
-                        <a class="possible-avatar" href="./?task=profile&id_user=${ID_USER}"> <img src="${AVATAR}" alt=""> </a> 
-                        <a href="./?task=profile&id_user=${ID_USER}">
+                        <a class="possible-avatar" href="./?task=profile&user_id=${ID_USER}"> <img src="${AVATAR}" alt=""> </a> 
+                        <a href="./?task=profile&user_id=${ID_USER}">
                           <h5><strong>${FIRSTNAME} <br />
                             ${LASTNAME}</strong></h5>
                           </a>

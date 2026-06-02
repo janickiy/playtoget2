@@ -58,10 +58,10 @@ if($_POST['action']){
 		$fields['created_at'] = date("Y-m-d H:i:s");		
 		$fields['confirmation_sent_at'] = date("Y-m-d H:i:s");	
 
-		$id_user = $data->addUser($fields);
+		$user_id = $data->addUser($fields);
 		
-		if($id_user){
-			$confirm_link = "http://".$_SERVER['SERVER_NAME']."/?task=confirmation&id=".$id_user."&confirmation_token=".$token;
+		if($user_id){
+			$confirm_link = "http://".$_SERVER['SERVER_NAME']."/?task=confirmation&id=".$user_id."&confirmation_token=".$token;
 			$success_msg = core::getLanguage('msg', 'success_registration');
 			
 			$msg = core::getLanguage('msg', 'registration');

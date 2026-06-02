@@ -10,7 +10,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -56,7 +56,7 @@ if($_SESSION['user_authorization'] == "ok"){
 				$fields['name'] = $name;	
 				$fields['created_at'] = date("Y-m-d H:i:s");	
 				$fields['photoalbumable_type'] = 'user';
-				$fields['id_owner'] = $user['id'];
+				$fields['owner_id'] = $user['id'];
 			
 				$result = Photoalbum::createAlbum($fields);	
 
@@ -178,7 +178,7 @@ if($_SESSION['user_authorization'] == "ok"){
 			$fields['name'] = core::getLanguage('str', 'my_album');
 			$fields['created_at'] = date("Y-m-d H:i:s");
 			$fields['photoalbumable_type'] = 'user';
-			$fields['id_owner'] = $user['id'];		
+			$fields['owner_id'] = $user['id'];		
 			
 			Photoalbum::createAlbum($fields);	
 		}	
@@ -212,10 +212,10 @@ if($_SESSION['user_authorization'] == "ok"){
 		$tpl->assign('BUTTON', core::getLanguage('button', 'edit'));	
 	}
 	else{	
-		$id_user = $_GET['id_user'] ? core::database()->escape((int)Core_Array::getRequest('id_user')) : $user['id'];
-		$tpl->assign('ID_OWNER', $id_user);
+		$user_id = $_GET['user_id'] ? core::database()->escape((int)Core_Array::getRequest('user_id')) : $user['id'];
+		$tpl->assign('ID_OWNER', $user_id);
 	
-		if($_GET['id_user'] == $user['id'] or !$_GET['id_user']){ 
+		if($_GET['user_id'] == $user['id'] or !$_GET['user_id']){ 
 			$tpl->assign('SHOW_ADD_PHOTOS_MENU', 'show');
 		}		
 		
@@ -251,7 +251,7 @@ if($_SESSION['user_authorization'] == "ok"){
 					$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], $info['photoalbumable_type']));
 					$rowBlock->assign('DESCRIPTION', $row['description']);
 				
-					if($row['id_owner'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
+					if($row['owner_id'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');
 					
 					$rowBlock->assign('STR_REMOVE_PHOTO', core::getLanguage('str', 'remove_photo'));
 					$tpl->assign('row_photos_list', $rowBlock);	
@@ -267,20 +267,20 @@ if($_SESSION['user_authorization'] == "ok"){
 			$tpl->assign('STR_OR', core::getLanguage('str', 'or'));
 			$tpl->assign('STR_POPULAR_PHOTOS', core::getLanguage('str', 'popular_photos'));			
 			$tpl->assign('STR_SHOW_MORE', core::getLanguage('str', 'show_more'));		
-			$tpl->assign('STR_MY_ALBUMS', $_GET['id_user'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));	
-			$tpl->assign('STR_MY_PHOTOS', $_GET['id_user'] ? core::getLanguage('str', 'user_photos') : core::getLanguage('str', 'my_photos'));
-			$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos($id_user, 'user'));		
-			$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($id_user, 'user')+Photoalbum::getNumberAlbums($id_user, 'user_attach'));		
-			$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($id_user, 'user'));		
+			$tpl->assign('STR_MY_ALBUMS', $_GET['user_id'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));	
+			$tpl->assign('STR_MY_PHOTOS', $_GET['user_id'] ? core::getLanguage('str', 'user_photos') : core::getLanguage('str', 'my_photos'));
+			$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos($user_id, 'user'));		
+			$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($user_id, 'user')+Photoalbum::getNumberAlbums($user_id, 'user_attach'));		
+			$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($user_id, 'user'));		
 		
-			if(!isset($_GET['id_user'])&&$_GET['task'] == 'photoalbums'){
+			if(!isset($_GET['user_id'])&&$_GET['task'] == 'photoalbums'){
 				$arr_pop_photos = Photoalbum::getPopularPhotos('user',9, 0);
 			
 				if($arr_pop_photos){			
 					foreach($arr_pop_photos as $row){
 						$rowBlock = $tpl->fetch('row_pop_photos_list');
 						$rowBlock->assign('ID', $row['id']);
-						$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+						$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 						$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'user'));				
 						$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'user'));
 						$rowBlock->assign('DESCRIPTION', $row['description']);
@@ -290,8 +290,8 @@ if($_SESSION['user_authorization'] == "ok"){
 				else $tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));	
 			}else $tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));		
 		
-			$arr_albums = Photoalbum::getAlbumList($id_user, 'user');
-			$arr_albums = array_merge($arr_albums, Photoalbum::getAlbumList($id_user, 'user_attach'));
+			$arr_albums = Photoalbum::getAlbumList($user_id, 'user');
+			$arr_albums = array_merge($arr_albums, Photoalbum::getAlbumList($user_id, 'user_attach'));
 			
 			if($arr_albums){
 				foreach($arr_albums as $row){
@@ -314,7 +314,7 @@ if($_SESSION['user_authorization'] == "ok"){
 
 					$pic = Photoalbum::getMainImage($row['id']);
 				
-					if($_GET['id_user']) $rowBlock->assign('PROFILE_USER_ID', $_GET['id_user']);				
+					if($_GET['user_id']) $rowBlock->assign('PROFILE_USER_ID', $_GET['user_id']);				
 
 					if ($pic['small_photo'] && file_exists(core::documentparser()->photogalleryPic($pic['small_photo'], 'user'))){
 						$image = core::documentparser()->photogalleryPic($pic['small_photo'], 'user');
@@ -332,18 +332,18 @@ if($_SESSION['user_authorization'] == "ok"){
 				}
 			}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 	
-			$arr_photos = Photoalbum::getPhotosList($id_user, 'user', 6, 0);
+			$arr_photos = Photoalbum::getPhotosList($user_id, 'user', 6, 0);
 
 			if($arr_photos){
 				foreach($arr_photos as $row){
 					$rowBlock = $tpl->fetch('row_my_photos_list');
 					$rowBlock->assign('ID', $row['id']);
-					$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+					$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 					$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'user'));				
 					$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'user'));
 					$rowBlock->assign('DESCRIPTION', $row['description']);					
 				
-					if($row['id_owner'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');				
+					if($row['owner_id'] == $user['id']) $rowBlock->assign('ALLOW_EDIT', 'show');				
 
 					$rowBlock->assign('STR_REMOVE_PHOTO', core::getLanguage('str', 'remove_photo'));				
 					$tpl->assign('row_my_photos_list', $rowBlock);
@@ -396,8 +396,8 @@ else{
 	include_once "left_block.inc";
 	include_once "right_block.inc";
 	
-	$id_user = core::database()->escape((int)Core_Array::getRequest('id_user'));
-	$tpl->assign('ID_OWNER', $id_user);
+	$user_id = core::database()->escape((int)Core_Array::getRequest('user_id'));
+	$tpl->assign('ID_OWNER', $user_id);
 	
 	include_once "user_profile_info.inc";	
 	
@@ -435,20 +435,20 @@ else{
 		$tpl->assign('STR_OR', core::getLanguage('str', 'or'));
 		$tpl->assign('STR_POPULAR_PHOTOS', core::getLanguage('str', 'popular_photos'));			
 		$tpl->assign('STR_SHOW_MORE', core::getLanguage('str', 'show_more'));		
-		$tpl->assign('STR_MY_ALBUMS', $_GET['id_user'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));	
-		$tpl->assign('STR_MY_PHOTOS', $_GET['id_user'] ? core::getLanguage('str', 'user_photos') : core::getLanguage('str', 'my_photos'));
-		$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos($id_user, 'user'));		
-		$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($id_user, 'user')+Photoalbum::getNumberAlbums($id_user, 'user_attach'));		
-		$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($id_user, 'user'));		
+		$tpl->assign('STR_MY_ALBUMS', $_GET['user_id'] ? core::getLanguage('str', 'user_albums') : core::getLanguage('str', 'my_albums'));	
+		$tpl->assign('STR_MY_PHOTOS', $_GET['user_id'] ? core::getLanguage('str', 'user_photos') : core::getLanguage('str', 'my_photos'));
+		$tpl->assign('NUMBER_POPULAR_PHOTOS', Photoalbum::NumberTotalPopPhotos($user_id, 'user'));		
+		$tpl->assign('NUMBER_MY_ALBUMS', Photoalbum::getNumberAlbums($user_id, 'user')+Photoalbum::getNumberAlbums($user_id, 'user_attach'));		
+		$tpl->assign('NUMBER_MY_PHOTOS', Photoalbum::NumberPhotos($user_id, 'user'));		
 		
-		if(!isset($_GET['id_user']) && $_GET['task'] == 'photoalbums'){
+		if(!isset($_GET['user_id']) && $_GET['task'] == 'photoalbums'){
 			$arr_pop_photos = Photoalbum::getPopularPhotos('user',9, 0);
 			
 			if($arr_pop_photos){			
 				foreach($arr_pop_photos as $row){
 					$rowBlock = $tpl->fetch('row_pop_photos_list');
 					$rowBlock->assign('ID', $row['id']);
-					$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+					$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 					$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'user'));				
 					$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'user'));
 					$rowBlock->assign('DESCRIPTION', $row['description']);
@@ -458,8 +458,8 @@ else{
 			else $tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));	
 		}else $tpl->assign('NO_POP_PHOTOS', core::getLanguage('str', 'empty'));		
 		
-		$arr_albums = Photoalbum::getAlbumList($id_user, 'user');
-		$arr_albums = array_merge($arr_albums, Photoalbum::getAlbumList($id_user, 'user_attach'));
+		$arr_albums = Photoalbum::getAlbumList($user_id, 'user');
+		$arr_albums = array_merge($arr_albums, Photoalbum::getAlbumList($user_id, 'user_attach'));
 			
 		if($arr_albums){
 			foreach($arr_albums as $row){
@@ -477,7 +477,7 @@ else{
 				
 				$pic = Photoalbum::getMainImage($row['id']);
 				
-				if($_GET['id_user']) $rowBlock->assign('PROFILE_USER_ID', $_GET['id_user']);				
+				if($_GET['user_id']) $rowBlock->assign('PROFILE_USER_ID', $_GET['user_id']);				
 
 				if ($pic['small_photo'] && file_exists(core::documentparser()->photogalleryPic($pic['small_photo'], 'user'))){
 					$image = core::documentparser()->photogalleryPic($pic['small_photo'], 'user');
@@ -495,13 +495,13 @@ else{
 			}
 		}else $tpl->assign('NO_ALBUMS', core::getLanguage('str', 'empty'));
 	
-		$arr_photos = Photoalbum::getPhotosList($id_user, 'user', 6, 0);
+		$arr_photos = Photoalbum::getPhotosList($user_id, 'user', 6, 0);
 
 		if($arr_photos){
 			foreach($arr_photos as $row){
 				$rowBlock = $tpl->fetch('row_my_photos_list');
 				$rowBlock->assign('ID', $row['id']);
-				$rowBlock->assign('ID_PHOTO', $row['id_photo']);
+				$rowBlock->assign('ID_PHOTO', $row['photo_id']);
 				$rowBlock->assign('SMALL_IMAGE', core::documentparser()->photogalleryPic($row['small_photo'], 'user'));				
 				$rowBlock->assign('BIG_IMAGE', core::documentparser()->photogalleryPic($row['photo'], 'user'));
 				$rowBlock->assign('DESCRIPTION', $row['description']);					

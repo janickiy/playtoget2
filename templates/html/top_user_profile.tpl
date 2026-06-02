@@ -64,7 +64,7 @@
 
 
     <!-- IF '${SHOW_MESSAGES_LINK}' == 'show' -->
-    <div class="cover-buttons"> <a class="cover-send-message" href="./?task=profile&id_user=${ID_USER}&q=messages&sel=${PROFILE_ID_USER}">
+    <div class="cover-buttons"> <a class="cover-send-message" href="./?task=profile&user_id=${ID_USER}&q=messages&sel=${PROFILE_ID_USER}">
       <button class="btn btn-primary">${BUTTON_TOP_SEND_MESSAGE}</button>
       </a>
       <!-- END IF -->
@@ -108,7 +108,7 @@
       <!-- END IF -->
       </p>
       <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-      <a class='button_edit_groups' href="./?task=events&id_event=${ID_EVENT}&q=edit">${TOP_BUTTON_EDIT}</a>
+      <a class='button_edit_groups' href="./?task=events&event_id=${ID_EVENT}&q=edit">${TOP_BUTTON_EDIT}</a>
       <!-- END IF -->
     </h3>
     <!-- ELSE -->
@@ -138,9 +138,9 @@
       <!-- END IF -->
     </p>
     <!-- IF '${ALLOW_EDIT}' == 'yes' -->
-	<!-- IF '${COMMUNITY_TYPE}' == 'team' --><a class='button_edit_groups' href="./?task=teams&id_community=${ID_COMMUNITY}&q=edit">${TOP_BUTTON_EDIT}</a>
+	<!-- IF '${COMMUNITY_TYPE}' == 'team' --><a class='button_edit_groups' href="./?task=teams&community_id=${ID_COMMUNITY}&q=edit">${TOP_BUTTON_EDIT}</a>
 	<!-- ELSE IF '${COMMUNITY_TYPE}' == 'group' -->
-	<a class='button_edit_groups' href="./?task=groups&id_community=${ID_COMMUNITY}&q=edit">${TOP_BUTTON_EDIT}</a>
+	<a class='button_edit_groups' href="./?task=groups&community_id=${ID_COMMUNITY}&q=edit">${TOP_BUTTON_EDIT}</a>
 	<!-- END IF -->
     <!-- END IF -->
     <!-- END IF -->
@@ -257,11 +257,11 @@
   <!-- IF '${SHOW_ROLLOUT}' != '' --><hr><a class="minimax" onclick='return false'><i>${STR_ROLLOUT}</i><i>${STR_ROLLIN}</i></a><!-- END IF -->
   </div>
 <div class="profilelink"> 
-	<!-- IF '${PROFILE_PHOTO_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'photoalbums' -->class="active-link" <!-- END IF --> href="./?task=photoalbums&id_user=${PROFILE_ID_USER}"><span>${STR_PROFILE_PHOTO_LINK}</span></a><!-- END IF --> 
-	<!-- IF '${PROFILE_VIDEO_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'videoalbums' -->class="active-link" <!-- END IF --> href="./?task=videoalbums&id_user=${PROFILE_ID_USER}"><span>${STR_PROFILE_VIDEO_LINK}</span></a><!-- END IF --> 
-	<!-- IF '${PROFILE_FRIENDS_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'friends' -->class="active-link" <!-- END IF --> href="./?task=friends&id_user=${PROFILE_ID_USER}"><span>${STR_PROFILE_FRIENDS_LINK}</span></a><!-- END IF --> 
-	<!-- IF '${PROFILE_GROUPS_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'groups' -->class="active-link" <!-- END IF --> href="./?task=groups&id_user=${PROFILE_ID_USER}"><span>${STR_PROFILE_GROUPS_LINK}</span></a><!-- END IF --> 
-	<!-- IF '${PROFILE_TEAMS_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'teams' -->class="active-link" <!-- END IF --> href="./?task=teams&id_user=${PROFILE_ID_USER}"><span>${STR_PROFILE_TEAMS_LINKS}</span></a><!-- END IF --> 
+	<!-- IF '${PROFILE_PHOTO_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'photoalbums' -->class="active-link" <!-- END IF --> href="./?task=photoalbums&user_id=${PROFILE_ID_USER}"><span>${STR_PROFILE_PHOTO_LINK}</span></a><!-- END IF --> 
+	<!-- IF '${PROFILE_VIDEO_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'videoalbums' -->class="active-link" <!-- END IF --> href="./?task=videoalbums&user_id=${PROFILE_ID_USER}"><span>${STR_PROFILE_VIDEO_LINK}</span></a><!-- END IF --> 
+	<!-- IF '${PROFILE_FRIENDS_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'friends' -->class="active-link" <!-- END IF --> href="./?task=friends&user_id=${PROFILE_ID_USER}"><span>${STR_PROFILE_FRIENDS_LINK}</span></a><!-- END IF --> 
+	<!-- IF '${PROFILE_GROUPS_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'groups' -->class="active-link" <!-- END IF --> href="./?task=groups&user_id=${PROFILE_ID_USER}"><span>${STR_PROFILE_GROUPS_LINK}</span></a><!-- END IF --> 
+	<!-- IF '${PROFILE_TEAMS_PERMIT}' == 'display' --><a <!-- IF '${TASK}' == 'teams' -->class="active-link" <!-- END IF --> href="./?task=teams&user_id=${PROFILE_ID_USER}"><span>${STR_PROFILE_TEAMS_LINKS}</span></a><!-- END IF --> 
 </div>
 <!-- END IF -->
 <script>
@@ -271,7 +271,7 @@ $(document).on( "click", "#block_user", function() {
 	let IdUser = $(this).attr('data-item');
 
 	$.ajax({
-		url: "./?task=ajax_action&action=block_user&id_user=" + IdUser,
+		url: "./?task=ajax_action&action=block_user&user_id=" + IdUser,
 		cache: false,
 		dataType: "json",
 		success: function(data){
@@ -288,7 +288,7 @@ $(document).on( "click", "#unblock_user", function() {
 	let IdUser = $(this).attr('data-item');
 
 	$.ajax({
-		url: "./?task=ajax_action&action=unblock_user&id_user=" + IdUser,
+		url: "./?task=ajax_action&action=unblock_user&user_id=" + IdUser,
 		cache: false,
 		dataType: "json",
 		success: function(data){

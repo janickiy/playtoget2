@@ -13,65 +13,65 @@ class Model_ajax_action extends Model
 	{
 		$id_comment = core::database()->escape($id_comment);
 		
-		$query = "SELECT *, a.id AS id_comment, DATE_FORMAT(a.created_at,'%d.%m.%Y %H:%i') AS created, a.id_user AS id_user FROM " . core::database()->getTableName('comments') . " a LEFT JOIN  " . core::database()->getTableName('users') . " b ON a.id_user=b.id WHERE a.id=" . $id_comment;
+		$query = "SELECT *, a.id AS id_comment, DATE_FORMAT(a.created_at,'%d.%m.%Y %H:%i') AS created, a.user_id AS user_id FROM " . core::database()->getTableName('comments') . " a LEFT JOIN  " . core::database()->getTableName('users') . " b ON a.user_id=b.id WHERE a.id=" . $id_comment;
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getRow($result);
 	}
 	
-	public function liked($id_content, $likeable_type, $id_user)
+	public function liked($content_id, $likeable_type, $user_id)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('likes') . " WHERE (id_content=" . $id_content  . ") AND (id_user=" . $id_user . ") AND (likeable_type='" . $likeable_type . "')";
+		$query = "SELECT * FROM " . core::database()->getTableName('likes') . " WHERE (content_id=" . $content_id  . ") AND (user_id=" . $user_id . ") AND (likeable_type='" . $likeable_type . "')";
 		$result = core::database()->querySQL($query);
 		
 		if(core::database()->getRecordCount($result) == 0){
 			$fields = array();
 			$fields['id'] = 0;
-			$fields['id_user'] = $id_user;
+			$fields['user_id'] = $user_id;
 			$fields['likeable_type'] = $likeable_type;
-			$fields['id_content'] = $id_content;
+			$fields['content_id'] = $content_id;
 			$fields['time'] = date("Y-m-d H:i:s");
 		
 			core::database()->insert($fields, core::database()->getTableName('likes'));
 		}
 		else{
-			core::database()->delete(core::database()->getTableName('likes'), "(id_content=" . $id_content  . ") AND (id_user=" . $id_user . ") AND (likeable_type='" . $likeable_type . "')",'');
+			core::database()->delete(core::database()->getTableName('likes'), "(content_id=" . $content_id  . ") AND (user_id=" . $user_id . ") AND (likeable_type='" . $likeable_type . "')",'');
 		}
 
-		$query = "SELECT * FROM " . core::database()->getTableName('likes') . " WHERE id_content=" . $id_content  . " AND likeable_type='" . $likeable_type . "'";
+		$query = "SELECT * FROM " . core::database()->getTableName('likes') . " WHERE content_id=" . $content_id  . " AND likeable_type='" . $likeable_type . "'";
 		$result = core::database()->querySQL($query);
 			
 		return core::database()->getRecordCount($result);
 	}
 	
-	public function shared($id_content, $shareable_type, $id_user)
+	public function shared($content_id, $shareable_type, $user_id)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('share') . " WHERE (id_content=" . $id_content  . ") AND (id_user=" . $id_user . ") AND (shareable_type='" . $shareable_type . "')";
+		$query = "SELECT * FROM " . core::database()->getTableName('share') . " WHERE (content_id=" . $content_id  . ") AND (user_id=" . $user_id . ") AND (shareable_type='" . $shareable_type . "')";
 		$result = core::database()->querySQL($query);
 		
 		if(core::database()->getRecordCount($result) == 0){
 			$fields = array();
 			$fields['id'] = 0;
-			$fields['id_user'] = $id_user;
+			$fields['user_id'] = $user_id;
 			$fields['shareable_type'] = $shareable_type;			
 			$fields['time'] = date("Y-m-d H:i:s");			
-			$fields['id_content'] = $id_content;
+			$fields['content_id'] = $content_id;
 		
 			core::database()->insert($fields, core::database()->getTableName('share'));
 		}
 		
-		$query = "SELECT * FROM " . core::database()->getTableName('share') . " WHERE id_content=" . $id_content  . " AND shareable_type='" . $shareable_type . "'";
+		$query = "SELECT * FROM " . core::database()->getTableName('share') . " WHERE content_id=" . $content_id  . " AND shareable_type='" . $shareable_type . "'";
 		$result = core::database()->querySQL($query);
 			
 		return core::database()->getRecordCount($result);
 	}	
 	
 	
-	public function getPopularPhotos($id_owner, $offset, $postnumbers)
+	public function getPopularPhotos($owner_id, $offset, $postnumbers)
 	{
 		$from = core::database()->getTableName('photos');
 		$parameters = '*';
-		$where = "WHERE id_owner=" . $id_owner ."";
+		$where = "WHERE owner_id=" . $owner_id ."";
 		$limit = "LIMIT ".$postnumbers." OFFSET ".$offset."";
 		$order = "ORDER by id DESC";
 		
@@ -89,18 +89,18 @@ class Model_ajax_action extends Model
 	{
 		$id_message = core::database()->escape($id_message);
 		
-		$query = "SELECT *, a.id AS id_message, DATE_FORMAT(a.created_at,'%d.%m.%Y %H:%i') AS created, a.id_sender AS id_sender FROM " . core::database()->getTableName('messages') . " a LEFT JOIN  " . core::database()->getTableName('users') . " b ON a.id_sender=b.id WHERE a.id=" . $id_message;
+		$query = "SELECT *, a.id AS id_message, DATE_FORMAT(a.created_at,'%d.%m.%Y %H:%i') AS created, a.sender_id AS sender_id FROM " . core::database()->getTableName('messages') . " a LEFT JOIN  " . core::database()->getTableName('users') . " b ON a.sender_id=b.id WHERE a.id=" . $id_message;
 		$result = core::database()->querySQL($query);
 		
 		return core::database()->getRow($result);
 	}
 
-	public function getMessagesListAjax($offset, $number, $id_sender, $id_receiver)
+	public function getMessagesListAjax($offset, $number, $sender_id, $receiver_id)
 	{
 		
-		$query = "SELECT *, a.id AS id, b.id AS id_user, DATE_FORMAT(a.created_at,'%d.%m.%y %H:%i') as created FROM " . core::database()->getTableName('messages') . " a 
-					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.id_sender 
-					WHERE (id_sender=" . $id_sender . " AND id_receiver=" . $id_receiver . " AND status IN (0,1,3)) OR (id_sender=" . $id_receiver . " AND id_receiver=" . $id_sender . " AND status IN (0,1,2)) 
+		$query = "SELECT *, a.id AS id, b.id AS user_id, DATE_FORMAT(a.created_at,'%d.%m.%y %H:%i') as created FROM " . core::database()->getTableName('messages') . " a 
+					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.sender_id 
+					WHERE (sender_id=" . $sender_id . " AND receiver_id=" . $receiver_id . " AND status IN (0,1,3)) OR (sender_id=" . $receiver_id . " AND receiver_id=" . $sender_id . " AND status IN (0,1,2)) 
 					ORDER BY a.created_at DESC
 					LIMIT " . $number . " OFFSET ".$offset." 
 					
@@ -111,16 +111,16 @@ class Model_ajax_action extends Model
 		return  array_reverse(core::database()->getColumnArray($result));		
 	}
 	
-	public function changeFriendsStatus($id_friend, $id_user, $status)
+	public function changeFriendsStatus($friend_id, $user_id, $status)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE (id_user=" . $id_user . " AND id_friend=" . $id_friend . ") OR (id_user=" . $id_friend . " AND id_friend=" . $id_user . ")";
+		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE (user_id=" . $user_id . " AND friend_id=" . $friend_id . ") OR (user_id=" . $friend_id . " AND friend_id=" . $user_id . ")";
 		$result = core::database()->querySQL($query);
 			
 		if(core::database()->getRecordCount($result) == 0){
 			$fields = array();
 			$fields['id'] = 0;
-			$fields['id_user'] = $id_user;
-			$fields['id_friend'] = $id_friend;			
+			$fields['user_id'] = $user_id;
+			$fields['friend_id'] = $friend_id;			
 			$fields['status'] = $status;			
 			
 			$result = core::database()->insert($fields, core::database()->getTableName('friends'));
@@ -131,7 +131,7 @@ class Model_ajax_action extends Model
 			$row = core::database()->getRow($result);
 			
 			if($row['status'] == 0){
-				$update = "UPDATE " . core::database()->getTableName('friends') . " SET status=" . $status . ", added=NOW() WHERE id_user=" . $id_user . " AND id_friend=" . $id_friend;
+				$update = "UPDATE " . core::database()->getTableName('friends') . " SET status=" . $status . ", added=NOW() WHERE user_id=" . $user_id . " AND friend_id=" . $friend_id;
 
 				if(core::database()->querySQL($update)){
 					return $status;
@@ -140,13 +140,13 @@ class Model_ajax_action extends Model
 		}
 	}
 	
-	public function removeFriend($id_user, $id_friend)
+	public function removeFriend($user_id, $friend_id)
 	{
-		if(core::database()->delete(core::database()->getTableName('friends'), "((id_user=" . $id_friend . " AND id_friend=" . $id_user.") OR (id_user=" . $id_user . " AND id_friend=" . $id_friend. "))",'')) return TRUE;
+		if(core::database()->delete(core::database()->getTableName('friends'), "((user_id=" . $friend_id . " AND friend_id=" . $user_id.") OR (user_id=" . $user_id . " AND friend_id=" . $friend_id. "))",'')) return TRUE;
 		else return FALSE;
 	}
 	
-	public function editUserProfile($fields, $id_user){
+	public function editUserProfile($fields, $user_id){
 
 		$result = TRUE;
 		$document_root = !empty($_SERVER['DOCUMENT_ROOT']) ? rtrim($_SERVER['DOCUMENT_ROOT'], '/') : rtrim(dirname(dirname(__DIR__)), '/');
@@ -161,31 +161,31 @@ class Model_ajax_action extends Model
 		core::database()->querySQL('SET AUTOCOMMIT=0');
 		core::database()->querySQL('START TRANSACTION');
 		
-		if($fields['avatar'] && file_exists($avatar_tmp)) $fields['user']['avatar'] = $id_user . '_' . $fields['avatar'];
-		if($fields['cover_page'] && file_exists($cover_page_tmp)) $fields['user']['cover_page'] = $id_user . '_' . $fields['cover_page'];	
+		if($fields['avatar'] && file_exists($avatar_tmp)) $fields['user']['avatar'] = $user_id . '_' . $fields['avatar'];
+		if($fields['cover_page'] && file_exists($cover_page_tmp)) $fields['user']['cover_page'] = $user_id . '_' . $fields['cover_page'];	
 
-		$query = "SELECT avatar, cover_page FROM " . core::database()->getTableName('users') . " WHERE id=" . $id_user;
+		$query = "SELECT avatar, cover_page FROM " . core::database()->getTableName('users') . " WHERE id=" . $user_id;
 		$rt =  core::database()->querySQL($query);
 		$pic = core::database()->getRow($rt);
 		
-		if(!core::database()->update($fields['user'], core::database()->getTableName('users'), "id=" . $id_user)) {
+		if(!core::database()->update($fields['user'], core::database()->getTableName('users'), "id=" . $user_id)) {
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}		
 		
-		$query = "SELECT * FROM " . core::database()->getTableName('occupations') . " WHERE kind=1 AND id_user=" . $id_user;
+		$query = "SELECT * FROM " . core::database()->getTableName('occupations') . " WHERE kind=1 AND user_id=" . $user_id;
 		$rt = core::database()->querySQL($query);
 		
 		$arr_tag = core::database()->getColumnArray($rt);
 		
 		foreach($arr_tag as $row){
-			if(!core::database()->delete(core::database()->getTableName('geo_target'), "target_type='occupation' AND id_target=" . $row['id'])) {
+			if(!core::database()->delete(core::database()->getTableName('geo_target'), "target_type='occupation' AND target_id=" . $row['id'])) {
 				$result = FALSE;
 				core::database()->querySQL('ROLLBACK');	
 			}
 		}	
 			
-		if(!core::database()->delete(core::database()->getTableName('occupations'), "kind=1 AND id_user=" . $id_user)) {
+		if(!core::database()->delete(core::database()->getTableName('occupations'), "kind=1 AND user_id=" . $user_id)) {
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
@@ -193,7 +193,7 @@ class Model_ajax_action extends Model
 			for($i=0; $i < count($fields['education']['name']); $i++){
 				$arr = array();
 				$arr['id'] = 0;
-				$arr['id_user'] = $id_user;
+				$arr['user_id'] = $user_id;
 				$arr['name'] = htmlspecialchars(trim($fields['education']['name'][$i]));
 				$arr['description'] = htmlspecialchars(trim($fields['education']['description'][$i]));
 				$arr['month_start'] = $fields['education']['month_start'][$i];
@@ -220,10 +220,10 @@ class Model_ajax_action extends Model
 					$arr = array();
 					$arr['id'] = 0;
 					$arr['target_type'] = 'occupation';
-					$arr['id_target'] = $insert_id;
-					$arr['id_country'] = $country['id_country']; 	
-					$arr['id_region'] = $region['id_region']; 
-					$arr['id_city'] = $fields['education']['id_place'][$i];
+					$arr['target_id'] = $insert_id;
+					$arr['country_id'] = $country['country_id']; 	
+					$arr['region_id'] = $region['region_id']; 
+					$arr['city_id'] = $fields['education']['id_place'][$i];
 					
 					if(!core::database()->insert($arr, core::database()->getTableName('geo_target'))){
 						$result = FALSE;
@@ -233,19 +233,19 @@ class Model_ajax_action extends Model
 			}	
 		}	
 		
-		$query = "SELECT * FROM " . core::database()->getTableName('occupations') . " WHERE kind=3 AND id_user=" . $id_user;
+		$query = "SELECT * FROM " . core::database()->getTableName('occupations') . " WHERE kind=3 AND user_id=" . $user_id;
 		$result = core::database()->querySQL($query);
 		
 		$arr_tag = core::database()->getColumnArray($result);
 		
 		foreach($arr_tag as $row){
-			if(!core::database()->delete(core::database()->getTableName('geo_target'), "target_type='occupation' AND id_target=" . $row['id'])) {
+			if(!core::database()->delete(core::database()->getTableName('geo_target'), "target_type='occupation' AND target_id=" . $row['id'])) {
 				$result = FALSE;
 				core::database()->querySQL('ROLLBACK');	
 			}
 		}	
 
-		if(!core::database()->delete(core::database()->getTableName('occupations'), "kind=3 AND id_user=" . $id_user)) {
+		if(!core::database()->delete(core::database()->getTableName('occupations'), "kind=3 AND user_id=" . $user_id)) {
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
@@ -253,7 +253,7 @@ class Model_ajax_action extends Model
 			for($i=0; $i < count($fields['job']['name']); $i++){
 				$arr = array();
 				$arr['id'] = 0;
-				$arr['id_user'] = $id_user;
+				$arr['user_id'] = $user_id;
 				$arr['name'] = htmlspecialchars(trim($fields['job']['name'][$i]));
 				$arr['description'] = htmlspecialchars(trim($fields['job']['description'][$i]));
 				$arr['month_start'] = $fields['job']['month_start'][$i];
@@ -280,10 +280,10 @@ class Model_ajax_action extends Model
 					$arr = array();
 					$arr['id'] = 0;
 					$arr['target_type'] = 'occupation';
-					$arr['id_target'] = $insert_id;
-					$arr['id_country'] = $country['id_country']; 	
-					$arr['id_region'] = $region['id_region']; 
-					$arr['id_city'] = $fields['job']['id_place'][$i];
+					$arr['target_id'] = $insert_id;
+					$arr['country_id'] = $country['country_id']; 	
+					$arr['region_id'] = $region['region_id']; 
+					$arr['city_id'] = $fields['job']['id_place'][$i];
 					
 					if(!core::database()->insert($arr, core::database()->getTableName('geo_target'))){
 						$result = FALSE;
@@ -293,7 +293,7 @@ class Model_ajax_action extends Model
 			}	
 		}		
 		
-		if(!core::database()->delete(core::database()->getTableName('users_sport_types'), "id_user=" . $id_user)) {
+		if(!core::database()->delete(core::database()->getTableName('users_sport_types'), "user_id=" . $user_id)) {
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
@@ -301,14 +301,14 @@ class Model_ajax_action extends Model
 			for($i=0; $i < count($fields['sport']['id_sport_type']); $i++){
 				$arr = array();
 				$arr['id'] = 0;
-				$arr['id_user'] = $id_user;
+				$arr['user_id'] = $user_id;
 				
 				if(is_numeric($fields['job']['id_sport_type'][$i])){
 					$name = Sport::getSportType($fields['job']['id_sport_type'][$i]);
 					if($name) $arr['sport_type'] = $name;
 				}
 				
-				$arr['id_sport_level'] = $fields['sport']['id_sport_level'][$i];				
+				$arr['sport_level_id'] = $fields['sport']['sport_level_id'][$i];				
 				$arr['sport_type'] = $fields['sport']['sport_type'][$i];			
 				$arr['search_team'] = $fields['sport']['search_team'][$i] == 'on' ? 1 : 0;
 					
@@ -320,7 +320,7 @@ class Model_ajax_action extends Model
 		}
 		
 		if($fields['id_place']){
-			$query = "SELECT * FROM " . core::database()->getTableName('geo_target') . " WHERE target_type='user' AND id_target=" . $id_user;
+			$query = "SELECT * FROM " . core::database()->getTableName('geo_target') . " WHERE target_type='user' AND target_id=" . $user_id;
 			$rt = core::database()->querySQL($query);
 			
 			$country = Places::getCountryByCity($fields['id_place']);
@@ -330,10 +330,10 @@ class Model_ajax_action extends Model
 				$arr = array();
 				$arr['id'] = 0;				
 				$arr['target_type'] = 'user';				
-				$arr['id_target'] = $id_user;					
-				$arr['id_country'] = $country['id_country']; 	
-				$arr['id_region'] = $region['id_region']; 
-				$arr['id_city'] = $fields['id_place'];
+				$arr['target_id'] = $user_id;					
+				$arr['country_id'] = $country['country_id']; 	
+				$arr['region_id'] = $region['region_id']; 
+				$arr['city_id'] = $fields['id_place'];
 				
 				if(!core::database()->insert($arr, core::database()->getTableName('geo_target'))){
 					$result = FALSE;
@@ -341,11 +341,11 @@ class Model_ajax_action extends Model
 				}				
 			}else{
 				$arr = array();
-				$arr['id_country'] = $country['id_country']; 	
-				$arr['id_region'] = $region['id_region'];
-				$arr['id_city'] = $fields['id_place'];
+				$arr['country_id'] = $country['country_id']; 	
+				$arr['region_id'] = $region['region_id'];
+				$arr['city_id'] = $fields['id_place'];
 				
-				if(!core::database()->update($arr, core::database()->getTableName('geo_target'), "target_type='user' AND id_target=" . $id_user)){
+				if(!core::database()->update($arr, core::database()->getTableName('geo_target'), "target_type='user' AND target_id=" . $user_id)){
 					$result = FALSE;
 					core::database()->querySQL('ROLLBACK');				
 				}
@@ -370,19 +370,19 @@ class Model_ajax_action extends Model
 	}
 	
 	
-	public function clearDialog($id_user, $id_receiver)
+	public function clearDialog($user_id, $receiver_id)
 	{
-		if(!core::database()->delete(core::database()->getTableName('comments'), "(id_sender=" . $id_user . " AND id_receiver=" . $id_receiver . ") OR (id_sender=" . $id_receiver . " AND id_receiver=" . $id_user . ")", '')){
+		if(!core::database()->delete(core::database()->getTableName('comments'), "(sender_id=" . $user_id . " AND receiver_id=" . $receiver_id . ") OR (sender_id=" . $receiver_id . " AND receiver_id=" . $user_id . ")", '')){
 			$result = FALSE;
 			core::database()->querySQL('ROLLBACK');
 		}
 	}
 	
-	public function getLastMessage($id_receiver, $id_user)
+	public function getLastMessage($receiver_id, $user_id)
 	{
-		$query = "SELECT *, a.id AS id, b.id AS id_user, DATE_FORMAT(a.created_at,'%d.%m.%y %H:%i') as created FROM " . core::database()->getTableName('messages') . " a 
-					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.id_sender  
-					WHERE (id_sender=" . $id_user . " AND id_receiver=" . $id_receiver . " AND a.status IN (0,1,3)) OR (id_sender=" . $id_receiver . " AND id_receiver=" . $id_user . " AND a.status IN (0,1,2)) 
+		$query = "SELECT *, a.id AS id, b.id AS user_id, DATE_FORMAT(a.created_at,'%d.%m.%y %H:%i') as created FROM " . core::database()->getTableName('messages') . " a 
+					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.sender_id  
+					WHERE (sender_id=" . $user_id . " AND receiver_id=" . $receiver_id . " AND a.status IN (0,1,3)) OR (sender_id=" . $receiver_id . " AND receiver_id=" . $user_id . " AND a.status IN (0,1,2)) 
 					ORDER by a.created_at DESC 
 					LIMIT 1";
 					
@@ -391,18 +391,18 @@ class Model_ajax_action extends Model
 		return core::database()->getColumnArray($result);
 	}
 	
-	public function blockUser($id_user, $id_friend)
+	public function blockUser($user_id, $friend_id)
 	{
-		core::database()->delete(core::database()->getTableName('friends'), "(status=0 OR status=1) AND (id_user=" . $id_friend . " AND id_friend=" . $id_user . ")", '');		
+		core::database()->delete(core::database()->getTableName('friends'), "(status=0 OR status=1) AND (user_id=" . $friend_id . " AND friend_id=" . $user_id . ")", '');		
 		
-		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE id_user=" . $id_user . " AND id_friend=" . $id_friend;
+		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE user_id=" . $user_id . " AND friend_id=" . $friend_id;
 		$result = core::database()->querySQL($query);
 		
 		if(core::database()->getRecordCount($result) == 0){
 			$fields = array();
 			$fields['id'] = 0;
-			$fields['id_user'] = $id_user;
-			$fields['id_friend'] = $id_friend;			
+			$fields['user_id'] = $user_id;
+			$fields['friend_id'] = $friend_id;			
 			$fields['status'] = 2;			
 			
 			$result = core::database()->insert($fields, core::database()->getTableName('friends'));
@@ -417,33 +417,33 @@ class Model_ajax_action extends Model
 			$fields = array();
 			$fields['status'] = 2;	
 
-			if(core::database()->update($fields, core::database()->getTableName('friends'), "id_user=" . $id_user ." AND id_friend=" . $id_friend))
+			if(core::database()->update($fields, core::database()->getTableName('friends'), "user_id=" . $user_id ." AND friend_id=" . $friend_id))
 				return TRUE;
 			else
 				return FALSE;
 		}		
 	}
 	
-	public function unblockUser($id_user, $id_friend)
+	public function unblockUser($user_id, $friend_id)
 	{
-		if(core::database()->delete(core::database()->getTableName('friends'), "id_user=" . $id_user ." AND id_friend=" . $id_friend))
+		if(core::database()->delete(core::database()->getTableName('friends'), "user_id=" . $user_id ." AND friend_id=" . $friend_id))
 			return TRUE;
 		else
 			return FALSE;
 	}
 	
-	public function sendCommunityInvitation($id_community, $id_user)
+	public function sendCommunityInvitation($community_id, $user_id)
 	{
-		$query = "SELECT *,u.id as id_user FROM " . core::database()->getTableName('users') . " u LEFT JOIN " . core::database()->getTableName('community_roles') . " c ON (c.id_user=u.id) AND (c.id_community=" . $id_community . "), 
+		$query = "SELECT *,u.id as user_id FROM " . core::database()->getTableName('users') . " u LEFT JOIN " . core::database()->getTableName('community_roles') . " c ON (c.user_id=u.id) AND (c.community_id=" . $community_id . "), 
 					" . core::database()->getTableName('friends') . " f
 					WHERE
 					CASE
-						WHEN f.id_user='" . $id_user . "'
-						THEN f.id_friend=u.id
-						WHEN f.id_friend='" . $id_user . "'
-						THEN f.id_user=u.id
+						WHEN f.user_id='" . $user_id . "'
+						THEN f.friend_id=u.id
+						WHEN f.friend_id='" . $user_id . "'
+						THEN f.user_id=u.id
 					END
-					AND	(f.status='1') AND (c.id_user IS NULL)
+					AND	(f.status='1') AND (c.user_id IS NULL)
 					";
 				
 		$result = core::database()->querySQL($query);
@@ -451,18 +451,18 @@ class Model_ajax_action extends Model
 		return core::database()->getColumnArray($result);
 	}
 	
-	public function sendEventInvitation($id_event, $type, $id_user)
+	public function sendEventInvitation($event_id, $type, $user_id)
 	{
-		$query = "SELECT *,u.id as id_user FROM " . core::database()->getTableName('users') . " u LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON (a.id_member=u.id) AND (a.eventable_type='".$type."') AND (id_event=" . $id_event . "), 
+		$query = "SELECT *,u.id as user_id FROM " . core::database()->getTableName('users') . " u LEFT JOIN " . core::database()->getTableName('accepted_event_members') . " a ON (a.member_id=u.id) AND (a.eventable_type='".$type."') AND (event_id=" . $event_id . "), 
 					" . core::database()->getTableName('friends') . " f
 					WHERE
 					CASE
-						WHEN f.id_user='" . $id_user . "' 
-						THEN f.id_friend=u.id
-						WHEN f.id_friend='" . $id_user . "' 
-						THEN f.id_user=u.id
+						WHEN f.user_id='" . $user_id . "' 
+						THEN f.friend_id=u.id
+						WHEN f.friend_id='" . $user_id . "' 
+						THEN f.user_id=u.id
 					END
-					AND	(f.status='1') AND (a.id_member IS NULL)
+					AND	(f.status='1') AND (a.member_id IS NULL)
 					";
 					
 		$result = core::database()->querySQL($query);
@@ -478,9 +478,9 @@ class Model_ajax_action extends Model
 		return core::database()->getRow($result);
 	}
 	
-	public function removeShare($id_content, $shareable_type)
+	public function removeShare($content_id, $shareable_type)
 	{
-		if(core::database()->delete(core::database()->getTableName('share'), "shareable_type='" . $shareable_type . "' AND id_content=" . $id_content, ''))
+		if(core::database()->delete(core::database()->getTableName('share'), "shareable_type='" . $shareable_type . "' AND content_id=" . $content_id, ''))
 			return TRUE;
 		else
 			return FALSE;		
@@ -491,9 +491,9 @@ class Model_ajax_action extends Model
 		return core::database()->insert($fields, core::database()->getTableName('feedback'));
 	}
 
-	public function checkBlock($id_receiver, $id_user)
+	public function checkBlock($receiver_id, $user_id)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE	(status=2) AND (id_friend=" . $id_receiver . ") AND (id_user=" . $id_user . ")";
+		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE	(status=2) AND (friend_id=" . $receiver_id . ") AND (user_id=" . $user_id . ")";
 		$result = core::database()->querySQL($query);
 		
 		if(core::database()->getRecordCount($result) == 0) 
@@ -502,7 +502,7 @@ class Model_ajax_action extends Model
 			return FALSE;	
 	}
 	
-	public function removeMessage($id, $id_user)
+	public function removeMessage($id, $user_id)
 	{
 		$query = "SELECT * FROM " . core::database()->getTableName('messages') . " WHERE id=" . $id;
 		$result = core::database()->querySQL($query);
@@ -511,31 +511,31 @@ class Model_ajax_action extends Model
 		switch($row['status']) {
 			case 0: 
 			
-				if($row['id_sender'] == $id_user) 
+				if($row['sender_id'] == $user_id) 
 					$status = 2;
-				else if($row['id_receiver'] == $id_user) 
+				else if($row['receiver_id'] == $user_id) 
 					$status = 3;	
 			
 			break;
 			
 			case 1: 
 			
-				if($row['id_sender'] == $id_user) 
+				if($row['sender_id'] == $user_id) 
 					$status = 2;
-				else if($row['id_receiver'] == $id_user) 
+				else if($row['receiver_id'] == $user_id) 
 					$status = 3;
 			
 			break;
 			
 			case 2: 
 	
-				if($row['id_receiver'] == $id_user) $status = 4;
+				if($row['receiver_id'] == $user_id) $status = 4;
 			
 			break;
 			
 			case 3: 
 			
-				if($row['id_sender'] == $id_user) $status = 4;
+				if($row['sender_id'] == $user_id) $status = 4;
 			
 			break;
 		}	
@@ -551,12 +551,12 @@ class Model_ajax_action extends Model
 		}	
 	}
 	
-	public function checkBanMsgReceiver($id_receiver)
+	public function checkBanMsgReceiver($receiver_id)
 	{
 		$check = TRUE;
 		
-		if(is_numeric($id_receiver)){
-			$query = "SELECT * FROM " . core::database()->getTableName('users') . " WHERE id=" . $id_receiver  . " AND banned=1";
+		if(is_numeric($receiver_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('users') . " WHERE id=" . $receiver_id  . " AND banned=1";
 			$result = core::database()->querySQL($query);
 		
 			if(core::database()->getRecordCount($result) > 0) $check = FALSE;
@@ -565,12 +565,12 @@ class Model_ajax_action extends Model
 		return $check;
 	}
 	
-	public function checkDeletedMsgReceiver($id_receiver)
+	public function checkDeletedMsgReceiver($receiver_id)
 	{
 		$check = TRUE;
 		
-		if(is_numeric($id_receiver)){
-			$query = "SELECT * FROM " . core::database()->getTableName('users') . " WHERE id=" . $id_receiver  . " AND deleted=1";
+		if(is_numeric($receiver_id)){
+			$query = "SELECT * FROM " . core::database()->getTableName('users') . " WHERE id=" . $receiver_id  . " AND deleted=1";
 			$result = core::database()->querySQL($query);
 		
 			if(core::database()->getRecordCount($result) > 0) $check = FALSE;

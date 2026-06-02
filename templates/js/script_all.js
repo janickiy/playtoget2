@@ -113,7 +113,7 @@ function remove_black_list(id) {
                     $.ajax({
                         type: 'POST',
                         url: './?task=ajax_action&action=unblock_user',
-                        data: 'id_user=' + id,
+                        data: 'user_id=' + id,
                         success: function (msg) {
                             if (msg.status == 'success') {
                                 $('.possible-friend-cart[data-num=' + id + ']').remove();
@@ -143,7 +143,7 @@ function showMore(id, type) {
         data: {
             number: settMore.number,
             offset: settMore.offset,
-            id_user: id,
+            user_id: id,
             type: type,
         },
         success: function (data) {
@@ -196,7 +196,7 @@ function showMoreEvent(id, type) {
         data: {
             number: settMore.number,
             offset: settMore.offset,
-            id_member: id,
+            member_id: id,
             eventable_type: type,
         },
         success: function (data) {
@@ -250,7 +250,7 @@ function showMorePhotos(id, type) {
         data: {
             number: settMorePhotos.number,
             offset: settMorePhotos.offset,
-            id_owner: id,
+            owner_id: id,
             type: type,
         },
         success: function (data) {
@@ -279,7 +279,7 @@ function showMoreVideos(id, type) {
         data: {
             number: settMoreVideos.number,
             offset: settMoreVideos.offset,
-            id_owner: id,
+            owner_id: id,
             type: type,
         },
         success: function (data) {
@@ -299,7 +299,7 @@ const settMoreFriend = {
     offset: 10,
 };
 
-function showMoreFriend(id_user) {
+function showMoreFriend(user_id) {
     //alert(id+' '+type);
     $.ajax({
         type: 'POST',
@@ -307,7 +307,7 @@ function showMoreFriend(id_user) {
         data: {
             number: settMoreFriend.number,
             offset: settMoreFriend.offset,
-            id_user: id_user,
+            user_id: user_id,
         },
         success: function (data) {
             if (data.item != null) {
@@ -315,13 +315,13 @@ function showMoreFriend(id_user) {
                     console.log(data.item[i])
                     html = '';
                     html += '<div class="col-xs-6 possible-friend-cart">';
-                    html += '<a class="possible-avatar" href="./?task=profile&id_user=' + data.item[i]['id_user'] + '">';
-                    html += '<img src="' + data.item[i]['avatar'] + '" alt=""> </a> <a href="./?task=profile&id_user=' + data.item[i]['id_user'] + '">';
+                    html += '<a class="possible-avatar" href="./?task=profile&user_id=' + data.item[i]['user_id'] + '">';
+                    html += '<img src="' + data.item[i]['avatar'] + '" alt=""> </a> <a href="./?task=profile&user_id=' + data.item[i]['user_id'] + '">';
                     html += '<h5><strong>' + data.item[i]['firstname'] + '<span class="status_user';
                     if (data.item[i]['status_user'] == 'online') html += 'online';
-                    html += '" data-num="' + data.item[i]['id_user'] + '"></span><br />' + data.item[i]['lastname'] + '</strong></h5></a><br>';
+                    html += '" data-num="' + data.item[i]['user_id'] + '"></span><br />' + data.item[i]['lastname'] + '</strong></h5></a><br>';
                     if (data.item[i]['city'] != null) html += '<p>' + data.item[i]['city'] + '</p>';
-                    html += '<a href="./?task=profile&q=messages&sel=' + data.item[i]['id_user'] + '" data-tooltip="Написать сообщение"><b></b></a>';
+                    html += '<a href="./?task=profile&q=messages&sel=' + data.item[i]['user_id'] + '" data-tooltip="Написать сообщение"><b></b></a>';
                     html += '</div>';
 
                     $('#friends').append(html);
@@ -427,7 +427,7 @@ function commun_fr(id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=send_community_invitation',
-        data: 'id_community=' + id,
+        data: 'community_id=' + id,
         success: function (data) {
             if (data.result == 'success') {
                 $('body').append('<div id="ok_com_fr" class="save_window_ok hiden">Приглашения вашим друзьям отправлены!</div>');
@@ -446,13 +446,13 @@ function commun_fr(id) {
     })
 }
 
-function add_admin(id_user, id_community) {
+function add_admin(user_id, community_id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=add_community_administrator',
         data: {
-            id_community: id_community,
-            id_user: id_user,
+            community_id: community_id,
+            user_id: user_id,
         },
         success: function (data) {
             location.reload();
@@ -460,13 +460,13 @@ function add_admin(id_user, id_community) {
     })
 }
 
-function remove_admin(id_user, id_community) {
+function remove_admin(user_id, community_id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=remove_community_administrator',
         data: {
-            id_community: id_community,
-            id_user: id_user,
+            community_id: community_id,
+            user_id: user_id,
         },
         success: function (data) {
             location.reload();
@@ -474,13 +474,13 @@ function remove_admin(id_user, id_community) {
     })
 }
 
-function add_black_community(id_user, id_community) {
+function add_black_community(user_id, community_id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=block_community_user',
         data: {
-            id_community: id_community,
-            id_user: id_user,
+            community_id: community_id,
+            user_id: user_id,
         },
         success: function (data) {
             location.reload();
@@ -488,13 +488,13 @@ function add_black_community(id_user, id_community) {
     })
 }
 
-function remove_black_community(id_user, id_community) {
+function remove_black_community(user_id, community_id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=unblock_community_user',
         data: {
-            id_community: id_community,
-            id_user: id_user,
+            community_id: community_id,
+            user_id: user_id,
         },
         success: function (data) {
             location.reload();
@@ -502,13 +502,13 @@ function remove_black_community(id_user, id_community) {
     })
 }
 
-function approve_community_user(id_user, id_community) {
+function approve_community_user(user_id, community_id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=approve_community_user',
         data: {
-            id_community: id_community,
-            id_user: id_user,
+            community_id: community_id,
+            user_id: user_id,
         },
         success: function (data) {
             location.reload();
@@ -522,7 +522,7 @@ function event_fr(id) {
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=send_event_invitation',
-        data: 'id_event=' + id,
+        data: 'event_id=' + id,
         success: function (data) {
             if (data.result == 'success') {
                 $('body').append('<div id="ok_com_fr" class="save_window_ok hiden">Приглашения вашим друзьям отправлены!</div>');
@@ -546,7 +546,7 @@ function event_add(id) {
         type: 'POST',
         url: '?task=ajax_action&action=change_event_memberstatus',
         data: {
-            id_event: id,
+            event_id: id,
             status: 1,
         },
         success: function (data) {
@@ -592,7 +592,7 @@ function event_leave(id, type) {
                         type: 'POST',
                         url: '?task=ajax_action&action=change_event_memberstatus',
                         data: {
-                            id_event: id,
+                            event_id: id,
                             status: 0,
                         },
                         success: function (data) {
@@ -623,14 +623,14 @@ function event_join(id, status, type) {
         event_add(id);
 }
 
-function change_event_community_status(id_community, id_event, status) {
-    console.log(id_community + ' ' + id_event + ' ' + status);
+function change_event_community_status(community_id, event_id, status) {
+    console.log(community_id + ' ' + event_id + ' ' + status);
     $.ajax({
         type: 'POST',
         url: '/?task=ajax_action&action=change_event_community_status',
         data: {
-            id_event: id_event,
-            id_community: id_community,
+            event_id: event_id,
+            community_id: community_id,
             status: status,
         },
         success: function (data) {
@@ -645,7 +645,7 @@ function change_event_community_status(id_community, id_event, status) {
 /*ACEPT FRIEND*/
 function accept_friendship(id) {
     $.ajax({
-        url: "./?task=ajax_action&action=accept_friendship&id_user=" + id,
+        url: "./?task=ajax_action&action=accept_friendship&user_id=" + id,
         cache: false,
         dataType: "json",
         success: function (data) {
@@ -663,7 +663,7 @@ function accept_friendship(id) {
 /*REMOVE FRIEND*/
 function remove_friend(id) {
     $.ajax({
-        url: "./?task=ajax_action&action=remove_friend&id_user=" + id,
+        url: "./?task=ajax_action&action=remove_friend&user_id=" + id,
         cache: false,
         dataType: "json",
         success: function (data) {
@@ -680,7 +680,7 @@ function remove_friend(id) {
 function add_as_friend(id) {
     //alert(id)
     $.ajax({
-        url: "./?task=ajax_action&action=add_as_friend&id_user=" + id,
+        url: "./?task=ajax_action&action=add_as_friend&user_id=" + id,
         cache: false,
         dataType: "json",
         success: function (data) {

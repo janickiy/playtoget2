@@ -4,16 +4,16 @@ defined('PLAYTOGET') || exit('Playtoget: access denied!');
 
 class Friends
 {
-	static function getPossibleFriendsList($id_user, $limit = 10, $offset = 0)
+	static function getPossibleFriendsList($user_id, $limit = 10, $offset = 0)
 	{
-		if(is_numeric($id_user)){
-			$query = "SELECT *, id AS id_user FROM " . core::database()->getTableName('users') . " WHERE id != " . $id_user . " AND id NOT IN (SELECT u.id as id_user FROM " . core::database()->getTableName('users') . " u, " . core::database()->getTableName('friends') . " f
+		if(is_numeric($user_id)){
+			$query = "SELECT *, id AS user_id FROM " . core::database()->getTableName('users') . " WHERE id != " . $user_id . " AND id NOT IN (SELECT u.id as user_id FROM " . core::database()->getTableName('users') . " u, " . core::database()->getTableName('friends') . " f
 						WHERE
 						CASE
-							WHEN f.id_user='" . $id_user . "'
-							THEN f.id_friend=u.id
-							WHEN f.id_friend='" . $id_user . "'
-							THEN f.id_user=u.id
+							WHEN f.user_id='" . $user_id . "'
+							THEN f.friend_id=u.id
+							WHEN f.friend_id='" . $user_id . "'
+							THEN f.user_id=u.id
 						END)
 						ORDER by RAND()
 						LIMIT " . $limit . " OFFSET " . $offset . "
@@ -25,16 +25,16 @@ class Friends
 		}
 	}
 	
-	static function NumberFriends($id_user)
+	static function NumberFriends($user_id)
 	{
-		if(is_numeric($id_user)){
-			$query = "SELECT *,u.id as id_user FROM " . core::database()->getTableName('users') . " u, " . core::database()->getTableName('friends') . " f
+		if(is_numeric($user_id)){
+			$query = "SELECT *,u.id as user_id FROM " . core::database()->getTableName('users') . " u, " . core::database()->getTableName('friends') . " f
 						WHERE
 						CASE
-							WHEN f.id_user='" . $id_user . "'
-							THEN f.id_friend=u.id
-							WHEN f.id_friend='" . $id_user . "'
-							THEN f.id_user=u.id
+							WHEN f.user_id='" . $user_id . "'
+							THEN f.friend_id=u.id
+							WHEN f.friend_id='" . $user_id . "'
+							THEN f.user_id=u.id
 						END
 						AND	(f.status='1')";
 					
@@ -44,16 +44,16 @@ class Friends
 		}
 	}
 	
-	static function getFriendsList($id_user, $limit = 0, $offset = 0)
+	static function getFriendsList($user_id, $limit = 0, $offset = 0)
 	{
-		if(is_numeric($id_user)){
-			$query = "SELECT *,u.id as id_user FROM " . core::database()->getTableName('users') . " u, " . core::database()->getTableName('friends') . " f
+		if(is_numeric($user_id)){
+			$query = "SELECT *,u.id as user_id FROM " . core::database()->getTableName('users') . " u, " . core::database()->getTableName('friends') . " f
 						WHERE
 							CASE
-								WHEN f.id_user='" . $id_user . "'
-								THEN f.id_friend=u.id
-								WHEN f.id_friend='" . $id_user . "'
-								THEN f.id_user=u.id
+								WHEN f.user_id='" . $user_id . "'
+								THEN f.friend_id=u.id
+								WHEN f.friend_id='" . $user_id . "'
+								THEN f.user_id=u.id
 						END
 						AND	(f.status='1')
 						LIMIT " . $limit . " OFFSET " . $offset . "
@@ -66,12 +66,12 @@ class Friends
 		}		
 	}
 	
-	static function NumberFriendsRequest($id_friend)
+	static function NumberFriendsRequest($friend_id)
 	{
-		if(is_numeric($id_friend)){
+		if(is_numeric($friend_id)){
 			$query = "SELECT * FROM " . core::database()->getTableName('friends') . " f 
-						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.id_user=u.id
-						WHERE status=0 AND f.id_friend=" . $id_friend;
+						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.user_id=u.id
+						WHERE status=0 AND f.friend_id=" . $friend_id;
 						
 			$result = core::database()->querySQL($query);
 		
@@ -79,12 +79,12 @@ class Friends
 		}
 	}
 	
-	static function getFriendsRequestList($id_friend)
+	static function getFriendsRequestList($friend_id)
 	{
-		if(is_numeric($id_friend)){
+		if(is_numeric($friend_id)){
 			$query = "SELECT * FROM " . core::database()->getTableName('friends') . " f 
-						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.id_user=u.id
-						WHERE status=0 AND f.id_friend=" . $id_friend;
+						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.user_id=u.id
+						WHERE status=0 AND f.friend_id=" . $friend_id;
 					
 			$result = core::database()->querySQL($query);
 		
@@ -92,25 +92,25 @@ class Friends
 		}
 	}
 	
-	static function removeFriend($id_user, $id_friend)
+	static function removeFriend($user_id, $friend_id)
 	{
-		if(core::database()->delete(core::database()->getTableName('friends'), "((id_user=" . $id_friend . " AND id_friend=" . $id_user.") OR (id_user=" . $id_user . " AND id_friend=" . $id_friend. "))",'')) 
+		if(core::database()->delete(core::database()->getTableName('friends'), "((user_id=" . $friend_id . " AND friend_id=" . $user_id.") OR (user_id=" . $user_id . " AND friend_id=" . $friend_id. "))",'')) 
 			return TRUE;
 		else 
 			return FALSE;
-		//if(core::database()->delete(core::database()->getTableName('friends'), "(id_user=" . $id_friend . " AND id_friend=" . $id_user.")",'')) return true;
+		//if(core::database()->delete(core::database()->getTableName('friends'), "(user_id=" . $friend_id . " AND friend_id=" . $user_id.")",'')) return true;
 	}
 	
-	static function changeFriendsStatus($id_friend, $id_user, $status)
+	static function changeFriendsStatus($friend_id, $user_id, $status)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE (id_user=" . $id_user . " AND id_friend=" . $id_friend . ") OR (id_user=" . $id_user . " AND id_friend=" . $id_friend . ")";
+		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE (user_id=" . $user_id . " AND friend_id=" . $friend_id . ") OR (user_id=" . $user_id . " AND friend_id=" . $friend_id . ")";
 		$result = core::database()->querySQL($query);
 			
 		if(core::database()->getRecordCount($result) == 0){
 			$fields = array();
 			$fields['id'] = 0;
-			$fields['id_user'] = $id_user;
-			$fields['id_friend'] = $id_friend;			
+			$fields['user_id'] = $user_id;
+			$fields['friend_id'] = $friend_id;			
 			$fields['status'] = $status;			
 			
 			$result = core::database()->insert($fields, core::database()->getTableName('friends'));
@@ -118,7 +118,7 @@ class Friends
 			if($result) return $status;			
 		}
 		else{
-			$update = "UPDATE " . core::database()->getTableName('friends') . " SET status=" . $status . ", added=NOW() WHERE id_user=" . $id_user . " AND id_friend=" . $id_friend;
+			$update = "UPDATE " . core::database()->getTableName('friends') . " SET status=" . $status . ", added=NOW() WHERE user_id=" . $user_id . " AND friend_id=" . $friend_id;
 
 			if(core::database()->querySQL($update)){
 				return $status;
@@ -126,12 +126,12 @@ class Friends
 		}
 	}
 	
-	static function getOutgoingRequestList($id_user, $limit = 10, $offset = 0)
+	static function getOutgoingRequestList($user_id, $limit = 10, $offset = 0)
 	{
-		if(is_numeric($id_user)){
-			$query = "SELECT *, f.id_friend as id_user FROM " . core::database()->getTableName('friends') . " f 
-						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.id_friend=u.id
-						WHERE status=0 AND f.id_user=" . $id_user . "
+		if(is_numeric($user_id)){
+			$query = "SELECT *, f.friend_id as user_id FROM " . core::database()->getTableName('friends') . " f 
+						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.friend_id=u.id
+						WHERE status=0 AND f.user_id=" . $user_id . "
 						LIMIT " . $limit . " OFFSET " . $offset . "
 						";
 					
@@ -141,12 +141,12 @@ class Friends
 		}
 	}
 	
-	static function NumberOutgoingRequest($id_user)
+	static function NumberOutgoingRequest($user_id)
 	{
-		if(is_numeric($id_user)){
+		if(is_numeric($user_id)){
 			$query = "SELECT * FROM " . core::database()->getTableName('friends') . " f 
-						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.id_friend=u.id
-						WHERE status=0 AND f.id_user=" . $id_user;
+						LEFT JOIN " . core::database()->getTableName('users') . " u ON f.friend_id=u.id
+						WHERE status=0 AND f.user_id=" . $user_id;
 					
 			$result = core::database()->querySQL($query);
 		
@@ -154,9 +154,9 @@ class Friends
 		}
 	}
 	
-	static function checkBlock($id_receiver, $id_user)
+	static function checkBlock($receiver_id, $user_id)
 	{
-		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE	(status=2) AND (id_friend=" . $id_receiver . ") AND (id_user=" . $id_user . ")";
+		$query = "SELECT * FROM " . core::database()->getTableName('friends') . " WHERE	(status=2) AND (friend_id=" . $receiver_id . ") AND (user_id=" . $user_id . ")";
 		$result = core::database()->querySQL($query);
 		
 		if(core::database()->getRecordCount($result) == 0) 

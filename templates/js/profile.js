@@ -35,7 +35,7 @@ $(document).ready(function () {
                     if (data.status) {
                         let Message = '<div id="message-' + data.id + '" class="message">';
                         Message += '<div class="message-account"><img src="' + data.avatar + '" alt="" class="img-account">';
-                        Message += '<h5 class="name"><a href="./?task=profile&id_user=' + data.id_sender + '">' + data.firstname + ' ' + data.lastname + '</a></h5>';
+                        Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.sender_id + '">' + data.firstname + ' ' + data.lastname + '</a></h5>';
                         Message += '<p class="data">' + data.created + '</p></div>';
                         Message += '<p class="message-text">' + data.content + '<br>';
                         Message += data.image + '</p>';
@@ -52,8 +52,8 @@ $(document).ready(function () {
                         $('.mess_list').find('.no_message').remove();
                         $('.mess_list').animate({scrollTop: 1000000}, 1100);
                         $('#message').val('');
-                        //web_send_msg(data.id_sender,data.id_receiver);
-                        socket.emit('message', {id_sender: data.id_sender, id_receiver: data.id_receiver});
+                        //web_send_msg(data.sender_id,data.receiver_id);
+                        socket.emit('message', {sender_id: data.sender_id, receiver_id: data.receiver_id});
                     } else {
                         $.each(data.errors, function (k, v) {
                             $('label[for=' + k + ']').append('<span class="error">' + v + '</span>');
@@ -70,7 +70,7 @@ $(document).ready(function () {
         number: 10,
         offset: 10,
     };
-    const id_receiver = '${SEL}';
+    const receiver_id = '${SEL}';
 
     $('.mess_list').scroll(function () {
 
@@ -82,7 +82,7 @@ $(document).ready(function () {
                     type: 'POST',
                     url: '/?task=ajax_action&action=getmessages',
                     data: {
-                        id_receiver: id_receiver,
+                        receiver_id: receiver_id,
                         number: settingsLoad.number,
                         offset: settingsLoad.offset,
                     },
@@ -92,7 +92,7 @@ $(document).ready(function () {
                             for (let i = 0; i < data.item.length; i++) {
                                 let Message = '<div id="message-' + data.item[i].id + '" class="message">';
                                 Message += '<div class="message-account"><img src="' + data.item[i].avatar + '" alt="" class="img-account">';
-                                Message += '<h5 class="name"><a href="./?task=profile&id_user=' + data.item[i].id_sender + '">' + data.item[i].firstname + ' ' + data.item[i].lastname + '</a></h5>';
+                                Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.item[i].sender_id + '">' + data.item[i].firstname + ' ' + data.item[i].lastname + '</a></h5>';
                                 Message += '<p class="data">' + data.item[i].created + '</p></div>';
                                 Message += '<p class="message-text">' + data.item[i].content + '</p>';
                                 Message += '</div>';
@@ -142,9 +142,9 @@ $(document).on("click", ".reply", function () {
     ReplyForm += '</div>';
     ReplyForm += '<form autocomplete="off" id="reply-form-' + IdComment + '" data-num = ' + IdComment + ' action="" enctype="multipart/form-data">';
     ReplyForm += '<input type="hidden" name="commentable_type" value="user">';
-    ReplyForm += '<input type="hidden" name="id_content" value="' + id_content + '">';
-    ReplyForm += '<input type="hidden" name="id_user" value="' + id_user + '">';
-    ReplyForm += '<input type="hidden" name="id_parent" value="' + IdComment + '">';
+    ReplyForm += '<input type="hidden" name="content_id" value="' + content_id + '">';
+    ReplyForm += '<input type="hidden" name="user_id" value="' + user_id + '">';
+    ReplyForm += '<input type="hidden" name="parent_id" value="' + IdComment + '">';
     ReplyForm += '<input type="file" class="file_name" name="file_name[]" data-num="' + IdComment + '" multiple/>';
     ReplyForm += '<input id="comment" name="comment" type="text" data-num="' + IdComment + '" placeholder="' + placeholder + '">';
     ReplyForm += '<div class="smile-files">';

@@ -10,7 +10,7 @@ Auth::authorization();
 	core::requireEx('libs', "html_template/SeparateTemplate.php");
 	$tpl = SeparateTemplate::instance()->loadSourceFromFile(core::getTemplate() . core::getSetting('controller') . ".tpl");
 
-	core::user()->setUser_id($_SESSION['id_user']);
+	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	core::user()->setUserActivity();
 
@@ -72,21 +72,21 @@ Auth::authorization();
 			
 			foreach($arr_groups as $row){
 				$rowBlock = $tpl->fetch('group_search_result_row');
-				$rowBlock->assign('ID', $row['id_community']);
+				$rowBlock->assign('ID', $row['community_id']);
 				$rowBlock->assign('NAME', $row['name']);	
 				$rowBlock->assign('ABOUT', $row['about']);						
 				$rowBlock->assign('CITY', $row['place']);
 				$rowBlock->assign('SPORT_TYPE', $row['sport_type']);	
 
-				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['id_community'], 2), core::getLanguage('str', 'participants_friends')));
+				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['community_id'], 2), core::getLanguage('str', 'participants_friends')));
 					
-				if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])){
+				if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])){
 					$rowBlock->assign('ALLOW_EDIT', 'yes');
 					$rowBlock->assign('OWNER_COMMUNITY', 'yes');
 				} 					
 	
 				$rowBlock->assign('AVATAR', core::documentparser()->communityAvatar($row));		
-				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id'])));			
+				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id'])));			
 				$tpl->assign('group_search_result_row', $rowBlock);		
 			}	
 		}
@@ -99,21 +99,21 @@ Auth::authorization();
 	
 			foreach($arr_teams as $row){
 				$rowBlock = $tpl->fetch('team_search_result_row');
-				$rowBlock->assign('ID', $row['id_community']);
+				$rowBlock->assign('ID', $row['community_id']);
 				$rowBlock->assign('NAME', $row['name']);	
 				$rowBlock->assign('ABOUT', $row['about']);						
 				$rowBlock->assign('CITY', $row['place']);
 				$rowBlock->assign('SPORT_TYPE', $row['sport_type']);					
 
-				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['id_community'], 2), core::getLanguage('str', 'participants_friends')));
+				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['community_id'], 2), core::getLanguage('str', 'participants_friends')));
 					
-				if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])){
+				if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])){
 					$rowBlock->assign('ALLOW_EDIT', 'yes');
 					$rowBlock->assign('OWNER_COMMUNITY', 'yes');
 				} 					
 	
 				$rowBlock->assign('AVATAR', core::documentparser()->communityAvatar($row));		
-				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id'])));
+				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id'])));
 			
 				$tpl->assign('team_search_result_row', $rowBlock);		
 			}	
@@ -213,17 +213,17 @@ Auth::authorization();
 			
 			foreach($arr_events as $row){
 				$rowBlock = $tpl->fetch('events_search_result_row');				
-				$rowBlock->assign('ID', $row['id_event']);	
+				$rowBlock->assign('ID', $row['event_id']);	
 				$rowBlock->assign('NAME', $row['name']);
 				$rowBlock->assign('AVATAR', core::documentparser()->eventAvatar($row['cover_page']));		
 				$rowBlock->assign('SPORT_TYPE', $row['sport_type']);
 				$rowBlock->assign('CITY', $row['place']);
 				$rowBlock->assign('DATE', core::documentparser()->mysql_russian_datetime($row['date']));
 				$rowBlock->assign('DESCRIPTION', $row['description']);
-				$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['id_event']), core::getLanguage('str', 'participants_friends')));			
+				$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['event_id']), core::getLanguage('str', 'participants_friends')));			
 				$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));
 				$rowBlock->assign('STR_REMOVE', core::getLanguage('str', 'remove'));				
-				$rowBlock->assign('STATUS', Events::getEventStatus($row['id_event']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));	
+				$rowBlock->assign('STATUS', Events::getEventStatus($row['event_id']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));	
 				$tpl->assign('events_search_result_row', $rowBlock);	
 			}		
 		}
@@ -254,20 +254,20 @@ Auth::authorization();
 			foreach($arr_communities as $row){
 				$rowBlock = $tpl->fetch('row_group_list');	
 	
-				$rowBlock->assign('ID', $row['id_community']);
+				$rowBlock->assign('ID', $row['community_id']);
 				$rowBlock->assign('NAME', $row['name']);	
 				$rowBlock->assign('ABOUT', $row['about']);						
 				$rowBlock->assign('CITY', $row['place']);
 				$rowBlock->assign('SPORT_TYPE', $row['sport_type']);
-				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['id_community'], 2), core::getLanguage('str', 'participants_friends')));
+				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['community_id'], 2), core::getLanguage('str', 'participants_friends')));
 					
-				if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])){
+				if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])){
 					$rowBlock->assign('ALLOW_EDIT', 'yes');
 					$rowBlock->assign('OWNER_COMMUNITY', 'yes');
 				} 					
 	
 				$rowBlock->assign('AVATAR', core::documentparser()->communityAvatar($row));		
-				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id'])));			
+				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id'])));			
 				
 				$tpl->assign('row_group_list', $rowBlock);
 			}		
@@ -293,20 +293,20 @@ Auth::authorization();
 		if($arr_communities){
 			foreach($arr_communities as $row){		
 				$rowBlock = $tpl->fetch('row_team_list');	
-				$rowBlock->assign('ID', $row['id_community']);
+				$rowBlock->assign('ID', $row['community_id']);
 				$rowBlock->assign('NAME', $row['name']);	
 				$rowBlock->assign('ABOUT', $row['about']);						
 				$rowBlock->assign('CITY', $row['place']);
 				$rowBlock->assign('SPORT_TYPE', $row['sport_type']);	
-				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['id_community'], 2), core::getLanguage('str', 'participants_friends')));
+				$rowBlock->assign('STR_MEMBER', str_replace('%MEMBERS%', Communities::countMemberCommunity($row['community_id'], 2), core::getLanguage('str', 'participants_friends')));
 					
-				if(Communities::checkOwnerCommunity($row['id_community'], $user['id'])){
+				if(Communities::checkOwnerCommunity($row['community_id'], $user['id'])){
 					$rowBlock->assign('ALLOW_EDIT', 'yes');
 					$rowBlock->assign('OWNER_COMMUNITY', 'yes');
 				} 					
 	
 				$rowBlock->assign('AVATAR', core::documentparser()->communityAvatar($row));		
-				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['id_community'], $user['id'])));			
+				$rowBlock->assign('MEMBER_STATUS', Communities::getCommunityRole(Communities::getUserStatus($row['community_id'], $user['id'])));			
 				$tpl->assign('row_team_list', $rowBlock);
 			}
 		}else $tpl->assign('NOTHING_FOUND', core::getLanguage('msg', 'not_found'));
@@ -327,17 +327,17 @@ Auth::authorization();
 		if($arr_events){
 			foreach($arr_events as $row){
 				$rowBlock = $tpl->fetch('row_events_list');	
-				$rowBlock->assign('ID', $row['id_event']);	
+				$rowBlock->assign('ID', $row['event_id']);	
 				$rowBlock->assign('NAME', $row['name']);
 				$rowBlock->assign('AVATAR', core::documentparser()->eventAvatar($row['cover_page']));		
 				$rowBlock->assign('SPORT_TYPE', $row['sport_type']);
 				$rowBlock->assign('CITY', $row['place']);
 				$rowBlock->assign('DATE', core::documentparser()->mysql_russian_datetime($row['date']));
 				$rowBlock->assign('DESCRIPTION', $row['description']);
-				$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['id_event']), core::getLanguage('str', 'participants_friends')));			
+				$rowBlock->assign('PARTICIPANTS_FRIENDS', str_replace('%MEMBERS%', Events::countMembers($row['event_id']), core::getLanguage('str', 'participants_friends')));			
 				$rowBlock->assign('STR_EDIT', core::getLanguage('str', 'edit'));
 				$rowBlock->assign('STR_REMOVE', core::getLanguage('str', 'remove'));				
-				$rowBlock->assign('STATUS', Events::getEventStatus($row['id_event']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));	
+				$rowBlock->assign('STATUS', Events::getEventStatus($row['event_id']) ? core::getLanguage('str', 'event_continues') : core::getLanguage('str', 'event_completed'));	
 				$tpl->assign('row_events_list', $rowBlock);
 			}		
 		}else $tpl->assign('NOTHING_FOUND', core::getLanguage('msg', 'not_found'));	
