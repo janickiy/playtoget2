@@ -1067,6 +1067,54 @@ switch ($_GET['action'])
 		core::documentparser()->showJSONContent($content);		
 	
 	break;
+
+	case get_new_messages:
+
+		Auth::authorization();
+
+		$last_id = is_numeric(Core_Array::getRequest('last_id')) ? (int)Core_Array::getRequest('last_id') : 0;
+		$receiver_id = is_numeric(Core_Array::getRequest('receiver_id')) ? (int)Core_Array::getRequest('receiver_id') : 0;
+		$arr_messages = $data->getNewMessagesAfter($last_id, $user['id'], $receiver_id);
+		$rows = array();
+
+		foreach($arr_messages as $row){
+
+			$image = '<ul class="attach_image">';
+
+			foreach(Attach::getAttachList($row['id'], 'message') as $row2){
+				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+				$image .= '<li>';
+				$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
+				$image .= '</li>';
+			}
+			$image .= '</ul>';
+
+			$rows[] = array(
+				"id_message" => $row['id'],
+				"avatar" => core::documentparser()->userAvatar($row),
+				"sender_id" => $row['sender_id'],
+				"receiver_id" => $row['receiver_id'],
+				"firstname" => $row['firstname'],
+				"lastname" => $row['lastname'],
+				"created" => $row['created'],
+				"status" => $row['status'],
+				"image" => $image,
+				"content" => core::documentparser()->link_replace($row['content'])
+			);
+
+			if($receiver_id > 0 && $row['receiver_id'] == $user['id'] && $row['status'] == 0) {
+				core::database()->update(array('status' => 1), core::database()->getTableName('messages'), "id=" . $row['id']);
+			}
+		}
+
+		$content = array(
+			"item" => $rows,
+			"count" => core::user()->MessageNotification()
+		);
+
+		core::documentparser()->showJSONContent(json_encode($content));
+
+	break;
 	
 	case get_last_message:
 	

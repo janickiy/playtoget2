@@ -15,6 +15,7 @@ if($_SESSION['user_authorization'] == "ok"){
 	core::user()->setUser_id($_SESSION['user_id']);
 	$user = core::user()->getUserInfo();
 	$settings = core::user()->getUserSetting();
+	$user_id = core::database()->escape((int)Core_Array::getRequest('user_id'));
 
 	core::user()->setUserActivity();
 	

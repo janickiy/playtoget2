@@ -110,6 +110,32 @@ class Model_ajax_action extends Model
 		
 		return  array_reverse(core::database()->getColumnArray($result));		
 	}
+
+	public function getNewMessagesAfter($last_id, $user_id, $receiver_id = 0, $limit = 20)
+	{
+		$last_id = (int)$last_id;
+		$user_id = (int)$user_id;
+		$receiver_id = (int)$receiver_id;
+		$limit = (int)$limit;
+		if($limit <= 0) $limit = 20;
+
+		if($receiver_id > 0) {
+			$where = "a.id > " . $last_id . " AND ((a.sender_id=" . $user_id . " AND a.receiver_id=" . $receiver_id . " AND a.status IN (0,1,3)) OR (a.sender_id=" . $receiver_id . " AND a.receiver_id=" . $user_id . " AND a.status IN (0,1,2)))";
+		}
+		else {
+			$where = "a.id > " . $last_id . " AND a.receiver_id=" . $user_id . " AND a.status=0";
+		}
+
+		$query = "SELECT *, a.id AS id, b.id AS user_id, DATE_FORMAT(a.created_at,'%d.%m.%y %H:%i') as created FROM " . core::database()->getTableName('messages') . " a
+					LEFT JOIN " . core::database()->getTableName('users') . " b ON b.id=a.sender_id
+					WHERE " . $where . "
+					ORDER BY a.id ASC
+					LIMIT " . $limit;
+
+		$result = core::database()->querySQL($query);
+
+		return core::database()->getColumnArray($result);
+	}
 	
 	public function changeFriendsStatus($friend_id, $user_id, $status)
 	{
