@@ -1,0 +1,215 @@
+body {
+		font-size: 13px;
+}
+/*HEADER*/
+.left-top-header {
+	width: 35%;
+	padding: 0;
+}
+.top-header-menu {
+	width: 65%;
+	padding: 0;
+}
+.top-header .logo a {
+	background: url("../images/top-logo.png") no-repeat scroll 0 0;
+    display: block;
+    padding: 22px;
+    cursor: pointer;
+}
+.top-header .logo {
+	width: 45px;
+	height: 43px;
+}
+.left-top-header .logo img {
+	display: none;
+}
+.top-header .search {
+    width: 70%;
+}
+.top-header-menu li a {
+    margin-left: 15px;
+}
+.top-header-menu li:nth-of-type(1) a:nth-of-type(2) {
+    margin-right: 20px;
+}
+/*END HEADER*/
+/*menu*/
+.mnu {
+	padding: 10px 0 0;
+}
+span.for-submenu {
+    display: block;
+}
+.mnu .menu li,
+.mnu .menu li:last-of-type {
+	padding: 0 1.8%;
+}
+/**/
+.mnu .menu>li>a:first-of-type:before
+{
+	content: "";
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	z-index: -1;
+	border-radius: 50%;
+	left: 20px;
+    top: -12px;
+}
+.mnu .menu>li:nth-of-type(2)>a:first-of-type:before
+{
+    left: 14px;
+    top: -14px;
+}
+.mnu .menu>li:nth-of-type(3)>a:first-of-type:before
+{
+    left: 8px;
+    top: -14px;
+}
+.mnu .menu>li:nth-of-type(4)>a:first-of-type:before
+{
+    left: 22px;
+    top: -15px;
+}
+.mnu .menu>li:nth-of-type(5)>a:first-of-type:before
+{
+    left: 16px;
+    top: -16px;
+}
+.mnu .menu>li:nth-of-type(6)>a:first-of-type:before
+{
+    left: 10px;
+    top: -17px;
+}
+.mnu .menu>li:nth-of-type(7)>a:first-of-type:before
+{
+ 	left: 12px;
+    top: -20px;
+}
+.mnu .menu>li:nth-of-type(8)>a:first-of-type:before
+{
+ 	left: 30px;
+    top: -14px;
+}
+.mnu .menu>li:nth-of-type(9)>a:first-of-type:before
+{
+ 	left: 22px;
+    top: -10px;
+}
+@media screen and (max-width: 864px)
+{
+	.mnu .menu>li>a:first-of-type:before
+	{
+		left: 15px;
+		top: -12px;
+	}
+	.mnu .menu>li:nth-of-type(2)>a:first-of-type:before
+	{
+		left: 12px;
+		top: -14px;
+	}
+	.mnu .menu>li:nth-of-type(3)>a:first-of-type:before
+	{
+		left: 7px;
+		top: -14px;
+	}
+	.mnu .menu>li:nth-of-type(4)>a:first-of-type:before
+	{
+		left: 22px;
+		top: -15px;
+	}
+	.mnu .menu>li:nth-of-type(5)>a:first-of-type:before
+	{
+		left: 15px;
+		top: -16px;
+	}
+	.mnu .menu>li:nth-of-type(6)>a:first-of-type:before
+	{
+		left: 10px;
+		top: -17px;
+	}
+	.mnu .menu>li:nth-of-type(7)>a:first-of-type:before
+	{
+		left: 12px;
+    top: -20px;
+	}
+	.mnu .menu>li:nth-of-type(9)>a:first-of-type:before
+	{
+		left: 20px;
+		top: -10px;
+	}
+}
+/**/
+/*CONTENT*/
+.left-sitebar {
+    width: 30%;
+}
+.bg .content {
+    width: 70%;
+	float: right;
+}
+.cover_page {
+    top: 10px;
+}
+/**/
+#achivments .plus_sport_type {
+	font-size: 10px;
+	min-width: 140px;
+}
+#achivments .minus_sport_type {
+	margin: auto 36.5% auto auto !important;
+	font-size: 10px;
+	min-width: 135px;
+}
+/**/
+.profilelink a {
+	font-size: 15px;
+}
+/**/
+.sport_group_list li a {
+	margin: 0 8%;
+}
+/**/
+/**/
+.right-sitebar {
+	display: none;
+}
+.menu_groups
+{
+    display:inline-block!important;
+}
+.menu_groups_hide
+{
+    display:none!important;
+}
+/**/
+.main-entrance {
+	padding: 3%;
+	width: 94% !important;
+}
+.section-sport-inside {
+	width: 100%;
+	padding: 0;
+}
+
+.form-frame {
+	width: 50%;
+	margin: 0 25%;
+	padding: 0;
+}
+.main-registration .form-frame {
+	margin: auto;
+	width: 100%;
+}
+.menu-footer li 
+{
+	padding: 5px;
+}
+.copyrght {
+	font-size: 1em;
+}
+.menu-footer {
+	width: 70%;
+	margin-right: auto;
+	margin-left: auto;
+}

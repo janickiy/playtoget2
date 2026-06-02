@@ -1,0 +1,239 @@
+/*HEADER*/
+.left-top-header {
+    width: 85%;
+}
+.left-top-header .search {
+	margin-right: 0;
+}
+/*END HEADER*/
+/*menu*/
+.top-mnu-submenu::before,
+.top-mnu-submenu li:first-of-type:hover::before {
+    left: 7%;
+}
+.mnu + .wrapper {
+    margin-top: 81px;
+}
+.mnu .menu li a {
+	margin: auto;
+}
+.mnu .menu .top-mnu-submenu li a {
+	margin-bottom: 8px;
+	padding-left: 8px;
+}
+.mnu .menu li, .mnu .menu li:last-of-type {
+    padding: 0 1.2%;
+}
+.mnu .menu img {
+    max-height: 25px;
+    max-width: 25px;
+}
+.top-mnu-submenu {
+    left: 0;
+    top: 100%;
+}
+.mnu .menu li:nth-of-type(6) img {
+    vertical-align: -6px;
+}
+.top-mnu-submenu {
+    left: -13%;
+	top: 100%;
+}
+.mnu .menu li a:first-of-type:hover:before
+{
+	width: 45px;
+	height: 45px;
+	left: -25%;
+	top: -11px;
+}
+.mnu .menu li:nth-of-type(2):hover a:first-of-type:before
+{
+	left: -25%;
+	top: -11px;
+}
+.mnu .menu li:nth-of-type(3):hover a:first-of-type:before
+{
+	left: -15%;
+	top: -12px;
+}
+.mnu .menu li:nth-of-type(4):hover a:first-of-type:before
+{
+	left: -17%;
+	top: -13px;
+}
+.mnu .menu li:nth-of-type(5):hover a:first-of-type:before
+{
+	left: -16%;
+	top: -13px;
+}
+.mnu .menu li:nth-of-type(6):hover a:first-of-type:before
+{
+	left: -15%;
+	top: -14px;
+}
+.mnu .menu li:nth-of-type(7):hover a:first-of-type:before
+{
+	left: -20%;
+	top: -10px;
+}
+.mnu .menu li:nth-of-type(8):hover a:first-of-type:before
+{
+	left: -20%;
+	top: -10px;
+}
+/**/
+/*CONTENT*/
+.file_upload2 {
+    left: 2%;
+}
+.name_dialog
+{
+	display:none;
+}
+.img-account
+{
+	margin-right:30px;
+}
+/**/
+.cover_page {
+    margin: 0 auto 10px;
+}
+.cover-send-message,
+#friends_button,
+#block_user_button {
+	width: auto;
+}
+.cover_page button {
+    font-size: 0.9em;
+    padding: 11px;
+	width: auto;
+}
+/**/
+.profilelink {
+	margin-top: 55px;
+}
+.profilelink a {
+    margin: 0 4%;
+}
+
+.top_thumb_avatar img {
+	margin-right: 7px;
+}
+.message-content input[type="text"],.message-content textarea {
+	width: 78%;
+	font-size: 13px;
+}
+/*.message-reply-text,
+.message-text {
+    width: 38%;
+}*/
+.my-comment input[type="text"] {
+	right: 0;
+	padding-left: 2px;
+	width: 70%;
+}
+/**/
+#main .control-group label {
+    margin: auto;
+	max-width: 33%;
+	padding: 0;
+}
+.education_form_new label,
+.education_form label,
+.job_form_new label,
+.job_form label,
+.sport_type_form_new  label,
+.sport_type_form  label {
+    line-height: 1.5;
+    max-width: 41%;
+    padding-left: 5px;
+}
+#education .col-lg-6,
+#job .col-lg-6,
+#achivments .col-lg-6 {
+	/*width: 55%;*/
+}
+.profile-settings button {
+    font-size: 1.3em !important;
+    margin: 0 1.5% !important;
+    padding: 11.5px 16px!important;
+}
+/**/
+/*photo, video*/
+.add-photos-album span {
+	margin-left: 17%;
+}
+.my-albums {
+    text-align: center !important;
+}
+.my-albums .album {
+	width: 90%;
+	float: none;
+	border-right: 2px solid #eaebed !important;
+	border-bottom: 2px solid #eaebed !important;
+	border-left: 2px solid #eaebed !important;
+}
+
+	
+.my-albums .album:first-child {
+	border-top: 2px solid #eaebed !important;
+}
+/*photo, video*/
+.photo-container div {
+	width: 48%;
+	margin: 0.5%;
+}
+
+/**/
+/*friends*/
+a.show-more,
+.friends .possible-friend {
+	width: 92%;
+}
+.friends .possible-friend-cart .possible-avatar {
+    margin: 10px 15px 30px 10px;
+}
+/**/
+/*comand, goups, events*/
+.sport_group_list li a {
+    margin: 0 23%;
+}
+
+/**/
+.main-entrance {
+    padding-right: 0;
+    padding-left: 0;
+}
+.main-entrance .form-container {
+    width: 100%;
+}
+
+.form-container {
+	width: 100%;
+}
+#input-checkbox+label span {
+	display: none;
+}
+#input-login, #input-password, #input-submit {
+	height: 37px;
+}
+
+.main-entrance a.form-enter-link_pass {
+	margin-left: 8%;
+}
+
+.main-entrance #input-submit {
+    margin: 10px 0;
+}
+.main-registration #input-submit {
+	margin: 10px 0 10px 16%;
+}
+.main-registration #input-submit {
+    width: 225px;
+}
+.main-entrance a.form-enter-link_reg {
+	margin-left: 1%;
+}
+.main-registration a.form-enter-link_pass {
+    margin-left: 5px;
+}

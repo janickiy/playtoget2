@@ -1,0 +1,240 @@
+/*HEADER*/
+.left-top-header {
+	width: 50%;
+	padding: 0 5% 0 0;
+}
+/*END HEADER*/
+/*menu*/
+.mnu .menu li,
+.mnu .menu li:last-of-type {
+    padding: 0 2%;
+}
+.top-mnu-submenu::before,
+.top-mnu-submenu li:first-of-type:hover::before {
+    left: 12%;
+}
+.top-mnu-submenu {
+    left: 0;
+    top: 120%;
+}
+
+.mnu .menu li a:first-of-type:before
+{
+	width: 55px;
+	height: 55px;
+	left: -4%;
+	top: -11px;
+}
+.mnu .menu li:nth-of-type(2) a:first-of-type:before
+{
+	left: -2%;
+	top: -11px;
+}
+.mnu .menu li:nth-of-type(3) a:first-of-type:before
+{
+	left: 6%;
+	top: -12px;
+}
+.mnu .menu li:nth-of-type(4) a:first-of-type:before
+{
+	left: 5%;
+	top: -13px;
+}
+.mnu .menu li:nth-of-type(5) a:first-of-type:before
+{
+	left: 3%;
+	top: -13px;
+}
+.mnu .menu li:nth-of-type(6) a:first-of-type:before
+{
+	left: 3%;
+	top: -16px;
+}
+.mnu .menu li:nth-of-type(8) a:first-of-type:before
+{
+	left: 0px;
+    top: -11px;
+}
+.mnu .menu li:nth-of-type(9) a:first-of-type:before
+{
+	left: 2%;
+	top: -8px;
+}
+/**/
+/*CONTENT*/
+
+.cover-send-message,
+#friends_button,
+#block_user_button {
+	width: 31%;
+}
+.cover_page button {
+	width: 92%;
+	margin: 11% 4% 5%;
+}
+.profilelink a {
+    font-size: 14px;
+    margin: auto;
+}
+.message-reply {
+	padding-left: 5%;
+}
+.message-content input[type="text"],.message-content textarea {
+	width: 85%;
+}
+.my-comment input[type="text"] {
+	width: 70%;
+}
+/**/
+#tabs ul li {
+    width:100%!important;
+}
+#main .control-group label {
+    margin: 0 1% 0 2%;
+	max-width: 35%;
+	padding: 0 5px;
+}
+.sport_type_form  label {
+	max-width: 27.5%;
+}
+#education .col-lg-6,
+#job .col-lg-6,
+#achivments .col-lg-6,
+.education_form .col-lg-6,
+.job_form .col-lg-6 {
+	width: 65% !important;
+}
+#achivments .sport_type_form .col-lg-6,
+#achivments .sport_type_form_new .col-lg-6,
+#achivments .sport_block .sport_type_form .col-lg-6 {
+	width: 82% !important;
+}
+/**/
+/*photo, video*/
+
+/**/
+/*friends*/
+.friends .possible-friend .possible-friend-cart {
+	padding: 0 !important;
+	min-height: 135px;
+}
+.friends .possible-friend-cart .possible-avatar {
+    height: auto;
+    margin: 10px 15px 42px 10px;
+    min-width: 60px;
+    width: 23%;
+}
+/**/
+.file_upload2 {
+    left: 10%;
+}
+#preview-pane .preview-container {
+    height: 130px;
+    width: 130px;
+}
+/*teg*/
+.sport_group_list li a {
+	margin: 0 3%;
+}
+.profile-settings.fitness input[type="submit"] {
+	right: 7px;
+}
+.profile-settings input {
+	padding-left: 7px;
+}
+/**/
+.main-entrance .row{
+	margin: auto;
+}
+.section-sport-inside {
+	padding-bottom: 5%;
+}
+.main-entrance p.sport-inside {
+	margin-top: 0;
+}
+.main-entrance .form-container {
+	float: none;
+	margin: 5% auto;
+}
+.main-entrance #entrance-form  {
+	margin: auto;
+}
+
+.main-registration #input-submit {
+    margin: 10px 0 10px 16%;
+}
+.main-entrance .social {
+	margin: auto;
+}
+.section-sport-inside,
+.form-frame,
+.copyright {
+	width: 100%;
+	margin: auto;
+	text-align: center;
+}
+.index-registration-body .section-for-footer {
+    margin-top: 0;
+}
+.menu-footer {
+	width: 100%;
+}
+ul.attach_image li
+	{
+	width:100%;
+	}
+ul.attach_image li:nth-last-child(2):first-child,
+ul.attach_image li:nth-last-child(2):first-child ~ li
+{
+	width:49%;
+	height:80px;
+}
+
+ul.attach_image li:nth-last-child(3):first-child,
+ul.attach_image li:nth-last-child(5):first-child
+{
+	width:100%;
+	max-height:170px;
+}
+ul.attach_image li:nth-last-child(3):first-child ~ li,
+ul.attach_image li:nth-last-child(5):first-child ~ li,
+ul.attach_image li:nth-last-child(4):first-child,
+ul.attach_image li:nth-last-child(4):first-child ~ li
+{
+	width:49%;
+	height:80px;
+}
+@media screen and (max-width: 560px) {
+	.cover-send-message,
+	#friends_button,
+	#block_user_button {
+		width: 32.5%;
+	}
+	.cover_page button {
+		width: 100%;
+		margin: 11% 0 5%;
+		padding: 11px 9px;
+	}
+	.cover_page .upload_cover_img {
+		line-height: 34px;
+		width: 245px;
+		bottom: 96px;
+	}
+	#achivments .sport_type_form .col-lg-6,
+	#achivments .sport_type_form_new .col-lg-6,
+	#achivments .sport_block .sport_type_form .col-lg-6 {
+		width: 78% !important;
+		margin-bottom: 10px;
+	}
+	#achivments .addform_achivments_plus .form-group:last-child .col-lg-3 {
+		float: left;
+	}
+	#achivments .addform_achivments_plus .form-group:last-child .col-lg-6 {
+		width: 100% !important;
+	}
+	.reply span {
+		display: none;
+	}
+
+	
+}

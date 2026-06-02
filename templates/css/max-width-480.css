@@ -1,0 +1,349 @@
+/*HEADER*/
+.profile-user {
+	display: none;
+}
+.left-top-header {
+	width: 90%;
+	padding: 0;
+}
+.top-header .search {
+	margin-right: 6%;
+}
+/*END HEADER*/
+/*menu*/
+.mnu .menu li, .mnu .menu li:last-of-type {
+    padding: 0 1.5%;
+}
+.mnu .menu img {
+    max-height: 30px;
+    max-width: 30px;
+}
+.top-mnu-submenu {
+    left: 0;
+}
+.mnu .menu li:nth-of-type(6) img {
+    vertical-align: -10px;
+}
+.top-mnu-submenu {
+    left: -13%;
+	top: 100%;
+}
+.mnu .menu li a:first-of-type:before
+{
+	width: 50px;
+	height: 50px;
+	left: -15%;
+	top: -10px;
+}
+.mnu .menu li:nth-of-type(2) a:first-of-type:before
+{
+	left: -12%;
+	top: -10px;
+}
+.mnu .menu li:nth-of-type(3) a:first-of-type:before
+{
+	left: -2%;
+	top: -11px;
+}
+.mnu .menu li:nth-of-type(4) a:first-of-type:before
+{
+	left: -2%;
+	top: -12px;
+}
+.mnu .menu li:nth-of-type(5) a:first-of-type:before
+{
+	left: -5%;
+	top: -12px;
+}
+.mnu .menu li:nth-of-type(7) a:first-of-type:before
+{
+	left: -4%;
+	top: -15px;
+}
+.mnu .menu li:nth-of-type(8) a:first-of-type:before
+{
+	left: -9%;
+	top: -9px;
+}
+.mnu .menu li:nth-of-type(9) a:first-of-type:before
+{
+	left: -6%;
+	top: -7px;
+}
+/**/
+/*CONTENT*/
+.sport_group_list li a span  {
+	display: none;
+}
+.sport_group_list li a {
+	margin: 0 28%;
+}
+/**/
+#achivments .sport_type_form .col-lg-6,
+#achivments .sport_type_form_new .col-lg-6,
+#achivments .sport_block .sport_type_form .col-lg-6 {
+    width: 65% !important;
+}
+#achivments .plus_sport_type {
+	font-size: 10px;
+	width: 145px;
+	top: 0;
+	bottom: 0;
+	margin: 0 auto 10px;
+}
+#achivments .minus_sport_type {
+    margin: auto !important;
+	width: 145px;
+}
+#achivments .col-lg-3, #achivments .sport_block .sport_type_form .col-lg-3 {
+    width: 31% !important;
+}
+#achivments .addform_achivments_plus .form-group:last-child .col-lg-3 {
+	float: left;
+	width: 100px !important;
+}
+/**/
+.file_upload2 {
+    left: 5%;
+}
+#preview-pane .preview-container {
+    height: 110px;
+    width: 110px;
+}
+/**/
+.cover_page {
+	min-height: 140px;
+}
+.account {
+    bottom: -10%;
+}
+.groups_button span {
+	display: none;
+}
+.groups_button {
+	right: 4%;
+    bottom: 7%;
+    width: 34px!important;
+    border-radius: 100%;
+}
+
+.groups_button.leave_fr:after {
+
+    padding-left: 4px;
+ }   
+.groups_button::after {
+    border-radius: 8em;
+    height: 34px;
+    padding-left: 8px;
+    right: 0;
+    width: 34px;
+}
+.cover-photo {
+    bottom: -50%;
+    height: auto;
+    left: -50%;
+    margin: auto;
+    max-height: 100%;
+    min-height: 100%;
+    min-width: 100%;
+    position: absolute;
+    right: -50%;
+    top: -50%;
+    width: auto;
+}
+.account p {
+    max-height: 21px;
+    max-width: 58%;
+    overflow: hidden;
+}
+.cover_page button {
+    margin: 2% 0 5%;
+}
+.cover-buttons span {
+	display: none;
+}
+/*information*/
+#information li {
+	padding: 0 2%;
+}
+/**/
+.profilelink a {
+    margin: 0 7%;
+}
+.message-reply {
+	padding-left: 0;
+	
+}
+.message .name {
+    font-size: 12.5px;
+}
+.message-content input[type="text"],.message-content textarea {
+	width: 82%;
+}
+.message-reply .message {
+    width: 100%;
+}
+.message-reply-text,
+.message-text {
+	padding: 10px;
+}
+.mess_list .message
+{
+	padding:0;
+}
+.mess_list .message-account
+{
+	margin-left: 3%;
+}
+.mess_list .message-reply-text, .mess_list .message-text
+{
+	width:90%;
+	top:0;
+	right:5%;
+	margin-top: 0;
+}
+.message_textarea
+{
+	padding-top:0;
+}
+.my-comment input[type="text"] {
+	width: 60%;
+}
+.my-comment .smile-files {
+	right: 5px;
+}
+
+/**/
+.sport_type_form  label {
+	max-width: 30%;
+}
+#education .col-lg-6,
+#job .col-lg-6,
+#achivments .col-lg-6,
+.job_form .col-lg-6 {
+	width: 55% !important;
+}
+.profile-settings button {
+	font-size: 1.5em !important;
+}
+/**/
+.profilelink a span {
+    display: none;
+	
+}
+.profilelink a {
+    margin: 0 5%;
+	padding: 4px 16px;
+	background-size: 100% !important;
+}
+
+ 
+/*photo, video*/
+.add-photos-album {
+	text-align: left;
+}
+.add-photos-album span {
+	margin-left: 22.5%;
+	display: block;
+}
+.add-photos-album span:nth-child(2) {
+    text-align: center;
+	margin: auto;
+}
+.photo-container div {
+	width: 31.5%;
+}
+/**/
+/*friends*/
+.friends .possible-friend {
+	width: 80%;
+	margin: auto;
+}
+.friends .possible-friend .possible-friend-cart {
+	width: 100%;
+}
+.friends .possible-friend .possible-friend-cart:nth-child(2n+1) {
+	border-right: none;
+}
+.friends .possible-friend-cart .possible-avatar {
+    margin: 10px 15px 25px 10px;
+    width: 29%;
+}
+a.show-more {
+	width: 80%;
+	margin: auto;
+}
+/**/
+/*comand, goups, events*/
+.teg,
+.content .content-fitness-text {
+	width: 47%;
+}
+.event-container .event-item .img,
+.content .content-fitness-img {
+	width: 47%;
+}
+.sport_group_list li a {
+    margin: 0 19%;
+}
+[class*="icon-"]::before {
+	font-size: 25px;
+}
+.selects-field-events p.select-container {
+    display: block;
+	width: 100%;
+}
+.selects-field-events p.select-container:first-child  {
+	border-right: none;
+	border-bottom: 1px solid #e0e1e4;
+}
+.content-groups .profile-settings button {
+	font-size: 0.9em !important;
+	margin: 1.5% !important;
+}
+.profile-settings .styled-select-1,
+.profile-settings .styled-select-2,
+.profile-settings.fitness input[type="search"] {
+    width: 90%;
+	float: none;
+	display: block;
+	margin: auto;
+}
+.profile-settings.fitness input[type="submit"] {
+    right: 30px;
+    top: -26px;
+}
+/**/
+
+.main-entrance .row {
+	margin: auto;
+}
+.form-container {
+	width: 85%;
+}
+.main-entrance #input-submit {
+	width: 120px;
+}
+.main-entrance a.form-enter-link_pass {
+	margin-left: 10%;
+}
+.main-registration a.form-enter-link_pass {
+    margin-left: 5px;
+}
+.alert_msg, .error_msg {
+    padding: 0 3%;
+}
+
+.container_in_swiper {
+        height: 200px!important;
+    }
+
+  .description_shop .text
+ {
+ 	width:100%;
+ 	border-right:none;
+ }
+  .description_shop .contact
+ {
+ 	width:100%;
+ }
