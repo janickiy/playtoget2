@@ -1,6 +1,110 @@
 $(document).ready(function () {
     $('.mess_list').animate({scrollTop: 1000000}, 1100);
 
+    let lastDialogMessageId = 0;
+
+    function getMessageId(row) {
+        return parseInt(row.id_message || row.id || 0, 10) || 0;
+    }
+
+    function updateLastDialogMessageId(id) {
+        lastDialogMessageId = Math.max(lastDialogMessageId, parseInt(id, 10) || 0);
+    }
+
+    function initLastDialogMessageId() {
+        $('.mess_list [id^="message-"]').each(function () {
+            updateLastDialogMessageId(String($(this).attr('id')).replace('message-', ''));
+        });
+    }
+
+    function refreshMessageVisuals() {
+        $('.message-text').each(function () {
+            $(this).emotions();
+        });
+        $('.message-reply-text').each(function () {
+            $(this).emotions();
+        });
+    }
+
+    function renderDialogMessage(row) {
+        const id = getMessageId(row);
+        const isMine = String(row.sender_id) === String(window.user_id);
+        let message = '';
+
+        if (isMine) {
+            message += '<div id="message-' + id + '" class="message">';
+            message += '<div class="message-account"><img src="' + row.avatar + '" alt="" class="img-account">';
+            message += '<h5 class="name"><a href="./?task=profile&user_id=' + row.sender_id + '">' + row.firstname + ' ' + row.lastname + '</a></h5>';
+            message += '<p class="data">' + row.created + '</p></div>';
+            message += '<p class="message-text">' + row.content + '<br>';
+            message += row.image + '</p>';
+            message += "<div class='del-message' data-item='" + id + "' data-tooltip='Удалить сообщение'></div>";
+            message += '</div>';
+        } else {
+            message += '<div class="message-reply" id="message-' + id + '">';
+            message += '<div class="message">';
+            message += '<div class="message-account"><img src="' + row.avatar + '" alt="" class="img-account">';
+            message += '<h5 class="name"><a href="./?task=profile&user_id=' + row.sender_id + '">' + row.firstname + ' ' + row.lastname + '</a></h5>';
+            message += '<p class="data">' + row.created + '</p></div>';
+            message += '<p class="message-reply-text">' + row.content + '<br>';
+            message += row.image + '</p>';
+            message += '</div>';
+            message += '</div>';
+        }
+
+        return message;
+    }
+
+    function appendDialogMessage(row) {
+        const id = getMessageId(row);
+
+        if (!id) {
+            return;
+        }
+
+        if ($('#message-' + id).length) {
+            updateLastDialogMessageId(id);
+            return;
+        }
+
+        $('#message-list').append(renderDialogMessage(row));
+        $('.mess_list').find('.no_message').remove();
+        $('.mess_list').animate({scrollTop: 1000000}, 1100);
+        refreshMessageVisuals();
+        updateLastDialogMessageId(id);
+    }
+
+    function pollDialogMessages() {
+        const receiver_id = $('[name=receiver_id]').val() || $('#message-list').attr('data-num');
+
+        if (!receiver_id) {
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: './?task=ajax_action&action=get_new_messages',
+            dataType: 'json',
+            data: {
+                receiver_id: receiver_id,
+                last_id: lastDialogMessageId
+            },
+            success: function (data) {
+                if (typeof data.count !== 'undefined' && typeof setMessageCount === 'function') {
+                    setMessageCount(data.count);
+                }
+
+                if (data && data.item) {
+                    $.each(data.item, function (_, row) {
+                        appendDialogMessage(row);
+                    });
+                }
+            }
+        });
+    }
+
+    initLastDialogMessageId();
+    setInterval(pollDialogMessages, 4000);
 
     $('#addMessageForm').submit(function (e) {
         $('.typing').removeClass('show')
@@ -52,8 +156,7 @@ $(document).ready(function () {
                         $('.mess_list').find('.no_message').remove();
                         $('.mess_list').animate({scrollTop: 1000000}, 1100);
                         $('#message').val('');
-                        //web_send_msg(data.sender_id,data.receiver_id);
-                        socket.emit('message', {sender_id: data.sender_id, receiver_id: data.receiver_id});
+                        updateLastDialogMessageId(data.id);
                     } else {
                         $.each(data.errors, function (k, v) {
                             $('label[for=' + k + ']').append('<span class="error">' + v + '</span>');
@@ -70,7 +173,7 @@ $(document).ready(function () {
         number: 10,
         offset: 10,
     };
-    const receiver_id = '${SEL}';
+    const receiver_id = $('[name=receiver_id]').val() || $('#message-list').attr('data-num');
 
     $('.mess_list').scroll(function () {
 
@@ -87,10 +190,9 @@ $(document).ready(function () {
                         offset: settingsLoad.offset,
                     },
                     success: function (data) {
-                        console.log(data);
                         if (data != '' && data.item != null) {
                             for (let i = 0; i < data.item.length; i++) {
-                                let Message = '<div id="message-' + data.item[i].id + '" class="message">';
+                                let Message = '<div id="message-' + data.item[i].id_message + '" class="message">';
                                 Message += '<div class="message-account"><img src="' + data.item[i].avatar + '" alt="" class="img-account">';
                                 Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.item[i].sender_id + '">' + data.item[i].firstname + ' ' + data.item[i].lastname + '</a></h5>';
                                 Message += '<p class="data">' + data.item[i].created + '</p></div>';

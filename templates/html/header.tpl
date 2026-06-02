@@ -33,22 +33,8 @@
 	<link rel="stylesheet" href="./templates/css/jquery.emotions.fb.css">
 	<script>
 		window.user = '${ID_USER}';
-		window.socketHost = window.location.protocol + '//' + window.location.hostname + ':3000';
 	</script>
-	<script type="text/javascript" src='./templates/js/header.js?v=20260602-2'></script>
-	<script>
-		(function () {
-			let socketScript = document.createElement('script');
-			socketScript.async = true;
-			socketScript.src = window.socketHost + '/socket.io/socket.io.js';
-			socketScript.onload = function () {
-				if (window.initHeaderSocket) {
-					window.initHeaderSocket();
-				}
-			};
-			document.head.appendChild(socketScript);
-		})();
-	</script>
+	<script type="text/javascript" src='./templates/js/header.js?v=20260602-3'></script>
 <!-- show/hidden -->
 <script src='./templates/js/show-hidden.js'></script>
 
