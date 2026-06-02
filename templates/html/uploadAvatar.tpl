@@ -4,8 +4,13 @@
 
 $(document).ready(function(){
 
-let width;
-let height;
+	$('#target, #target-cover').each(function(){
+		const src = $(this).data('src');
+		if(src) $(this).attr('src', src);
+	});
+
+	let width;
+	let height;
 let new_width;
 let k;
 
@@ -117,11 +122,10 @@ let jcrop_api;
 
 
         
-		    },
-		    error:function(data){
-		    	console.log(data);
-				$('#avatarUpload .loading-bar').html('Ошибка загрузки!');
-			}
+			    },
+			    error:function(data){
+					$('#avatarUpload .loading-bar').html('Ошибка загрузки!');
+				}
 		};
 		$('#uploadAva').ajaxForm(options);  
 
@@ -250,11 +254,10 @@ function showCoordsCover(c)
 			        },function(){
 					    jcrop_api = this;
 					  });
-		    },
-		    error:function(data){
-		    	console.log(data);
-			$('#coverUpload .loading-bar').html('Ошибка загрузки!');
-		    }
+			    },
+			    error:function(data){
+				$('#coverUpload .loading-bar').html('Ошибка загрузки!');
+			    }
 		};
 		$('#uploadCover').ajaxForm(optionsCover);
 
@@ -333,7 +336,7 @@ function showCoordsCover(c)
 
           <p class='text-show'>Выберите область, которую хотите использовать</p>
 
-            <img src="${TEAM_AVATAR}" id="target" alt=""/>
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="${TEAM_AVATAR}" id="target" alt=""/>
 
           <form autocomplete="off" action="/?task=ajax_action&action=uploadavatar" method="post" id="uploadAva" enctype="multipart/form-data">
             <div class="file_upload2">
@@ -375,7 +378,7 @@ function showCoordsCover(c)
           </div> 
           <div class="loading-bar"><img border="0" src="./templates/images/select2-spinner.gif" width=20px></div>
           <p class='text-show'>Выберите область, которую хотите использовать</p>
-            <img src="${TEAM_COVER_PAGE}" id="target-cover" alt=""/>
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-src="${TEAM_COVER_PAGE}" id="target-cover" alt=""/>
           <form action="/?task=ajax_action&action=uploadcover" method="post" id="uploadCover" enctype="multipart/form-data">
             <div class="file_upload2">
               <button type="button" id='load-cover'>Выберите файл</button>

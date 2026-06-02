@@ -67,7 +67,6 @@ function save_form() {
             url: './?task=ajax_action&action=edit_profile',
             data: form_content,
             success: function (data) {
-                console.log(data);
                 if (data.result == 'success') {
                     $('body').append('<div id="ok_com_fr" class="save_window_ok hiden">Профиль успешно сохранен!</div>');
                 } else {

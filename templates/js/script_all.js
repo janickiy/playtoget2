@@ -401,7 +401,6 @@ function community_add(id) {
             status: 1,
         },
         success: function (data) {
-            console.log(data);
             if (data.result == 'success') {
                 $('.groups_button').addClass('leave_fr').html('Пригласить друзей');
                 $('.groups_button_leave').removeClass('hide');
@@ -550,7 +549,6 @@ function event_add(id) {
             status: 1,
         },
         success: function (data) {
-            console.log(data);
             if (data.result == 'success') {
                 $('.groups_button').addClass('leave_fr').html('Пригласить друзей');
                 $('.groups_button').attr('onclick', 'event_fr(' + id + ');');
@@ -596,7 +594,6 @@ function event_leave(id, type) {
                             status: 0,
                         },
                         success: function (data) {
-                            console.log(data);
                             if (data.result == 'success') {
                                 $('.groups_button').removeClass('leave_fr').html('Присоединиться');
                                 $('.groups_button').attr('onclick', 'event_join(' + id + ',1,"");');
@@ -634,7 +631,6 @@ function change_event_community_status(community_id, event_id, status) {
             status: status,
         },
         success: function (data) {
-            console.log(data);
             if (data.result == 'success')
                 location.reload();
         }
@@ -869,7 +865,6 @@ $(document).ready(function () {
             dataType: "json",
             success: function (data) {
                 const Result = data.result;
-                console.log(data);
                 if (Result != '') {
                     $('.tell[data-type=' + type + '][data-item=' + IdComment + ']').text(Result);
                     $('body').append('<div id="ok_com_fr" class="save_window_ok hiden">Запись появится в новостях у Ваших друзей!</div>');
@@ -980,7 +975,6 @@ $(document).ready(function () {
                 type: 'POST',
                 success: function (data) {
 
-                    console.log(data);
                     $('textarea').css('height', '38px');
                     then[0].reset();
 

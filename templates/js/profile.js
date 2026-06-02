@@ -286,7 +286,6 @@ $(document).scroll(function () {
                     id: id_profile
                 },
                 success: function (data) {
-                    console.log(data);
                     $('#comment-list').find('.loading-bar').remove();
                     $('#comment-list').append(data.html);
                     $('.message-text').each(function () {

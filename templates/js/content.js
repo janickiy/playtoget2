@@ -24,7 +24,6 @@ $(document).ready(function () {
                 url: './?task=ajax_action&action=send_message',
                 data: form,
                 success: function (data) {
-                    console.log(data);
                     if (data.status == 1) {
                         $('.save_window_ok').html(data.msg).removeClass('hiden');
 

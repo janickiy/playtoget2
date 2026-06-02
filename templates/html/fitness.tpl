@@ -193,9 +193,8 @@ $(document).on('click','.no_attach',function(){
     </div>
   </div>
 </section>
-<script src="./templates/js/browser.js"></script>
 <script src="./templates/js/select2.min.js"></script>
-<script src="./templates/js/bootstrap.min.js"></script>
+<script src="./templates/js/bootstrap.min.js?v=20260603-1"></script>
 <script src="./templates/js/common.js"></script>
 <script src="./templates/js/jquery.uploadThumbs.js"></script>
 <script>selectAction();</script>
