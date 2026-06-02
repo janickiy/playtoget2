@@ -361,7 +361,6 @@ $(document).scroll(function() {
 					id : '${ID_EVENT}'
 				},
 				success:function(data){
-					console.log(data);
 					$('#comment-list').find('.loading-bar').remove();
 					$('#comment-list').append(data.html);
 					settComments.offset+=settComments.number;

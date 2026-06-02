@@ -256,6 +256,29 @@ class Photoalbum
 			return core::database()->getRow($result);			
 		}		
 	}
+
+	static function getPhotoSmallSrc($photo)
+	{
+		if(!is_array($photo) || empty($photo['small_photo'])){
+			return '';
+		}
+
+		if(!empty($photo['photoalbumable_type'])){
+			$src = core::documentparser()->photogalleryPic($photo['small_photo'], $photo['photoalbumable_type']);
+			if($src){
+				return $src;
+			}
+		}
+
+		$attach_paths = array(PATH_COMMENT_ATTACHMENTS, PATH_MESSAGE_ATTACHMENTS);
+		foreach($attach_paths as $path){
+			if(file_exists($path . $photo['small_photo'])){
+				return $path . $photo['small_photo'];
+			}
+		}
+
+		return '';
+	}
 	
 	static function getPicList($photoalbum_id, $limit = 5, $offset = 0)
 	{

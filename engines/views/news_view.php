@@ -61,10 +61,11 @@ session_start();
 			$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 			$publication_msg .= '<ul class="attach_image">';
 			
-			foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
-			}
+				foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+					if($photo_src) $publication_msg .= '<li><img border="0" src="' . $photo_src . '" class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
+				}
 			
 			$publication_msg .= '</ul>'	;
 			$arrs[] = array('name' => $publication_name,'type' => 'event','id_author' => $event_id, 'msg' => $publication_msg, 'avatar' => core::documentparser()->eventAvatar($row['cover_page']), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
@@ -81,10 +82,11 @@ session_start();
 			$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 			$publication_msg .= '<ul class="attach_image">';
 			
-			foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-				$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
-			}	
+				foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+					if($photo_src) $publication_msg .= '<li><img border="0" src="' . $photo_src . '" class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
+				}	
 			
 			$publication_msg .= '</ul>'	;
 			$arrs[] = array('name' => $publication_name,'type' => $row['commentable_type'],'id_author' => $community_id, 'msg' => $publication_msg, 'avatar' => core::documentparser()->communityAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
@@ -97,10 +99,11 @@ session_start();
 		$publication_msg = str_replace('%MSG%', $row['content'], core::getLanguage('str', 'useraction_left_comment'));  
 		$publication_msg .= '<ul class="attach_image">';
 		
-		foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-			$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-			$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
-		}	
+			foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
+				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+				$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+				if($photo_src) $publication_msg .= '<li><img border="0" src="' . $photo_src . '" class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
+			}	
 		
 		$publication_msg .= '</ul>'	;
 		$arrs[] = array('name' => $publication_name,'type' => 'user', 'id_author' => $publication_id_author, 'msg' => $publication_msg, 'avatar' => core::documentparser()->userAvatar($row), 'content_id' => $row['id_comment'], 'likeable_type' => 'comment', 'publication_date' => core::documentparser()->mysql_russian_date($row['added']), 'timeorder' => $row['timeorder']);
@@ -226,10 +229,11 @@ session_start();
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg);
 				$publication_msg .= '<ul class="attach_image">';
 				
-				foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
-					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
-				}	
+					foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+						$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+						if($photo_src) $publication_msg .= '<li><img border="0" src="' . $photo_src . '" class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
+					}	
 				
 				$publication_msg .= '</ul>'	;
 				$publication_msg .= '</div></div>';
@@ -315,10 +319,11 @@ session_start();
 				$publication_msg = str_replace('%DATE%', $date , $publication_msg);			
 				$publication_msg .= '<ul class="attach_image">';
 				
-				foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
-					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-					$publication_msg .= '<li><img border="0" src='.PATH_COMMENT_ATTACHMENTS . $photo['small_photo'].' class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
-				}
+					foreach(Attach::getAttachList($row['content_id'], 'comment') as $row2){
+						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+						$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+						if($photo_src) $publication_msg .= '<li><img border="0" src="' . $photo_src . '" class="photo_big" data-num="'.$photo['photo_id'].'" /></li>';
+					}
 				
 				$publication_msg .= '</ul>'	;
 				$publication_msg .= '</div></div>';
@@ -393,4 +398,3 @@ session_start();
 		
 	$tpl->display();
 	
-

@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="./templates/css/responsive.css">
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
   <script src="./templates/js/jquery-3.7.1.min.js"></script>
-  <script src="./templates/js/jquery-migrate-3.5.2.min.js"></script>
+  <script src="./templates/js/jquery-migrate-3.5.2.min.js?v=20260602-2"></script>
   <script src="./templates/js/jquery.validate.min.js"></script>
   	<!--Responsive-->
 	<link href="./templates/css/responsive.css" rel="stylesheet" type="text/css">

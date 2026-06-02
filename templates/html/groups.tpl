@@ -593,7 +593,6 @@ $(document).scroll(function() {
 					id:'${ID_COMMUNITY}'
 				},
 				success:function(data){
-					console.log(data);
 					$('#comment-list').find('.loading-bar').remove();
 					$('#comment-list').append(data.html);
 					$('.message-text').each(function(){
@@ -823,22 +822,5 @@ $(document).scroll(function() {
   </div>
 </section>
 <!--END CONTENT-->
-<script type="text/javascript">
-
-let header = $('.row-fix');
-$(window).on('scroll', function(e){
-	header.css('top', $(this).scrollTop());
-	// или
-	// header.offset({top: $(this).scrollTop()});
-});
-
-let head = $('.row-fix-2');
-$(window).on('scroll', function(e){
-	head.css('top', $(this).scrollTop());
-	// или
-	// header.offset({top: $(this).scrollTop()});
-});
-
-</script>
 <script src="./templates/js/search.js"></script>
 <!-- INCLUDE footer.tpl -->

@@ -17,8 +17,6 @@ $(document).ready(function () {
                             cache: false,
                             dataType: "json",
                             success: function (data) {
-                                console.log(data);
-
                                 const Result = data.result;
                                 if (Result == 'success') {
                                     $('#photo-block-' + IdPic).remove();

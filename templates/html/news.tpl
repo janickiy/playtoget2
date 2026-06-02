@@ -128,8 +128,7 @@ $(document).ready(function(){
 						id : '${ID_USER}'
 					},
 					success:function(data){
-						console.log(data);
-							$('#comment-list').find('.loading-bar').remove();
+						$('#comment-list').find('.loading-bar').remove();
 							$('#comment-list').append(data.html);
 					          $('.mess_news').each(function(){
 					              $(this).emotions();

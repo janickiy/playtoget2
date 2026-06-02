@@ -943,23 +943,29 @@ if($_SESSION['user_authorization'] == "ok"){
 					$rowBlock->assign('BUTTON_SHARE', 'show');					
 				
 				if($row['parent_id'] == 0){
-					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-						$rowAttach = $rowBlock->fetch('row_attach');
-						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-						$rowAttach->assign('SMALL_PHOTO', PATH_COMMENT_ATTACHMENTS . $photo['small_photo']);
-						$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
-						$rowBlock->assign('row_attach', $rowAttach);
+						foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
+							$rowAttach = $rowBlock->fetch('row_attach');
+							$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+							$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+							if($photo_src){
+								$rowAttach->assign('SMALL_PHOTO', $photo_src);
+								$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
+								$rowBlock->assign('row_attach', $rowAttach);
+							}
+						}
 					}
-				}
-				else{
-					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-						$rowAttach = $rowBlock->fetch('row_reply_attach');
-						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-						$rowAttach->assign('SMALL_PHOTO', PATH_COMMENT_ATTACHMENTS . $photo['small_photo']);
-						$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
-						$rowBlock->assign('row_reply_attach', $rowAttach);
-					}
-				}	
+					else{
+						foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
+							$rowAttach = $rowBlock->fetch('row_reply_attach');
+							$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+							$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+							if($photo_src){
+								$rowAttach->assign('SMALL_PHOTO', $photo_src);
+								$rowAttach->assign('ID_PHOTO', $photo['photo_id']);
+								$rowBlock->assign('row_reply_attach', $rowAttach);
+							}
+						}
+					}	
 	
 				$rowBlock->assign('STR_REPLY', core::getLanguage('str', 'reply'));
 				$tpl->assign('row_comments', $rowBlock);

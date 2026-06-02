@@ -11,7 +11,7 @@
 	<!-- BEGIN row_js_list -->
 	${JS}
 	<!-- END row_js_list -->	
-	<script src="./templates/js/jquery-migrate-3.5.2.min.js"></script>
+	<script src="./templates/js/jquery-migrate-3.5.2.min.js?v=20260602-2"></script>
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="./templates/css/jquery.confirm.css" />
 <link href="./favicon.ico" rel="shortcut icon" type="image/x-icon" />

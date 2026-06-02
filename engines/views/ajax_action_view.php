@@ -238,12 +238,13 @@ switch ($_GET['action'])
 						$html .= '<ul class="attach_image">';
 					
 						for( $i = 0, $length = count($attach); $i < $length; $i++){  
-							$html .= '<li>';
-							$message = Attach::uploadAttach($attach[$i], $insert_id,'comment');
+								$html .= '<li>';
+								$message = Attach::uploadAttach($attach[$i], $insert_id,'comment');
+								
+								$message_src = Photoalbum::getPhotoSmallSrc($message);
+								if($message_src) $html .=  '<img border="0" src="'  . $message_src . '" class="photo_big"  data-num='.$message['photo_id'].'>';
 							
-							if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $html .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big"  data-num='.$message['photo_id'].'>';
-						
-							$html .= '</li>';
+								$html .= '</li>';
 						}
 						
 						$html .= '</ul>';
@@ -277,12 +278,13 @@ switch ($_GET['action'])
 						$html .= '<ul class="attach_image">';
 					
 						for( $i = 0, $length = count($attach); $i < $length; $i++){  
-							$html .= '<li>';
-							$message = Attach::uploadAttach($attach[$i], $insert_id, 'comment');
+								$html .= '<li>';
+								$message = Attach::uploadAttach($attach[$i], $insert_id, 'comment');
+								
+								$message_src = Photoalbum::getPhotoSmallSrc($message);
+								if($message_src) $html .=  '<img border="0" src="'  . $message_src . '" class="photo_big" data-num='.$message['photo_id'].'>';
 							
-							if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $html .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big" data-num='.$message['photo_id'].'>';
-						
-							$html .= '</li>';
+								$html .= '</li>';
 						}
 						
 						$html .= '</ul>';
@@ -749,13 +751,15 @@ switch ($_GET['action'])
 					$html .= '<p class="message-text">' . $row['content'] . '<br>';
 					$html .= '<ul class="attach_image">';
 				
-					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-						
-						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-						$html .= '<li>';
-						$html .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
-						$html .= '</li>';
-					}		
+						foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
+							
+							$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+							$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+							if(!$photo_src) continue;
+							$html .= '<li>';
+							$html .= '<img border="0" src="' . $photo_src . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
+							$html .= '</li>';
+						}		
 				
 					$html .= '</ul>';
 					$html .= '</p>';			
@@ -783,12 +787,14 @@ switch ($_GET['action'])
 					$html .= '<p class="message-reply-text">' . $row['content'] . '<br>'; 
 					$html .= '<ul class="attach_image">';
 				
-					foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
-						$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-						$html .= '<li>';
-						$html .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
-						$html .= '</li>';
-					}
+						foreach(Attach::getAttachList($row['id_comment'], 'comment') as $row2){
+							$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+							$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+							if(!$photo_src) continue;
+							$html .= '<li>';
+							$html .= '<img border="0" src="' . $photo_src . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
+							$html .= '</li>';
+						}
 				
 					$html .= '</ul>';				
 					$html .= '</p>';			  
@@ -969,12 +975,13 @@ switch ($_GET['action'])
 					$image = '<ul class="attach_image">';
 					
 					for( $i = 0, $length = count($attach); $i < $length; $i++){  
-						$image .= '<li>';
-						$message = Attach::uploadAttach($attach[$i], $insert_id,'message');
-						
-						if($message['small_photo'] && file_exists(PATH_COMMENT_ATTACHMENTS . $message['small_photo'])) $image .=  '<img border="0" src="'  . PATH_COMMENT_ATTACHMENTS . $message['small_photo']. '" class="photo_big"  data-num='.$message['photo_id'].'>';
-						
-						$image .= '</li>';
+							$image .= '<li>';
+							$message = Attach::uploadAttach($attach[$i], $insert_id,'message');
+							
+							$message_src = Photoalbum::getPhotoSmallSrc($message);
+							if($message_src) $image .=  '<img border="0" src="'  . $message_src . '" class="photo_big"  data-num='.$message['photo_id'].'>';
+							
+							$image .= '</li>';
 					}
 					$image .= '</ul>';
 				}	
@@ -1043,12 +1050,14 @@ switch ($_GET['action'])
 			
 			$image = '<ul class="attach_image">';
 				
-			foreach(Attach::getAttachList($row['id'], 'message') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-						$image .= '<li>';
-						$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
-						$image .= '</li>';
-			}
+				foreach(Attach::getAttachList($row['id'], 'message') as $row2){
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+					if(!$photo_src) continue;
+					$image .= '<li>';
+					$image .= '<img border="0" src="' . $photo_src . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
+					$image .= '</li>';
+				}
 			$image.='</ul>';
 			$rows[] = array(
 			"id_message" => $row['id'],
@@ -1081,12 +1090,14 @@ switch ($_GET['action'])
 
 			$image = '<ul class="attach_image">';
 
-			foreach(Attach::getAttachList($row['id'], 'message') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-				$image .= '<li>';
-				$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
-				$image .= '</li>';
-			}
+				foreach(Attach::getAttachList($row['id'], 'message') as $row2){
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+					if(!$photo_src) continue;
+					$image .= '<li>';
+					$image .= '<img border="0" src="' . $photo_src . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
+					$image .= '</li>';
+				}
 			$image .= '</ul>';
 
 			$rows[] = array(
@@ -1127,12 +1138,14 @@ switch ($_GET['action'])
 			
 			$image = '<ul class="attach_image">';
 				
-			foreach(Attach::getAttachList($row['id'], 'message') as $row2){
-				$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
-						$image .= '<li>';
-						$image .= '<img border="0" src="' . PATH_COMMENT_ATTACHMENTS . $photo['small_photo'] . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
-						$image .= '</li>';
-			}
+				foreach(Attach::getAttachList($row['id'], 'message') as $row2){
+					$photo = Photoalbum::getPhotoInfo($row2['photo_id']);
+					$photo_src = Photoalbum::getPhotoSmallSrc($photo);
+					if(!$photo_src) continue;
+					$image .= '<li>';
+					$image .= '<img border="0" src="' . $photo_src . '" class="photo_big" data-num="' . $photo['photo_id'] . '">';
+					$image .= '</li>';
+				}
 			$image.='</ul>';
 			
 			$rows[] = array(

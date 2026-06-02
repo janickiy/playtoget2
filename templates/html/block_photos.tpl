@@ -40,7 +40,6 @@ $(document).scroll(function() {
 					id_album:'${ID_ALBUM}',
 				},
 				success:function(data){
-					console.log(data);
 					$('.photo-container').find('.loading-bar').remove();
 					$('.photo-container').append(data.html);
 					settPhotos.offset+=settPhotos.number;
