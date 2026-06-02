@@ -1,134 +1,188 @@
-let socket = null;
-let time = null;
+let messagePollTimer = null;
+let messagePollPrimed = false;
+let lastInboxMessageId = 0;
+const messagePollInterval = 5000;
 
-function initHeaderSocket() {
-    if (socket || typeof io === 'undefined') {
+function messageId(row) {
+    return parseInt(row.id_message || row.id || 0, 10) || 0;
+}
+
+function rememberLastInboxId(rows) {
+    $.each(rows || [], function (_, row) {
+        lastInboxMessageId = Math.max(lastInboxMessageId, messageId(row));
+    });
+}
+
+function applyMessageEmotions() {
+    $('.message-text').each(function () {
+        $(this).emotions();
+    });
+
+    $('.message-reply-text').each(function () {
+        $(this).emotions();
+    });
+}
+
+function setMessageCount(count) {
+    const value = parseInt(count, 10) || 0;
+    const counter = $('#message_count');
+
+    if (!counter.length) {
         return;
     }
 
-    socket = io.connect(window.socketHost || (window.location.protocol + '//' + window.location.hostname + ':3000'));
-    time = setTimeout(function () {
-        $('.typing').removeClass('show')
-    }, 1000);
+    counter.html(value);
 
+    if (value > 0) {
+        counter.removeClass('displayNone').fadeIn();
+    } else {
+        counter.addClass('displayNone').hide();
+    }
+}
 
-    socket.on('typing', function (msg) {
-        if (msg.receiver_id == window.user) {
-            $('.typing').addClass('show');
-            clearTimeout(time);
-            time = setTimeout(function () {
-                $('.typing').removeClass('show')
-            }, 1000);
-            $('.mess_list').animate({scrollTop: 1000000}, 1100);
-        }
-    })
+function playMessageSound() {
+    const audio = new Audio();
+    audio.preload = 'auto';
+    audio.src = './templates/audio/message.mp3';
 
+    const result = audio.play();
+    if (result && typeof result.catch === 'function') {
+        result.catch(function () {});
+    }
+}
 
-    socket.on('message', function (msg) {
-        console.log(msg)
-        if (msg.receiver_id == window.user) {
+function renderIncomingMessage(row) {
+    let message = '<div class="message-reply" id="message-' + messageId(row) + '">';
+    message += '<div class="message ">';
+    message += '<div class="message-account">';
+    message += '<img src="' + row.avatar + '" alt="" class="img-account">';
+    message += '<h5 class="name"><a href="./?task=profile&user_id=' + row.sender_id + '">' + row.firstname + ' ' + row.lastname + '</a></h5>';
+    message += '<p class="data">' + row.created + '</p>';
+    message += '</div>';
+    message += '<p class="message-reply-text">' + row.content + '<br>';
+    message += row.image + '</p>';
+    message += '</div>';
+    message += '</div>';
 
-            $.ajax({
-                type: 'POST',
-                url: './?task=ajax_action&action=get_last_message',
-                data: {
-                    receiver_id: msg.sender_id,
-                },
-                success: function (data) {
-                    console.log(data);
-                    const audio = new Audio();
-                    audio.preload = 'auto';
-                    audio.src = './templates/audio/message.mp3';
-                    audio.play();
+    return message;
+}
 
-                    let Message = '<div class="message-reply" id="message-' + data.item[0].id_message + '">';
-                    Message += '<div class="message ">';
-                    Message += '<div class="message-account">';
-                    Message += '<img src="' + data.item[0].avatar + '" alt="" class="img-account">';
-                    Message += '<h5 class="name"><a href="./?task=profile&user_id=' + data.item[0].sender_id + '">' + data.item[0].firstname + ' ' + data.item[0].lastname + '</a></h5>';
-                    Message += '<p class="data">' + data.item[0].created + '</p>';
-                    Message += '</div>';
-                    Message += '<p class="message-reply-text">' + data.item[0].content + '<br>';
-                    Message += data.item[0].image + '</p>';
-                    Message += '</div>';
-                    Message += '</div>';
+function updateDialogPreview(row) {
+    const dialog = $('div').is('#old_dialogue');
+    const dialogExists = $('div').is('.dialogues[data-num=' + row.sender_id + ']');
 
-                    const fact = $("div").is("#message-list[data-num='" + data.item[0].sender_id + "']");
-                    console.log(fact)
-                    if (fact) {
-                        $('#message-list').append(Message);
-                        $('#message_count').fadeOut();
-                        $('.mess_list').find('.no_message').remove();
-                        $('.mess_list').animate({scrollTop: 1000000}, 1100);
-                        $('.message-text').each(function () {
-                            $(this).emotions();
-                        })
+    if (!dialog) {
+        return false;
+    }
 
-                        $('.message-reply-text').each(function () {
-                            $(this).emotions();
-                        })
-                    } else {
-                        const dialog = $('div').is('#old_dialogue');
-                        const dialog_con = $('div').is('.dialogues[data-num=' + data.item[0].sender_id + ']');
+    $('#old_dialogue').find('.no_dialogues').remove();
 
-                        if (dialog) {
+    if (!dialogExists) {
+        let dialogues = '<div class="row dialogues " data-num=' + row.sender_id + '>';
+        dialogues += '<div class="col-md-4">';
+        dialogues += '<a href="./?task=profile&user_id=' + row.sender_id + '">';
+        dialogues += '<img src="' + row.avatar + '" width="50" alt="" class="img-account" style="float: left;">';
+        dialogues += '<div class="fromwho">' + row.firstname + '<br>' + row.lastname + '<br>';
+        dialogues += '<span>' + row.created + '</span></div>';
+        dialogues += '</a></div>';
+        dialogues += '<div class="col-md-8 ">';
+        dialogues += '<a href="./?task=profile&user_id=' + row.sender_id + '&q=messages&sel=' + row.sender_id + '" >';
+        dialogues += '<img src="' + row.avatar + '" alt="" class="img-mess-dialog">';
+        dialogues += '<span class="ahref status_red ">' + row.content + '</span>';
+        dialogues += '</a></div></div>';
+        $('.container_dialog').prepend(dialogues);
+    } else {
+        $('.dialogues[data-num=' + row.sender_id + ']').find('.ahref').html(row.content);
+    }
 
-                            $('#old_dialogue').find('.no_dialogues').remove();
-                            if (!dialog_con) {
-                                let dialogues = '<div class="row dialogues " data-num=' + data.item[0].sender_id + '>';
-                                dialogues += '<div class="col-md-4">';
-                                dialogues += '<a href="./?task=profile&user_id=' + data.item[0].sender_id + '">';
-                                dialogues += '<img src="' + data.item[0].avatar + '" width="50" alt="" class="img-account" style="float: left;">'
-                                dialogues += '<div class="fromwho">' + data.item[0].firstname + '<br>' + data.item[0].lastname + '<br>';
-                                dialogues += '<span>' + data.item[0].created + '</span></div>';
-                                dialogues += '</a></div>';
-                                dialogues += '<div class="col-md-8 ">';
-                                dialogues += '<a href="./?task=profile&user_id=' + data.item[0].sender_id + '&q=messages&sel=' + data.item[0].sender_id + '" >';
-                                dialogues += '<img src="' + data.item[0].avatar + '" alt="" class="img-mess-dialog">';
-                                dialogues += '<span class="ahref status_red ">' + data.item[0].content + '</span>';
-                                dialogues += '</a></div></div>';
-                                $('.container_dialog').prepend(dialogues);
+    $('.href').each(function () {
+        $(this).emotions();
+    });
 
-                                $('.href').each(function () {
-                                    $(this).emotions();
-                                })
-                            } else {
-                                $('.dialogues[data-num=' + data.item[0].sender_id + ']').find('.ahref').html(data.item[0].content);
-                            }
-                        } else {
-                            const count = parseInt($('#message_count').html()) + 1;
-                            $('#message_count').html(count).fadeIn();
+    return true;
+}
 
-                            let message = '<img src="' + data.item[0].avatar + '" width="50" alt="" class="img-account" style="float: left;">';
-                            message += '<div class="fromwho">' + data.item[0].firstname + '<br>' + data.item[0].lastname + '<br>';
-                            message += '<span>' + data.item[0].created + '</span></div>';
-                            message += '<p>' + data.item[0].content + '</p>';
-                            $('.window-message').html(message);
-                            $('.window-message').fadeIn();
-                            setTimeout(function () {
-                                $('.window-message').fadeOut();
-                            }, 2000)
-                        }
-                    }
-                }
-            })
+function showMessagePopup(row) {
+    let message = '<img src="' + row.avatar + '" width="50" alt="" class="img-account" style="float: left;">';
+    message += '<div class="fromwho">' + row.firstname + '<br>' + row.lastname + '<br>';
+    message += '<span>' + row.created + '</span></div>';
+    message += '<p>' + row.content + '</p>';
+    $('.window-message').html(message);
+    $('.window-message').fadeIn();
+    setTimeout(function () {
+        $('.window-message').fadeOut();
+    }, 2000);
+}
+
+function handleIncomingMessage(row, notify) {
+    const id = messageId(row);
+    const selectedDialogUser = $('#message-list').attr('data-num');
+
+    if (!id || $('#message-' + id).length) {
+        return;
+    }
+
+    if (selectedDialogUser && String(selectedDialogUser) === String(row.sender_id)) {
+        $('#message-list').append(renderIncomingMessage(row));
+        $('.mess_list').find('.no_message').remove();
+        $('.mess_list').animate({scrollTop: 1000000}, 1100);
+        applyMessageEmotions();
+    } else if (!updateDialogPreview(row) && notify) {
+        showMessagePopup(row);
+    }
+
+    if (notify) {
+        playMessageSound();
+    }
+}
+
+function pollIncomingMessages() {
+    if (!window.user) {
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: './?task=ajax_action&action=get_new_messages',
+        dataType: 'json',
+        data: {
+            last_id: lastInboxMessageId
+        },
+        success: function (data) {
+            const rows = data && data.item ? data.item : [];
+
+            if (typeof data.count !== 'undefined') {
+                setMessageCount(data.count);
+            }
+
+            if (!messagePollPrimed) {
+                rememberLastInboxId(rows);
+                messagePollPrimed = true;
+                return;
+            }
+
+            $.each(rows, function (_, row) {
+                rememberLastInboxId([row]);
+                handleIncomingMessage(row, true);
+            });
         }
     });
 }
 
+function initHeaderPolling() {
+    if (messagePollTimer) {
+        return;
+    }
+
+    pollIncomingMessages();
+    messagePollTimer = setInterval(pollIncomingMessages, messagePollInterval);
+}
+
+window.initHeaderPolling = initHeaderPolling;
+
 
 $(document).ready(function () {
-    initHeaderSocket();
-
-    $('#message').keypress(function () {
-        if (!socket) {
-            return;
-        }
-
-        const sender_id = $('[name=sender_id]').val();
-        const receiver_id = $('[name=receiver_id]').val();
-        socket.emit('typing', {sender_id: sender_id, receiver_id: receiver_id});
-    })
+    initHeaderPolling();
 
 
     function getresult(url) {
