@@ -155,7 +155,7 @@ else if($_SESSION['user_authorization'] != "ok" && $_GET['user_id']){
 	$tpl->assign('STR_PROFILE_TEAMS_LINKS', core::getLanguage('str', 'profile_teams_links'));	
 }
 			
-if($profile['id'] && $profile['id'] != $user['id'] && $profile['banned'] != 1 && $profile['deleted'] != 1 && $_SESSION['user_authorization'] == "ok") {
+if(isset($profile['id']) && $profile['id'] != $user['id'] && $profile['banned'] != 1 && $profile['deleted'] != 1 && $_SESSION['user_authorization'] == "ok") {
 	$friendship = core::user()->getFriendship($user['id']);	
 
 	if(core::user()->checkInvited($user['id']) && !core::user()->checkBlock($user['id']))

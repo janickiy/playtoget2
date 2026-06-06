@@ -46,7 +46,7 @@ class Auth
 					else if($row['banned'] == 1){
 						$alert_error = core::getLanguage('msg', 'locked_user');				
 					}
-					else if($row['password'] == md5(trim($_POST['password']))){
+					else if(self::passwordMatches($row['password'], $password)){
 						self::Login($row['id'], $_POST['remember_me']);
 					}
 					else{
@@ -160,10 +160,19 @@ class Auth
 			$tpl->display();
 				
 			exit();			
-		}					
-	}
-	
-	static function LoginUser($user_id, $token, $session_id){
+			}					
+		}
+
+		static function passwordMatches($hash, $password)
+		{
+			if(password_get_info($hash)['algo']) {
+				return password_verify($password, $hash);
+			}
+
+			return hash_equals($hash, md5($password));
+		}
+		
+		static function LoginUser($user_id, $token, $session_id){
 		$user_id = core::database()->escape($user_id);
 		$session_id = core::database()->escape($session_id);
 	

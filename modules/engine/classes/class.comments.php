@@ -234,7 +234,7 @@ class Comments
 		
 		if(is_numeric($content_id) && $commentable_type){
 			switch($commentable_type){
-				case user:
+				case 'user':
 				
 					$query = "SELECT * FROM " . core::database()->getTableName('users') . " WHERE id=" . $content_id  . " AND banned=1";
 					$result = core::database()->querySQL($query);
@@ -243,7 +243,7 @@ class Comments
 	
 				break;
 				
-				case photo:
+				case 'photo':
 				
 					$query = "SELECT * FROM " . core::database()->getTableName('photos') . " WHERE id=" . $content_id  . " AND banned=1";
 					$result = core::database()->querySQL($query);
@@ -252,7 +252,7 @@ class Comments
 					
 				break;	
 				
-				case video:
+				case 'video':
 				
 					$query = "SELECT * FROM " . core::database()->getTableName('videos') . " WHERE id=" . $content_id  . " AND banned=1";
 					$result = core::database()->querySQL($query);
@@ -261,7 +261,7 @@ class Comments
 					
 				break;
 				
-				case group:
+				case 'group':
 				
 					$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE id=" . $content_id  . " AND banned=1";
 					$result = core::database()->querySQL($query);
@@ -270,7 +270,7 @@ class Comments
 				
 				break;				
 				
-				case team:
+				case 'team':
 				
 					$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE id=" . $content_id  . " AND banned=1";
 					$result = core::database()->querySQL($query);
@@ -279,7 +279,7 @@ class Comments
 					
 				break;
 				
-				case event:
+				case 'event':
 				
 					$query = "SELECT * FROM " . core::database()->getTableName('events') . " WHERE id=" . $content_id  . " AND banned=1";
 					$result = core::database()->querySQL($query);
@@ -317,7 +317,7 @@ class Comments
 			if($row['behalfable_type'] && $row['behalf_id']){
 				switch($row['behalfable_type']){
 				
-					case group:
+					case 'group':
 				
 						$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE id=" . $row['behalf_id'];
 						$result = core::database()->querySQL($query);					
@@ -327,7 +327,7 @@ class Comments
 					
 					break;
 				
-					case team:
+					case 'team':
 				
 						$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE id=" . $row['behalf_id'];
 						$result = core::database()->querySQL($query);					
@@ -337,7 +337,7 @@ class Comments
 				
 					break;
 				
-					case event:
+					case 'event':
 				
 						$query = "SELECT * FROM " . core::database()->getTableName('events') . " WHERE id=" . $row['behalf_id'];
 						$result = core::database()->querySQL($query);					
@@ -377,7 +377,7 @@ class Comments
 			if($row['behalfable_type'] && $row['behalf_id']){
 				switch($row['behalfable_type']){
 				
-					case group:
+					case 'group':
 				
 						$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE id=" . $row['behalf_id'];
 						$result = core::database()->querySQL($query);					
@@ -387,7 +387,7 @@ class Comments
 					
 					break;
 				
-					case team:
+					case 'team':
 				
 						$query = "SELECT * FROM " . core::database()->getTableName('communities') . " WHERE id=" . $row['behalf_id'];
 						$result = core::database()->querySQL($query);					
@@ -397,7 +397,7 @@ class Comments
 				
 					break;
 				
-					case event:
+					case 'event':
 				
 						$query = "SELECT * FROM " . core::database()->getTableName('events') . " WHERE id=" . $row['behalf_id'];
 						$result = core::database()->querySQL($query);					

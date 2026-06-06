@@ -10,7 +10,7 @@ foreach(Rss::getRssNews(5) as $row){
 	$rowBlock->assign('LINK', $row['link']);
 	$rowBlock->assign('TITLE', $row['title']);
 	$rowBlock->assign('DESCRIPTION', $row['description']);
-	$rowBlock->assign('PUBDATE', $row['time']);
+	$rowBlock->assign('PUBDATE', isset($row['time']) ? $row['time'] : $row['created_at']);
 	$tpl->assign('row_sport_news_block', $rowBlock);
 }
 

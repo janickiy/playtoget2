@@ -24,3 +24,15 @@ define("CLIENT_VK_SECRET", "HsCA4arITb96Glmsct9n");
 define("CLIENT_FB_ID", "140019129730323"); //857528611039836
 define("CLIENT_FB_SECRET", "daa510ad0498133e9259e4d2408ea56a"); //0677e8590209f36c45785a2bfe1a1f3b
 define("REDIRECT_FB_URI", "http://playtoget.com/?task=fb");
+
+define("CLIENT_OK_ID", "");
+define("CLIENT_OK_SECRET", "");
+define("CLIENT_OK_PUBLIC", "");
+define("REDIRECT_OK_URI", "http://site5.local/?task=ok");
+
+define("CLIENT_MR_ID", "");
+define("CLIENT_MR_SECRET", "");
+define("REDIRECT_MR_URI", "http://site5.local/?task=mailru");
+
+define("CLIENT_YANDEX_ID", "");
+define("CLIENT_YANDEX_SECRET", "");

@@ -13,7 +13,7 @@ if($_SESSION['user_authorization'] == "ok"){
 
 switch ($_GET['action'])
 {	
-	case removepic:
+	case 'removepic':
 	
 		Auth::authorization();
 	
@@ -27,35 +27,35 @@ switch ($_GET['action'])
 			
 			switch($row['photoalbumable_type']) {
 		
-				case user:
+				case 'user':
 					if($row['owner_id'] == $user['id']) $allow = TRUE;
 				break;
 
-				case user_attach:
+				case 'user_attach':
 					if($row['owner_id'] == $user['id']) $allow = TRUE;
 				break;
 
-				case team: 		
+				case 'team':
 					if(Communities::checkOwnerCommunity($row['photoalbum_owner'], $user['id']) or Communities::checkAdminCommunity($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;	
 				
-				case group: 		
+				case 'group':
 					if(Communities::checkOwnerCommunity($row['photoalbum_owner'], $user['id']) or Communities::checkAdminCommunity($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;		
 		
-				case event: 		
+				case 'event':
 					if($row['owner_id'] == $user['id'] or Events::checkOwnerEvent($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 		
-				case playground:		
+				case 'playground':
 					if($row['owner_id'] == $user['id'] or Playgrounds::checkOwnerPlayground($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 		
-				case fitness:		
+				case 'fitness':
 					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 		
-				case shop: 		
+				case 'shop':
 					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['photoalbum_owner'], $user['id'])) $allow = TRUE;
 				break;
 			}			
@@ -73,7 +73,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case removevideo:
+	case 'removevideo':
 	
 		Auth::authorization();
 	
@@ -86,32 +86,32 @@ switch ($_GET['action'])
 			
 			switch($row['videoalbumable_type']) {
 		
-				case user:
+				case 'user':
 					if($row['owner_id'] == $user['id']) $allow = TRUE;
 				break;			
 		
-				case team: 		
+				case 'team': 		
 					if(Communities::checkOwnerCommunity($row['id_albumowner'], $user['id']) or Communities::checkAdminCommunity($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				
 				break;	
 				
-				case group: 		
+				case 'group': 		
 					if(Communities::checkOwnerCommunity($row['id_albumowner'], $user['id']) or Communities::checkAdminCommunity($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;		
 		
-				case event: 		
+				case 'event': 		
 					if($row['owner_id'] == $user['id'] or Events::checkOwnerEvent($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 		
-				case playground:		
+				case 'playground':		
 					if($row['owner_id'] == $user['id'] or Playgrounds::checkOwnerPlayground($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 		
-				case fitness:		
+				case 'fitness':		
 					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 		
-				case shop: 		
+				case 'shop': 		
 					if($row['owner_id'] == $user['id'] or SportBlocks::checkOwner($row['id_albumowner'], $user['id'])) $allow = TRUE;
 				break;
 			}
@@ -130,7 +130,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case addcomment:
+	case 'addcomment':
 	
 		Auth::authorization();
 	
@@ -194,19 +194,19 @@ switch ($_GET['action'])
 					
 					switch($commentable_type){
 						
-						case team:
+						case 'team':
 						
 							$page_link = './?task=teams&user_id=' . $content_id;
 						
 						break;
 						
-						case group:
+						case 'group':
 						
 							$page_link = './?task=groups&user_id=' . $content_id;
 							
 						break;
 						
-						case event:
+						case 'event':
 						
 							$page_link = './?task=events&user_id=' . $content_id;
 							
@@ -591,7 +591,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case liked:
+	case 'liked':
 	
 		Auth::authorization();
 	
@@ -605,7 +605,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case shared:	
+	case 'shared':	
 	
 		Auth::authorization();
 	
@@ -619,7 +619,7 @@ switch ($_GET['action'])
 		
 	break;
 	
-	case getcomments:
+	case 'getcomments':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -703,19 +703,19 @@ switch ($_GET['action'])
 					
 					switch($commentable_type){
 						
-						case team:
+						case 'team':
 						
 							$page_link = './?task=teams&user_id=' . $content_id;
 						
 						break;
 						
-						case group:
+						case 'group':
 						
 							$page_link = './?task=groups&user_id=' . $content_id;
 							
 						break;
 						
-						case event:
+						case 'event':
 						
 							$page_link = './?task=events&user_id=' . $content_id;
 							
@@ -814,7 +814,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case get_communities_list:
+	case 'get_communities_list':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -857,7 +857,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case get_events_list:
+	case 'get_events_list':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -907,7 +907,7 @@ switch ($_GET['action'])
 		
 	break;
 
-	case getpopphotos:
+	case 'getpopphotos':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$postnumbers = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -930,7 +930,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case addmessage:
+	case 'addmessage':
 	
 		Auth::authorization();
 	
@@ -1036,7 +1036,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case getmessages:	
+	case 'getmessages':	
 	
 		Auth::authorization();
 
@@ -1077,7 +1077,7 @@ switch ($_GET['action'])
 	
 	break;
 
-	case get_new_messages:
+	case 'get_new_messages':
 
 		Auth::authorization();
 
@@ -1127,7 +1127,7 @@ switch ($_GET['action'])
 
 	break;
 	
-	case get_last_message:
+	case 'get_last_message':
 	
 		Auth::authorization();
 	
@@ -1166,7 +1166,7 @@ switch ($_GET['action'])
 		
 	break;
 	
-	case add_as_friend:
+	case 'add_as_friend':
 	
 		Auth::authorization();
 	
@@ -1220,7 +1220,7 @@ switch ($_GET['action'])
 		
 	break;
 	
-	case accept_friendship:
+	case 'accept_friendship':
 	
 		Auth::authorization();
 	
@@ -1276,7 +1276,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case block_user:
+	case 'block_user':
 	
 		Auth::authorization();
 
@@ -1292,7 +1292,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case unblock_user:
+	case 'unblock_user':
 	
 		Auth::authorization();
 
@@ -1308,7 +1308,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case remove_friend:
+	case 'remove_friend':
 	
 		Auth::authorization();
 	
@@ -1324,7 +1324,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case search_city:
+	case 'search_city':
 	
 		$city = trim(Core_Array::getRequest('city'));
 		
@@ -1340,7 +1340,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case search_sport_types:
+	case 'search_sport_types':
 	
 		$sport_types = trim(Core_Array::getRequest('sport_types'));
 	
@@ -1356,7 +1356,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case getpossiblefriends:
+	case 'getpossiblefriends':
 	
 		Auth::authorization();
 	
@@ -1377,7 +1377,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case getphotoinfo:
+	case 'getphotoinfo':
 	
 		$photo_id = is_numeric(Core_Array::getRequest('photo_id')) ? Core_Array::getRequest('photo_id') : exit();
 		$row = Photoalbum::getPhotoInfo($photo_id);		
@@ -1402,7 +1402,7 @@ switch ($_GET['action'])
 		
 	break;
 	
-	case getvideoinfo:
+	case 'getvideoinfo':
 	
 		$video_id = is_numeric(Core_Array::getRequest('video_id')) ? Core_Array::getRequest('video_id') : exit();
 		$row = Videoalbum::getVideoInfo($video_id);
@@ -1430,7 +1430,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case edit_profile:
+	case 'edit_profile':
 	
 		Auth::authorization();
 	
@@ -1509,7 +1509,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case adduseravatar:
+	case 'adduseravatar':
 	
 		Auth::authorization();
 	
@@ -1529,7 +1529,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case crop:
+	case 'crop':
 	
 		Auth::authorization();
 	
@@ -1543,7 +1543,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case cropcover:
+	case 'cropcover':
 	
 		Auth::authorization();
 	
@@ -1556,7 +1556,7 @@ switch ($_GET['action'])
 	
 	break;	
 
-	case add_photo_ajax:
+	case 'add_photo_ajax':
 	
 		Auth::authorization();
 		
@@ -1570,7 +1570,7 @@ switch ($_GET['action'])
 		
 	break;	
 	
-	case add_photo_ajax_attach:
+	case 'add_photo_ajax_attach':
 	
 		Auth::authorization();
 	
@@ -1601,7 +1601,7 @@ switch ($_GET['action'])
 	break;
 
 
-	case uploadcover:
+	case 'uploadcover':
 	
 		Auth::authorization();
 	
@@ -1639,7 +1639,7 @@ switch ($_GET['action'])
 
 	break;
 	
-	case uploadavatar:
+	case 'uploadavatar':
 	
 		Auth::authorization();
 	
@@ -1678,7 +1678,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case removecomment:
+	case 'removecomment':
 	
 		Auth::authorization();
 		
@@ -1693,7 +1693,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case cleardialog:
+	case 'cleardialog':
 	
 		Auth::authorization();
 	
@@ -1710,7 +1710,7 @@ switch ($_GET['action'])
 		
 	break;	
 	
-	case change_event_memberstatus:
+	case 'change_event_memberstatus':
 	
 		Auth::authorization();
 	
@@ -1728,7 +1728,7 @@ switch ($_GET['action'])
 
 	break;
 	
-	case changememberstatus:
+	case 'changememberstatus':
 	
 		Auth::authorization();
 	
@@ -1747,7 +1747,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case get_photos_list:
+	case 'get_photos_list':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -1788,7 +1788,7 @@ switch ($_GET['action'])
 		
 	break;
 
-	case get_videos_list:
+	case 'get_videos_list':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -1822,7 +1822,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case get_album_photos:
+	case 'get_album_photos':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -1862,7 +1862,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case get_album_videos:
+	case 'get_album_videos':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -1893,7 +1893,7 @@ switch ($_GET['action'])
 
 	break;
 	
-	case send_community_invitation:
+	case 'send_community_invitation':
 	
 		Auth::authorization();
 	
@@ -1956,7 +1956,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case send_event_invitation:
+	case 'send_event_invitation':
 	
 		Auth::authorization();
 	
@@ -2009,7 +2009,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case check_user_online:
+	case 'check_user_online':
 	
 		$user_id = is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : exit();
 		
@@ -2023,7 +2023,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case news_parse:
+	case 'news_parse':
 	
 		$url = "http://www.sport-express.ru/services/materials/news/se/";
 		$xml = simplexml_load_file($url);
@@ -2055,7 +2055,7 @@ switch ($_GET['action'])
 		
 	break;
 	
-	case get_usernews_list:
+	case 'get_usernews_list':
 	
 		Auth::authorization();
 	
@@ -2411,7 +2411,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case send_message:
+	case 'send_message':
 	
 		Auth::authorization();
 	
@@ -2465,7 +2465,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case block_community_user:
+	case 'block_community_user':
 	
 		Auth::authorization();
 	
@@ -2484,7 +2484,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case unblock_community_user:
+	case 'unblock_community_user':
 	
 		Auth::authorization();
 	
@@ -2503,7 +2503,7 @@ switch ($_GET['action'])
 		
 	break;
 
-	case add_community_administrator:
+	case 'add_community_administrator':
 	
 		Auth::authorization();
 	
@@ -2522,7 +2522,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case approve_community_user:
+	case 'approve_community_user':
 	
 		Auth::authorization();
 	
@@ -2541,7 +2541,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case remove_community_administrator:
+	case 'remove_community_administrator':
 	
 		Auth::authorization();
 	
@@ -2560,7 +2560,7 @@ switch ($_GET['action'])
 		
 	break;
 
-	case search_event:
+	case 'search_event':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -2615,7 +2615,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case change_event_community_status:
+	case 'change_event_community_status':
 
 		Auth::authorization();
 	
@@ -2637,7 +2637,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case get_sport_block_list:
+	case 'get_sport_block_list':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -2682,7 +2682,7 @@ switch ($_GET['action'])
 	
 	break;	
 	
-	case get_pop_events_list:
+	case 'get_pop_events_list':
 	
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
@@ -2737,7 +2737,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case get_pop_communities_list:
+	case 'get_pop_communities_list':
 	
 		$number = is_numeric($_REQUEST['number']) ? $_REQUEST['number'] : exit();
 		$offset = is_numeric($_REQUEST['offset']) ? $_REQUEST['offset'] : exit();		
@@ -2779,7 +2779,7 @@ switch ($_GET['action'])
 	
 	break;
 	
-	case get_parsing:
+	case 'get_parsing':
 
 		$str = !empty($_REQUEST['str']) ? $_REQUEST['str'] : exit();
 		
@@ -2806,7 +2806,7 @@ switch ($_GET['action'])
 		
 	break;
 	
-	case get_friends_list:
+	case 'get_friends_list':
 	
 		Auth::authorization();
 	
@@ -2843,7 +2843,7 @@ switch ($_GET['action'])
 		
 	break;
 	
-	case remove_message:
+	case 'remove_message':
 	
 		Auth::authorization();		
 		

@@ -33,7 +33,7 @@ class DBParser {
             if (mysqli_connect_errno()) {
                 $this->dbh = null;
 				
-				core::documentparser()->error("Error connect to ".$config["host"]);
+				core::documentparser()->error("Database connection error", "Error connect to ".$config["host"]);
             } else {
                 mysqli_report(MYSQLI_REPORT_ERROR);
             }

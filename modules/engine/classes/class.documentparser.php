@@ -246,12 +246,17 @@ class DocumentParser {
 	
 	public function userAvatar($user)
 	{
-		if($user['avatar'] && file_exists(PATH_USER_AVATAR_IMAGES . $user['avatar']) && $user['banned'] != 1 && $user['deleted'] !=1)
-			$avatar = PATH_USER_AVATAR_IMAGES . $user['avatar'];
+		$avatarFile = isset($user['avatar']) ? $user['avatar'] : '';
+		$sex = isset($user['sex']) ? $user['sex'] : '';
+		$banned = isset($user['banned']) ? $user['banned'] : 0;
+		$deleted = isset($user['deleted']) ? $user['deleted'] : 0;
+
+		if($avatarFile && file_exists(PATH_USER_AVATAR_IMAGES . $avatarFile) && $banned != 1 && $deleted !=1)
+			$avatar = PATH_USER_AVATAR_IMAGES . $avatarFile;
 		else{
-			if($user['sex'] == 'male' && $user['banned'] != 1 && $user['deleted'] !=1)
+			if($sex == 'male' && $banned != 1 && $deleted !=1)
 				$avatar = 'templates/images/default_male.png';
-			else if($user['sex'] == 'female' && $user['banned'] != 1 && $user['deleted'] !=1)
+			else if($sex == 'female' && $banned != 1 && $deleted !=1)
 				$avatar = 'templates/images/default_female.png';
 			else
 				$avatar = 'templates/images/noimage.png';	
@@ -477,49 +482,49 @@ class DocumentParser {
 	public function getPhotogalleryPath($photoalbumable_type){
 		
 		switch($photoalbumable_type){
-			case group:
+			case 'group':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'group/';
 				
 			break;
 			
-			case team:
+			case 'team':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'team/';
 				
 			break;
 			
-			case event:
+			case 'event':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'event/';
 				
 			break;
 			
-			case fitness:
+			case 'fitness':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'fitness/';
 				
 			break;
 			
-			case playground:
+			case 'playground':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'playground/';
 				
 			break;
 			
-			case shop:
+			case 'shop':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'shop/';
 				
 			break;
 			
-			case user:
+			case 'user':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'user/';
 				
 			break;
 			
-			case user_attach:
+			case 'user_attach':
 			
 				$path = PATH_PHOTOGALLERY_IMAGES . 'user_attach/';
 				
@@ -1118,43 +1123,43 @@ class DocumentParser {
 		if(is_numeric($id) && $type){
 			switch($type){
 				
-				case user:
+				case 'user':
 				
 					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=profile&user_id=' . $id;
 					
 				break;
 				
-				case group:
+				case 'group':
 				
 					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=groups&community_id=' . $id;
 				
 				break;
 				
-				case team:
+				case 'team':
 				
 					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=teams&community_id=' . $id;				
 				
 				break;
 				
-				case event:
+				case 'event':
 				
 					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=events&event_id=' . $id;	
 				
 				break;
 				
-				case playground:
+				case 'playground':
 				
 					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=playgrounds&id_sport_block=' . $id;	
 				
 				break;
 				
-				case shop:
+				case 'shop':
 				
 					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=shops&id_sport_block=' . $id;
 				
 				break;
 				
-				case fitness:
+				case 'fitness':
 				
 					return 'http://' . $_SERVER['SERVER_NAME'] . '/?task=fitness&id_sport_block=' . $id;
 				
