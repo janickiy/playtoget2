@@ -90,18 +90,24 @@ class Comments
 		return true;
 	}
 	
-	static function treeComments($parent=0, &$tags) {
-		global $new_arr;
-	
-		for ($i=0;$i<=count($tags[$parent])-1;$i++) {
-			$new_arr[] = $tags[$parent][$i];
-			unset($new_arr[count($arr) - 1]);
-		
-			if (isset($tags[ $tags[$parent][$i]['id_comment'] ])) self::treeComments($tags[$parent][$i]['id_comment'], $tags, $arr);
-			unset($tags[$parent][$i]['id_comment']);
+	static function treeComments($parent=0, $tags=array(), &$comments=null) {
+		if ($comments === null) {
+			$comments = array();
+		}
+
+		if (!isset($tags[$parent]) || !is_array($tags[$parent])) {
+			return $comments;
+		}
+
+		foreach ($tags[$parent] as $comment) {
+			$comments[] = $comment;
+
+			if (isset($tags[$comment['id_comment']])) {
+				self::treeComments($comment['id_comment'], $tags, $comments);
+			}
 		}
 	
-		return $new_arr;	
+		return $comments;	
 	}
 
 	static function getUserComment($user_id, $limit = 20, $offset = 0)

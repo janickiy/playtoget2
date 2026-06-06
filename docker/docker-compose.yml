@@ -1,0 +1,61 @@
+name: site5-local
+
+services:
+  web:
+    container_name: site5-apache2
+    build:
+      context: .
+      dockerfile: apache/Dockerfile
+    depends_on:
+      php-fpm:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ..:/var/www/html
+    restart: unless-stopped
+
+  php-fpm:
+    container_name: site5-php72
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ..:/var/www/html
+    restart: unless-stopped
+
+  mysql:
+    container_name: site5-mysql
+    image: mysql:8.0
+    command:
+      - --character-set-server=utf8
+      - --collation-server=utf8_general_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --sql-mode=
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: playtoget
+      MYSQL_USER: playtoget
+      MYSQL_PASSWORD: playtoget
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../janicky_playtoge.sql:/docker-entrypoint-initdb.d/01-janicky_playtoge.sql:ro
+      - ../database/refactor_schema_20260602.sql:/docker-entrypoint-initdb.d/02-refactor_schema_20260602.sql:ro
+      - ../database/rename_news_rss_pubdate_20260602.sql:/docker-entrypoint-initdb.d/03-rename_news_rss_pubdate_20260602.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

@@ -59,7 +59,15 @@ class Core_Array
 	 */
 	static public function getRequest($key, $defaultValue = NULL)
 	{
-		return self::get($_REQUEST, $key, $defaultValue);
+		if (array_key_exists($key, $_POST)) {
+			return $_POST[$key];
+		}
+
+		if (array_key_exists($key, $_GET)) {
+			return $_GET[$key];
+		}
+
+		return self::get($_COOKIE, $key, $defaultValue);
 	}
 
 	/**

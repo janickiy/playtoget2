@@ -24,26 +24,35 @@ class Attach
 	
 	static function uploadAttach($photo_id,$content_id,$type)  
     {  
-
+    	$info = null;
+    	$error = null;
+    	$path_small_photo = null;
+    	$path_photo = null;
+    	$photoalbumable_type = null;
+    	
     	$photo = Photoalbum::getPhotoInfo($photo_id);
+    	
+    	if (is_array($photo)) {
+    		$photoalbumable_type = $photo['photoalbumable_type'];
+    	}
 
-		if (file_exists(PATH_COMMENT_ATTACHMENTS.$photo['photo'])){
-						$fields = array();
-						$fields['id'] = 0;			
-						$fields['type'] = $type;
-						$fields['content_id'] = $content_id;
-						$fields['photo_id'] = $photo_id;									
+		if (Photoalbum::getPhotoSmallSrc($photo)){
+							$fields = array();
+							$fields['id'] = 0;			
+							$fields['type'] = $type;
+							$fields['content_id'] = $content_id;
+							$fields['photo_id'] = $photo_id;									
 						
-						$insert_id = core::database()->insert($fields, core::database()->getTableName('attachment'));
-						$info = 'FILE_SUCCESSFULLY_DOWNLOADED';
-						$path_small_photo = $photo['photo'];
-						$path_photo = $photo['small_photo'];
-						$photo_id = $photo['photo_id'];
-					}  
-                    else 
-                        $error = 'COULDNT_LOAD_FILE';
+							$insert_id = core::database()->insert($fields, core::database()->getTableName('attachment'));
+							$info = 'FILE_SUCCESSFULLY_DOWNLOADED';
+							$path_small_photo = $photo['small_photo'];
+							$path_photo = $photo['photo'];
+							$photo_id = $photo['photo_id'];
+						}  
+	                    else 
+	                        $error = 'COULDNT_LOAD_FILE';
 
-    	return array('info' => $info, 'photo_id' => $photo_id, 'small_photo' => $path_small_photo, 'photo' => $path_photo, 'error' => $error);
+    	return array('info' => $info, 'photo_id' => $photo_id, 'small_photo' => $path_small_photo, 'photo' => $path_photo, 'photoalbumable_type' => $photoalbumable_type, 'error' => $error);
     }		
 	
 	static function getAttachList($content_id, $type)
